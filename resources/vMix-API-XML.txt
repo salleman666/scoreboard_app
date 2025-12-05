@@ -1,0 +1,1860 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<vmix>
+<version>29.0.0.40</version>
+<edition>Pro</edition>
+<preset>C:\H1_Grafikpaket\Test Scoreboard-2025-11-21.vmix</preset>
+<inputs>
+<input key="ceeb8a5d-a0b9-477d-b276-26c93c3855b8" number="1" type="GT" title="SCOREBOARD UPPE" shortTitle="SCOREBOARD UPPE" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+SCOREBOARD UPPE
+<overlay index="8" key="eaba5756-9495-457a-92d0-e0464bf2086d"/>
+<overlay index="9" key="9ef84cac-969a-45fa-914c-c9639e289fb5"/>
+<text index="0" name="HighLightNr.Text">1</text>
+<text index="1" name="HighLight.Text">HIGHLIGHTS P</text>
+<text index="2" name="AwayShotNr.Text">99</text>
+<text index="3" name="HomeShotNr.Text">99</text>
+<text index="4" name="Binding.Text">-</text>
+<text index="5" name="HomeP1time.Text">01:45</text>
+<text index="6" name="HomeP1nr.Text">12</text>
+<text index="7" name="HomeP2time.Text">00:00</text>
+<text index="8" name="HomeP2nr.Text"/>
+<text index="9" name="AwayP1time.Text">00:00</text>
+<text index="10" name="AwayP1nr.Text"/>
+<text index="11" name="AwayP2time.Text">00:00</text>
+<text index="12" name="AwayP2nr.Text"/>
+<text index="13" name="AwayScore.Text">0</text>
+<text index="14" name="HomeScore.Text">1</text>
+<text index="15" name="Time.Text">19:01</text>
+<text index="16" name="AwayName.Text">CHC</text>
+<text index="17" name="HomeName.Text">SUN</text>
+<text index="18" name="PeriodNr.Text">1</text>
+<text index="19" name="PeriodText.Text">PERIOD</text>
+<text index="20" name="EmptyGoalA.Text">EMPTY GOAL</text>
+<text index="21" name="EmptyGoalH.Text">EMPTY GOAL</text>
+<image index="0" name="HighLightBG.Source">22da0de7-bd5f-4478-bbb4-3989db094ced\periodskylt.png</image>
+<image index="1" name="Shotbg.Source">de7b459b-5c2c-47f5-8b82-2d09c5db45b4\Shot.png</image>
+<image index="2" name="HomeP1bg.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\Penalty.png</image>
+<image index="3" name="HomeP1bgnr.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\PenaltyNr.png</image>
+<image index="4" name="HomeP2bg.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\Penalty.png</image>
+<image index="5" name="HomeP2bgnr.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\PenaltyNr.png</image>
+<image index="6" name="AwayP1bg.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\Penalty.png</image>
+<image index="7" name="AwayP1bgnr.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\PenaltyNr.png</image>
+<image index="8" name="AwayP2bg.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\Penalty.png</image>
+<image index="9" name="AwayP2bgnr.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\PenaltyNr.png</image>
+<image index="10" name="HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+<image index="11" name="AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/CHC.png</image>
+<image index="12" name="EmptyGoalAbg.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\Emtygoal.png</image>
+<image index="13" name="EmptyGoalHbg.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\Emtygoal.png</image>
+</input>
+<input key="46563561-4df2-4bd2-aa4a-f27ad5d05703" number="2" type="GT" title="SCOREBOARD NERE" shortTitle="SCOREBOARD NERE" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+SCOREBOARD NERE
+<text index="0" name="HomeName.Text">IF SUNDSVALL HOCKEY</text>
+<text index="1" name="AwayName.Text">CLEMENSNÄS HC</text>
+<text index="2" name="HomeScore.Text">4</text>
+<text index="3" name="AwayScore.Text">1</text>
+<text index="4" name="Time.Text">{0:15:50|mm:ss}</text>
+<text index="5" name="TextBottom.Text">LIVE FRÅN BRANDCODE CENTER</text>
+<image index="0" name="HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+<image index="1" name="LogoAway.Source">https://vmix-new.hockeyettan.se/premagesLogo/CHC.png</image>
+<image index="2" name="AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/CHC.png</image>
+<image index="3" name="LogoHome.Source">https://vmix-new.hockeyettan.se/premagesLogo/SUN.png</image>
+<image index="4" name="NameBG.Source">91bb4ed3-bdd1-438f-8841-58b1bfc50095\Scoreboard_nere_bg.png</image>
+<image index="5" name="TimeBG.Source">32056444-6b36-47dc-a86c-c54ea8a92d9b\Emtygoal.png</image>
+<color index="0" name="TextBG1.Fill.Color">https://vmix-new.hockeyettan.se/premagesLogo/SUN.png</color>
+<color index="1" name="TextBG.Fill.Color">https://vmix-new.hockeyettan.se/premagesLogo/CHC.png</color>
+</input>
+<input key="970d40e5-99c0-43b1-9a8e-632a983681c2" number="3" type="GT" title="PERIOD TIMER" shortTitle="PERIOD TIMER" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+PERIOD TIMER
+<text index="0" name="Bindery.Text">-</text>
+<text index="1" name="AwayScore.Text">1</text>
+<text index="2" name="HomeScore.Text">4</text>
+<text index="3" name="Time.Text">18:43</text>
+<text index="4" name="Periode Break.Text">PAUSE i väntan på nästa Period</text>
+<text index="5" name="Timer.Text">00:00</text>
+<image index="0" name="LogoHome.Source">https://vmix-new.hockeyettan.se/premagesLogo/SUN.png</image>
+<image index="1" name="LogoAway.Source">https://vmix-new.hockeyettan.se/premagesLogo/CHC.png</image>
+<image index="2" name="QR-Code.Source">702e8c83-a568-42a4-b36a-ad37756fa268\qrKod.png</image>
+</input>
+<input key="6adaaf66-a7f8-4d1f-8748-ad9059f5282a" number="4" type="GT" title="Time-Out" shortTitle="Time-Out" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+Time-Out
+<text index="0" name="Time.Text">18:43</text>
+<image index="0" name="AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/CHC.png</image>
+<image index="1" name="HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+</input>
+<input key="3a741ec2-7e79-40be-b4fb-62f658e34d7e" number="5" type="Colour" title="TIME_OUT SET" shortTitle="TIME_OUT SET" state="Paused" position="0" duration="0" loop="False">
+TIME_OUT SET
+<overlay index="0" key="e8e7bfb7-216d-48ad-a673-a28e87ac705d"/>
+<overlay index="1" key="7b8d7b5a-a447-4d65-bba3-4fbb905959b7"/>
+<overlay index="2" key="40b36085-d9ad-4e9b-a8ad-a4ccfef0880a">
+<position panX="-0.496" zoomX="0.49" zoomY="0.49" x="13.4" y="275.4" width="940.8" height="529.2"/>
+</overlay>
+<overlay index="3" key="eab1c088-3aab-45e1-be27-ae4c64e39f69">
+<position panX="0.496" zoomX="0.49" zoomY="0.49" x="965.8" y="275.4" width="940.8" height="529.2"/>
+</overlay>
+<overlay index="4" key="6adaaf66-a7f8-4d1f-8748-ad9059f5282a">
+<position panX="-0.005999923" panY="0.3333333" zoomX="1.274" zoomY="1.274" x="-268.8" y="-328" width="2446.1" height="1375.9"/>
+</overlay>
+</input>
+<input key="b0cf1235-3292-47df-8c83-07737fbcc17c" number="6" type="GT" title="FEEDBACK Text Studio" shortTitle="FEEDBACK Text Studio" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+FEEDBACK Text Studio
+<position panX="0.02169979" panY="1.92283" zoomX="1.023" zoomY="3.065"/>
+<crop X1="0" Y1="0.9116" X2="1" Y2="0.9767"/>
+<text index="0" name="Ticker.Text">HEADPHONES ON!</text>
+</input>
+<input key="d7b18b44-dc91-489a-b611-7a78fa9a2d8b" number="7" type="Output" title="FEEDBACK View Studio" shortTitle="FEEDBACK View Studio" state="Paused" position="0" duration="0" loop="False">
+FEEDBACK View Studio
+<overlay index="0" key="b0cf1235-3292-47df-8c83-07737fbcc17c"/>
+<overlay index="1" key="f2cb8837-523e-4eef-83c2-6f9aac10a74e">
+<position panY="1.767" x="0" y="-954.2" width="1920" height="1080"/>
+</overlay>
+<overlay index="2" key="09111257-ad3a-476b-9499-561c977b33bd">
+<position panY="1.537037" x="0" y="-830" width="1920" height="1080"/>
+</overlay>
+<overlay index="3" key="f81154fd-cf1b-4630-9f71-0c37c684a6f9"/>
+<overlay index="5" key="4452a8ff-c695-43dd-acab-a8ef1cf16eba"/>
+<overlay index="6" key="166ab229-635f-4604-aecf-bdbcf99662b7"/>
+<overlay index="7" key="e447bc79-5e35-4e73-8972-6fcca82e40a9"/>
+</input>
+<input key="15de31f7-97fa-4f3e-8ab3-dcf79a583b77" number="8" type="NDI" title="CAM 1 GOAL LEFT SIDE" shortTitle="CAM 1 GOAL LEFT SIDE" state="Running" position="0" duration="0" loop="False" muted="True" volume="7.890479" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">
+CAM 1 GOAL LEFT SIDE
+<cc liftR="-0.2299999" liftG="-0.22" liftB="-0.2549999" liftY="-0.2375" gammaR="0.3449998" gammaG="0.2499999" gammaB="0.2199999" gammaY="0.2824998" gainR="1.135" gainG="1.12" gainB="1.12" gainY="1.1275"/>
+</input>
+<input key="40b36085-d9ad-4e9b-a8ad-a4ccfef0880a" number="9" type="NDI" title="CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Running" position="0" duration="0" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">
+CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="1b096684-ccfa-48a8-b005-c18d84d5926e" number="10" type="NDI" title="CAM 3 CENTER" shortTitle="CAM 3 CENTER" state="Running" position="0" duration="0" frameDelay="18" loop="False" muted="False" volume="0.16" balance="0.15" solo="False" soloPFL="False" audiobusses="M,F,G" meterF1="0" meterF2="0" gainDb="4.999998">CAM 3 CENTER</input>
+<input key="5b0ba67b-07eb-4a99-be79-9b28a8afb751" number="11" type="Virtual" title="Virtual - CAM 3 CENTER" shortTitle="CAM 3 CENTER" state="Paused" position="0" duration="0" loop="False">Virtual - CAM 3 CENTER</input>
+<input key="eab1c088-3aab-45e1-be27-ae4c64e39f69" number="12" type="NDI" title="CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Running" position="0" duration="0" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">
+CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="d5bf6b8f-fb0e-462e-a9ec-021db4770276" number="13" type="NDI" title="CAM 5 GOAL RIGHT SIDE" shortTitle="CAM 5 GOAL RIGHT SIDE" state="Running" position="0" duration="0" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">
+CAM 5 GOAL RIGHT SIDE
+<cc liftR="0" liftG="0" liftB="-0.005000074" liftY="-0.002500037"/>
+</input>
+<input key="05062016-4c3b-483b-a71d-9c405ec4171b" number="14" type="SRT" title="CAM 6 PENALTYBOX HOME" shortTitle="CAM 6 PENALTYBOX HOME" state="Running" position="0" duration="0" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">CAM 6 PENALTYBOX HOME</input>
+<input key="6b2891df-b355-49bd-a6a9-b000305e8f0e" number="15" type="SRT" title="CAM 7 PENALTYBOX AWAY" shortTitle="CAM 7 PENALTYBOX AWAY" state="Running" position="0" duration="0" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">CAM 7 PENALTYBOX AWAY</input>
+<input key="1b05ba70-5488-4ab2-ad71-ee4e51b29385" number="16" type="NDI" title="CAM 8 PTZ EXTRA" shortTitle="CAM 8 PTZ EXTRA" state="Running" position="0" duration="0" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="11">CAM 8 PTZ EXTRA</input>
+<input key="67c0fa83-2481-44a1-a7d9-6f86afe49450" number="17" type="NDI" title="CAM 9 Field CAM 1" shortTitle="CAM 9 Field CAM 1" state="Running" position="0" duration="0" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="" volumeF1="0" volumeF2="0" meterF1="0" meterF2="0" gainDb="3.000003">
+CAM 9 Field CAM 1
+<overlay index="0" key="cfb4d898-8d97-40bb-8431-03cbf35c0cff"/>
+<cc liftR="-0.003937008" liftG="-0.003937008" liftB="-0.003937008" liftY="-0.003937008" gainR="1.003953" gainG="1.003953" gainB="1.003953" gainY="1.003953"/>
+</input>
+<input key="cef1150f-8b7a-473f-9325-88e0cd55949c" number="18" type="NDI" title="CAM 10 CLOSEUP" shortTitle="CAM 10 CLOSEUP" state="Running" position="0" duration="0" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">CAM 10 CLOSEUP</input>
+<input key="cfb4d898-8d97-40bb-8431-03cbf35c0cff" number="19" type="NDI" title="CAM 11 Field CAM 2" shortTitle="CAM 11 Field CAM 2" state="Running" position="0" duration="0" loop="False" muted="True" volume="3.418801" balance="0" solo="False" soloPFL="False" audiobusses="" volumeF1="0.03418801" volumeF2="0.067652" meterF1="0" meterF2="0" gainDb="9">CAM 11 Field CAM 2</input>
+<input key="7e468154-f667-4b5f-9c18-c60662b7c793" number="20" type="VideoCall" title="STUDIO1" shortTitle="STUDIO1" state="Running" position="0" duration="0" loop="False" muted="False" volume="28.39824" balance="0.15" solo="False" soloPFL="False" audiobusses="M,A,B,E,F,G" volumeF1="0.2839824" volumeF2="0.8493465" meterF1="0" meterF2="0" gainDb="19" callPassword="0006529222" callConnected="False" callVideoSource="Output3" callAudioSource="BusA">
+STUDIO1
+<overlay index="0" key="1b05ba70-5488-4ab2-ad71-ee4e51b29385"/>
+<overlay index="1" key="1b096684-ccfa-48a8-b005-c18d84d5926e"/>
+</input>
+<input key="db01c909-2407-4504-878b-61145fcc14bc" number="21" type="VideoCall" title="STUDIO2" shortTitle="STUDIO2" state="Running" position="0" duration="0" loop="False" muted="False" volume="28.39824" balance="0" solo="False" soloPFL="False" audiobusses="M,A,B,E,F,G" volumeF1="0.2839824" volumeF2="0.5220063" meterF1="0" meterF2="0" gainDb="15" callPassword="9356631872" callConnected="False" callVideoSource="Output3" callAudioSource="BusA">STUDIO2</input>
+<input key="1ad3b24b-c750-402d-b1e6-57bd0026d67c" number="22" type="VideoCall" title="STUDIO3" shortTitle="STUDIO3" state="Running" position="0" duration="0" loop="False" muted="False" volume="49.78713" balance="0" solo="False" soloPFL="False" audiobusses="M,A,B,E,F,G" volumeF1="0.4978713" volumeF2="0.1477634" meterF1="0" meterF2="0" gainDb="6.999999" callPassword="7949815586" callConnected="False" callVideoSource="Output3" callAudioSource="BusA">
+STUDIO3
+<overlay index="0" key="1b096684-ccfa-48a8-b005-c18d84d5926e"/>
+<overlay index="1" key="1b05ba70-5488-4ab2-ad71-ee4e51b29385"/>
+<overlay index="2" key="67c0fa83-2481-44a1-a7d9-6f86afe49450"/>
+<overlay index="3" key="cfb4d898-8d97-40bb-8431-03cbf35c0cff"/>
+</input>
+<input key="ae460538-23e1-4689-b8ce-de4965baa0b7" number="23" type="VideoCall" title="REPORTER" shortTitle="REPORTER" state="Running" position="0" duration="0" loop="False" muted="False" volume="81.45061" balance="0" solo="False" soloPFL="False" audiobusses="B,E,G" meterF1="0" meterF2="0" gainDb="3.999999" callPassword="8976243440" callConnected="False" callVideoSource="Output4" callAudioSource="BusB">REPORTER</input>
+<input key="e7bc3583-d920-417a-b781-7483305f697c" number="24" type="VideoCall" title="vMc Operator1" shortTitle="vMc Operator1" state="Running" position="0" duration="0" loop="False" muted="False" volume="54.70082" balance="0" solo="False" soloPFL="False" audiobusses="B,G" meterF1="0" meterF2="0" gainDb="0" callPassword="3880884162" callConnected="False" callVideoSource="Output1" callAudioSource="BusB">vMc Operator1</input>
+<input key="71572bce-59d0-4d39-ba4c-7c16e499e41f" number="25" type="VideoCall" title="vMc Operator2" shortTitle="vMc Operator2" state="Running" position="0" duration="0" loop="False" muted="False" volume="45.21217" balance="0" solo="False" soloPFL="False" audiobusses="B,G" meterF1="0" meterF2="0" gainDb="9" callPassword="0745810516" callConnected="False" callVideoSource="Output1" callAudioSource="BusB">vMc Operator2</input>
+<input key="2eeee215-34cd-41ee-8a0b-b6e57a3415aa" number="26" type="VideoCall" title="vMc Operator3" shortTitle="vMc Operator3" state="Running" position="0" duration="0" loop="False" muted="False" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="B,G" meterF1="0" meterF2="0" gainDb="0" callPassword="3641822817" callConnected="False" callVideoSource="Output1" callAudioSource="BusB">vMc Operator3</input>
+<input key="c189fe00-15b1-4eb8-a975-aa19638c0f51" number="27" type="VideoCall" title="vMc Producer" shortTitle="vMc Producer" state="Running" position="0" duration="0" loop="False" muted="False" volume="100" balance="0.03" solo="False" soloPFL="False" audiobusses="B,G" meterF1="0" meterF2="0" gainDb="0" callPassword="0007935355" callConnected="False" callVideoSource="Output1" callAudioSource="BusB">vMc Producer</input>
+<input key="909043b3-ba35-4e96-b898-2dc842a68990" number="28" type="Replay" title="Instant Replay - A" shortTitle="Instant Replay" state="Paused" position="0" duration="9704560" loop="False" muted="False" volume="59.96953" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">
+Instant Replay - A
+<overlay index="0" key="4b3c11c2-49ed-48c4-b9a3-4b9ddf8b2f54"/>
+<replay live="False" recording="False" channelMode="AB" events="1" eventsA="1" eventsB="1" cameraA="1" cameraB="1" speed="1" speedA="1" speedB="1">
+<timecode>2025-11-29T15:05:30.000</timecode>
+<timecodeA>2025-11-29T15:05:30.000</timecodeA>
+<timecodeB>0001-01-01T00:00:00.000</timecodeB>
+</replay>
+</input>
+<input key="271c8623-9b7e-4fb6-831c-71d5d0c62c45" number="29" type="ReplayPreview" title="Instant Replay - B" shortTitle="Instant Replay - B" state="Paused" position="0" duration="9704560" loop="False" muted="False" volume="35.15304" balance="0" solo="False" soloPFL="False" audiobusses="M,A,B,E,F,G" meterF1="0" meterF2="0" gainDb="0">Instant Replay - B</input>
+<input key="a0113966-27c4-4b85-ac8e-a14736ae52bd" number="30" type="GT" title="LINEUP HEMMA" shortTitle="LINEUP HEMMA" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+LINEUP HEMMA
+<text index="0" name="H_GK1_number.Text">30</text>
+<text index="1" name="H_GK1_name.Text">ADAM OHRE</text>
+<text index="2" name="H_GK2_number.Text">1</text>
+<text index="3" name="H_GK2_name.Text">JONATHAN REINHOLDT</text>
+<text index="4" name="H_LD1_number.Text">39</text>
+<text index="5" name="H_LD1_name.Text">NILS NORDH</text>
+<text index="6" name="H_RD1_number.Text">25</text>
+<text index="7" name="H_RD1_name.Text">EMIL MELANDER</text>
+<text index="8" name="H_LD2_number.Text">4</text>
+<text index="9" name="H_LD2_name.Text">AXEL ABRAHAMSSON</text>
+<text index="10" name="H_RD2_number.Text">28</text>
+<text index="11" name="H_RD2_name.Text">JONATHAN LIDMAN</text>
+<text index="12" name="H_LD3_number.Text">38</text>
+<text index="13" name="H_LD3_name.Text">KEVIN RÖNNELÖW</text>
+<text index="14" name="H_RD3_number.Text">11</text>
+<text index="15" name="H_RD3_name.Text">LEON HÄGGSTRÖM</text>
+<text index="16" name="H_LD4_number.Text"/>
+<text index="17" name="H_LD4_name.Text"/>
+<text index="18" name="H_RD4_number.Text">9</text>
+<text index="19" name="H_RD4_name.Text">EMIL WENGELIN</text>
+<text index="20" name="H_LW1_number.Text">12</text>
+<text index="21" name="H_LW1_name.Text">FILIP WIBERG</text>
+<text index="22" name="H_C1_number.Text">22</text>
+<text index="23" name="H_C1_name.Text">JOHAN LINDHOLM</text>
+<text index="24" name="H_RW1_number.Text">68</text>
+<text index="25" name="H_RW1_name.Text">EMIL LINDBLOM</text>
+<text index="26" name="H_LW2_number.Text">34</text>
+<text index="27" name="H_LW2_name.Text">ERIK HEDLUND</text>
+<text index="28" name="H_C2_number.Text">24</text>
+<text index="29" name="H_C2_name.Text">MARTIN ARPE</text>
+<text index="30" name="H_RW2_number.Text">8</text>
+<text index="31" name="H_RW2_name.Text">MATHIAS WIKUDD</text>
+<text index="32" name="H_LW3_number.Text">71</text>
+<text index="33" name="H_LW3_name.Text">FABIAN WESTLING ALM</text>
+<text index="34" name="H_C3_number.Text">14</text>
+<text index="35" name="H_C3_name.Text">LUDVIG WESTERLUND</text>
+<text index="36" name="H_RW3_number.Text">21</text>
+<text index="37" name="H_RW3_name.Text">OLIVER SUNDBERG</text>
+<text index="38" name="H_LW4_number.Text">10</text>
+<text index="39" name="H_LW4_name.Text">EDVIN MODIN</text>
+<text index="40" name="H_C4_number.Text">15</text>
+<text index="41" name="H_C4_name.Text">HUGO BERGENDAL</text>
+<text index="42" name="H_RW4_number.Text">37</text>
+<text index="43" name="H_RW4_name.Text">OSKAR LARSSON</text>
+<text index="44" name="H_XD1_number.Text"/>
+<text index="45" name="H_XD1_name.Text"/>
+<text index="46" name="H_XD2_number.Text"/>
+<text index="47" name="H_XD2_name.Text"/>
+<text index="48" name="H_XD3_number.Text"/>
+<text index="49" name="H_XD3_name.Text"/>
+<text index="50" name="H_XD4_number.Text"/>
+<text index="51" name="H_XD4_name.Text"/>
+<text index="52" name="H_LW5_number.Text"/>
+<text index="53" name="H_LW5_name.Text"/>
+<text index="54" name="H_C5_number.Text"/>
+<text index="55" name="H_C5_name.Text"/>
+<text index="56" name="H_RW5_number.Text"/>
+<text index="57" name="H_RW5_name.Text"/>
+<text index="58" name="H_TeamName.Text">IF SUNDSVALL HOCKEY</text>
+<text index="59" name="HeadlineGoalies.Text">MÅLVAKTER</text>
+<text index="60" name="HeadlineDef.Text">BACKPAR</text>
+<text index="61" name="HeadlineForw.Text">FORWARDS</text>
+<image index="0" name="H_GK1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="1" name="H_GK2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="2" name="H_LD1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="3" name="H_RD1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="4" name="H_LD2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="5" name="H_RD2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="6" name="H_LD3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="7" name="H_RD3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="8" name="H_LD4_plate.Source"/>
+<image index="9" name="H_RD4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="10" name="H_LW1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="11" name="H_C1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="12" name="H_RW1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="13" name="H_LW2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="14" name="H_C2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="15" name="H_RW2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="16" name="H_LW3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="17" name="H_C3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="18" name="H_RW3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="19" name="H_LW4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="20" name="H_C4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="21" name="H_RW4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="22" name="H_XD1_plate.Source"/>
+<image index="23" name="H_XD2_plate.Source"/>
+<image index="24" name="H_XD3_plate.Source"/>
+<image index="25" name="H_XD4_plate.Source"/>
+<image index="26" name="H_LW5_plate.Source"/>
+<image index="27" name="H_C5_plate.Source"/>
+<image index="28" name="H_RW5_plate.Source"/>
+<image index="29" name="Image1.Source"/>
+<image index="30" name="Divider1.Source">https://vmix-new.hockeyettan.se/tableImages/lineup-DIVISION.png</image>
+<image index="31" name="Divider2.Source">https://vmix-new.hockeyettan.se/tableImages/lineup-DIVISION.png</image>
+<image index="32" name="Divider3.Source">https://vmix-new.hockeyettan.se/tableImages/lineup-DIVISION.png</image>
+<image index="33" name="H_TeamLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+<image index="34" name="BG.Source">https://vmix-new.hockeyettan.se/scoreImages/lineupBG.png</image>
+</input>
+<input key="0b88c29f-edb2-42c8-bd06-4065ff6ca23f" number="31" type="GT" title="LINEUP BORTA" shortTitle="LINEUP BORTA" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+LINEUP BORTA
+<text index="0" name="A_GK1_number.Text">1</text>
+<text index="1" name="A_GK1_name.Text">VIKTOR RÖNNQVIST</text>
+<text index="2" name="A_GK2_number.Text">25</text>
+<text index="3" name="A_GK2_name.Text">LUCAS JOHANSSON</text>
+<text index="4" name="A_LD1_number.Text">6</text>
+<text index="5" name="A_LD1_name.Text">HUGO BYSTEDT</text>
+<text index="6" name="A_RD1_number.Text">5</text>
+<text index="7" name="A_RD1_name.Text">VILMER HOLM</text>
+<text index="8" name="A_LD2_number.Text">23</text>
+<text index="9" name="A_LD2_name.Text">LEO FRANSSON</text>
+<text index="10" name="A_RD2_number.Text">2</text>
+<text index="11" name="A_RD2_name.Text">VILLE SJÖSTEDT</text>
+<text index="12" name="A_LD3_number.Text">3</text>
+<text index="13" name="A_LD3_name.Text">FILIP WESTERMARK</text>
+<text index="14" name="A_RD3_number.Text">7</text>
+<text index="15" name="A_RD3_name.Text">ELVIS KARLSSON</text>
+<text index="16" name="A_LD4_number.Text"/>
+<text index="17" name="A_LD4_name.Text"/>
+<text index="18" name="A_RD4_number.Text">12</text>
+<text index="19" name="A_RD4_name.Text">GUSTAV OJA</text>
+<text index="20" name="A_LW1_number.Text">9</text>
+<text index="21" name="A_LW1_name.Text">OLIVER LINDGREN</text>
+<text index="22" name="A_C1_number.Text">19</text>
+<text index="23" name="A_C1_name.Text">LIAM LINDSTRÖM</text>
+<text index="24" name="A_RW1_number.Text">17</text>
+<text index="25" name="A_RW1_name.Text">ELIS HEDLUND</text>
+<text index="26" name="A_LW2_number.Text">27</text>
+<text index="27" name="A_LW2_name.Text">SAMUEL MANBERG</text>
+<text index="28" name="A_C2_number.Text">14</text>
+<text index="29" name="A_C2_name.Text">SAMUEL BERGMARK</text>
+<text index="30" name="A_RW2_number.Text">11</text>
+<text index="31" name="A_RW2_name.Text">KEVIN KARIANDER</text>
+<text index="32" name="A_LW3_number.Text">22</text>
+<text index="33" name="A_LW3_name.Text">JOHAN FAHLGREN</text>
+<text index="34" name="A_C3_number.Text">10</text>
+<text index="35" name="A_C3_name.Text">ROBIN JOHANSSON</text>
+<text index="36" name="A_RW3_number.Text">21</text>
+<text index="37" name="A_RW3_name.Text">KIAN MORÉN</text>
+<text index="38" name="A_LW4_number.Text">29</text>
+<text index="39" name="A_LW4_name.Text">ALEJANDRO KANLIC</text>
+<text index="40" name="A_C4_number.Text">13</text>
+<text index="41" name="A_C4_name.Text">ANTON LUNDSTRÖM</text>
+<text index="42" name="A_RW4_number.Text">20</text>
+<text index="43" name="A_RW4_name.Text">VIKTOR MEYER</text>
+<text index="44" name="A_XD1_number.Text"/>
+<text index="45" name="A_XD1_name.Text"/>
+<text index="46" name="A_XD2_number.Text"/>
+<text index="47" name="A_XD2_name.Text"/>
+<text index="48" name="A_XD3_number.Text"/>
+<text index="49" name="A_XD3_name.Text"/>
+<text index="50" name="A_XD4_number.Text"/>
+<text index="51" name="A_XD4_name.Text"/>
+<text index="52" name="A_LW5_number.Text">18</text>
+<text index="53" name="A_LW5_name.Text">HUGO DAHLBORG</text>
+<text index="54" name="A_C5_number.Text"/>
+<text index="55" name="A_C5_name.Text"/>
+<text index="56" name="A_RW5_number.Text"/>
+<text index="57" name="A_RW5_name.Text"/>
+<text index="58" name="A_TeamName.Text">CLEMENSNÄS HC</text>
+<text index="59" name="HeadlineGoalies.Text">MÅLVAKTER</text>
+<text index="60" name="HeadlineDef.Text">BACKPAR</text>
+<text index="61" name="HeadlineForw.Text">FORWARDS</text>
+<image index="0" name="A_GK1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="1" name="A_GK2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="2" name="A_LD1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="3" name="A_RD1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="4" name="A_LD2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="5" name="A_RD2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="6" name="A_LD3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="7" name="A_RD3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="8" name="A_LD4_plate.Source"/>
+<image index="9" name="A_RD4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="10" name="A_LW1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="11" name="A_C1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="12" name="A_RW1_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="13" name="A_LW2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="14" name="A_C2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="15" name="A_RW2_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="16" name="A_LW3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="17" name="A_C3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="18" name="A_RW3_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="19" name="A_LW4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="20" name="A_C4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="21" name="A_RW4_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="22" name="A_XD1_plate.Source"/>
+<image index="23" name="A_XD2_plate.Source"/>
+<image index="24" name="A_XD3_plate.Source"/>
+<image index="25" name="A_XD4_plate.Source"/>
+<image index="26" name="A_LW5_plate.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="27" name="A_C5_plate.Source"/>
+<image index="28" name="A_RW5_plate.Source"/>
+<image index="29" name="H1-Logo.Source">c8cc6dd7-a45d-4927-96e9-1bad60fa2acf\hockeyettan_logotyp_vit.png</image>
+<image index="30" name="Divider1.Source">https://vmix-new.hockeyettan.se/tableImages/lineup-DIVISION.png</image>
+<image index="31" name="Divider2.Source">https://vmix-new.hockeyettan.se/tableImages/lineup-DIVISION.png</image>
+<image index="32" name="Divider3.Source">https://vmix-new.hockeyettan.se/tableImages/lineup-DIVISION.png</image>
+<image index="33" name="A_TeamLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/CHC.png</image>
+</input>
+<input key="b8ce0212-7f13-4150-b168-80f0fc13aaa3" number="32" type="GT" title="SERIE1" shortTitle="SERIE1" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+SERIE1
+<text index="0" name="Headline.Text"/>
+<text index="1" name="G1Result.Text">(0 - 0)</text>
+<text index="2" name="G1HomeName.Text">Karlskrona HK</text>
+<text index="3" name="G1AwayName.Text">Nyköpings SK</text>
+<text index="4" name="G2Result.Text">(0 - 1)</text>
+<text index="5" name="G2HomeName.Text">Järfälla HC</text>
+<text index="6" name="G2AwayName.Text">Tranås AIF</text>
+<text index="7" name="G3Result.Text">(2 - 0)</text>
+<text index="8" name="G3HomeName.Text">Halmstad Hammers HC</text>
+<text index="9" name="G3AwayName.Text">Västerviks IK</text>
+<text index="10" name="G4Result.Text">(0 - 0)</text>
+<text index="11" name="G4HomeName.Text">HC Vita Hästen</text>
+<text index="12" name="G4AwayName.Text">Kungälvs IK</text>
+<text index="13" name="G5Result.Text">(0 - 0)</text>
+<text index="14" name="G5HomeName.Text">Borås HC</text>
+<text index="15" name="G5AwayName.Text">Mariestad BoIS HC</text>
+<text index="16" name="G6Result.Text"/>
+<text index="17" name="G6HomeName.Text"/>
+<text index="18" name="G6AwayName.Text"/>
+<text index="19" name="G7Result.Text"/>
+<text index="20" name="G7HomeName.Text"/>
+<text index="21" name="G7AwayName.Text"/>
+<text index="22" name="G8Result.Text"/>
+<text index="23" name="G8HomeName.Text"/>
+<text index="24" name="G8AwayName.Text"/>
+<text index="25" name="G9Result.Text"/>
+<text index="26" name="G9HomeName.Text"/>
+<text index="27" name="G9AwayName.Text"/>
+<text index="28" name="G10Result.Text"/>
+<text index="29" name="G10HomeName.Text"/>
+<text index="30" name="G10AwayName.Text"/>
+<image index="0" name="G1HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/KHK.png</image>
+<image index="1" name="G1AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/NSK.png</image>
+<image index="2" name="G1Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="3" name="G2HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/JÄR.png</image>
+<image index="4" name="G2AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/TRA.png</image>
+<image index="5" name="G2Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="6" name="G3HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/HHHC.png</image>
+<image index="7" name="G3AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/VÄS.png</image>
+<image index="8" name="G3Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="9" name="G4HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/VIT.png</image>
+<image index="10" name="G4AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/KUN.png</image>
+<image index="11" name="G4Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="12" name="G5HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/BRS.png</image>
+<image index="13" name="G5AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/MAR.png</image>
+<image index="14" name="G5Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="15" name="G6HomeLogo.Source"/>
+<image index="16" name="G6AwayLogo.Source"/>
+<image index="17" name="G6Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="18" name="G7HomeLogo.Source"/>
+<image index="19" name="G7AwayLogo.Source"/>
+<image index="20" name="G7Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="21" name="G8HomeLogo.Source"/>
+<image index="22" name="G8AwayLogo.Source"/>
+<image index="23" name="G8Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="24" name="G9HomeLogo.Source"/>
+<image index="25" name="G9AwayLogo.Source"/>
+<image index="26" name="G9Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="27" name="G10HomeLogo.Source"/>
+<image index="28" name="G10AwayLogo.Source"/>
+<image index="29" name="G10Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+</input>
+<input key="b100dc67-1d55-47e8-b6f9-8f356412763a" number="33" type="GT" title="TABELL-SERIE1" shortTitle="TABELL-SERIE1" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+TABELL-SERIE1
+<position panY="-0.09" zoomX="0.9" zoomY="0.9"/>
+<text index="0" name="Team01t.Text">Hudiksvalls HC</text>
+<text index="1" name="Pos01.Text">1</text>
+<text index="2" name="LastTrend01.Text">31</text>
+<text index="3" name="M01.Text">15</text>
+<text index="4" name="D01.Text">31</text>
+<text index="5" name="P01.Text">37</text>
+<text index="6" name="Team02t.Text">Lindlövens IF</text>
+<text index="7" name="Pos02.Text">2</text>
+<text index="8" name="LastTrend02.Text">13</text>
+<text index="9" name="M02.Text">13</text>
+<text index="10" name="D02.Text">35</text>
+<text index="11" name="P02.Text">34</text>
+<text index="12" name="Team03t.Text">IF Sundsvall Hockey</text>
+<text index="13" name="Pos03.Text">3</text>
+<text index="14" name="LastTrend03.Text">3</text>
+<text index="15" name="M03.Text">14</text>
+<text index="16" name="D03.Text">25</text>
+<text index="17" name="P03.Text">31</text>
+<text index="18" name="Team04t.Text">Borlänge HF</text>
+<text index="19" name="Pos04.Text">4</text>
+<text index="20" name="LastTrend04.Text">https://vmix-new.hockeyettan.se/scoreImages/frame.png</text>
+<text index="21" name="M04.Text">12</text>
+<text index="22" name="D04.Text">26</text>
+<text index="23" name="P04.Text">29</text>
+<text index="24" name="Team05t.Text">Forshaga IF</text>
+<text index="25" name="Pos05.Text">5</text>
+<text index="26" name="LastTrend05.Text">Borlänge HF</text>
+<text index="27" name="M05.Text">12</text>
+<text index="28" name="D05.Text">20</text>
+<text index="29" name="P05.Text">25</text>
+<text index="30" name="Team06t.Text">Bodens HF</text>
+<text index="31" name="Pos06.Text">6</text>
+<text index="32" name="LastTrend06.Text">https://vmix-new.hockeyettan.se/scoreImages/FOR.png</text>
+<text index="33" name="M06.Text">12</text>
+<text index="34" name="D06.Text">15</text>
+<text index="35" name="P06.Text">25</text>
+<text index="36" name="Team07t.Text">Strömsbro IF</text>
+<text index="37" name="Pos07.Text">7</text>
+<text index="38" name="LastTrend07.Text">25</text>
+<text index="39" name="M07.Text">12</text>
+<text index="40" name="D07.Text">10</text>
+<text index="41" name="P07.Text">22</text>
+<text index="42" name="Team08t.Text">Piteå HC</text>
+<text index="43" name="Pos08.Text">8</text>
+<text index="44" name="LastTrend08.Text">10</text>
+<text index="45" name="M08.Text">12</text>
+<text index="46" name="D08.Text">10</text>
+<text index="47" name="P08.Text">20</text>
+<text index="48" name="Team09t.Text">Surahammars IF</text>
+<text index="49" name="Pos09.Text">9</text>
+<text index="50" name="LastTrend09.Text">12</text>
+<text index="51" name="M09.Text">12</text>
+<text index="52" name="D09.Text">2</text>
+<text index="53" name="P09.Text">20</text>
+<text index="54" name="Team10t.Text">Sollentuna HC</text>
+<text index="55" name="Pos10.Text">10</text>
+<text index="56" name="LastTrend10.Text">9</text>
+<text index="57" name="M10.Text">13</text>
+<text index="58" name="D10.Text">1</text>
+<text index="59" name="P10.Text">20</text>
+<text index="60" name="Team11t.Text">Norrtälje IK</text>
+<text index="61" name="Pos11.Text">11</text>
+<text index="62" name="LastTrend11.Text">https://vmix-new.hockeyettan.se/scoreImages/frame.png</text>
+<text index="63" name="M11.Text">12</text>
+<text index="64" name="D11.Text">0</text>
+<text index="65" name="P11.Text">18</text>
+<text index="66" name="Team12t.Text">Örnsköldsvik HF</text>
+<text index="67" name="Pos12.Text">12</text>
+<text index="68" name="LastTrend12.Text">Sollentuna HC</text>
+<text index="69" name="M12.Text">14</text>
+<text index="70" name="D12.Text">-9</text>
+<text index="71" name="P12.Text">16</text>
+<text index="72" name="Team13t.Text">Falu IF</text>
+<text index="73" name="Pos13.Text">13</text>
+<text index="74" name="LastTrend13.Text">https://vmix-new.hockeyettan.se/scoreImages/NOR.png</text>
+<text index="75" name="M13.Text">14</text>
+<text index="76" name="D13.Text">-7</text>
+<text index="77" name="P13.Text">15</text>
+<text index="78" name="Team14t.Text">Kiruna IF</text>
+<text index="79" name="Pos14.Text">14</text>
+<text index="80" name="LastTrend14.Text">16</text>
+<text index="81" name="M14.Text">13</text>
+<text index="82" name="D14.Text">-12</text>
+<text index="83" name="P14.Text">14</text>
+<text index="84" name="Team15t.Text">Kalix HC</text>
+<text index="85" name="Pos15.Text">15</text>
+<text index="86" name="LastTrend15.Text">-7</text>
+<text index="87" name="M15.Text">12</text>
+<text index="88" name="D15.Text">-13</text>
+<text index="89" name="P15.Text">12</text>
+<text index="90" name="Team16t.Text">Vallentuna Hockey</text>
+<text index="91" name="Pos16.Text">16</text>
+<text index="92" name="LastTrend16.Text">13</text>
+<text index="93" name="M16.Text">15</text>
+<text index="94" name="D16.Text">-36</text>
+<text index="95" name="P16.Text">11</text>
+<text index="96" name="Team17t.Text">Wings HC Arlanda</text>
+<text index="97" name="Pos17.Text">17</text>
+<text index="98" name="LastTrend17.Text">15</text>
+<text index="99" name="M17.Text">11</text>
+<text index="100" name="D17.Text">-19</text>
+<text index="101" name="P17.Text">10</text>
+<text index="102" name="Team18t.Text">Väsby IK HK</text>
+<text index="103" name="Pos18.Text">18</text>
+<text index="104" name="LastTrend18.Text">https://vmix-new.hockeyettan.se/scoreImages/frame.png</text>
+<text index="105" name="M18.Text">12</text>
+<text index="106" name="D18.Text">-20</text>
+<text index="107" name="P18.Text">9</text>
+<text index="108" name="Team19t.Text">Enköpings SK HK</text>
+<text index="109" name="Pos19.Text">19</text>
+<text index="110" name="LastTrend19.Text">Vallentuna Hockey</text>
+<text index="111" name="M19.Text">12</text>
+<text index="112" name="D19.Text">-24</text>
+<text index="113" name="P19.Text">7</text>
+<text index="114" name="Team20t.Text">Clemensnäs HC</text>
+<text index="115" name="Pos20.Text">20</text>
+<text index="116" name="LastTrend20.Text">https://vmix-new.hockeyettan.se/scoreImages/WIN.png</text>
+<text index="117" name="M20.Text">12</text>
+<text index="118" name="D20.Text">-35</text>
+<text index="119" name="P20.Text">6</text>
+<text index="120" name="SolidLine1.Text"> </text>
+<text index="121" name="SolidLine2.Text"> </text>
+<text index="122" name="SolidLine3.Text"> </text>
+<text index="123" name="SolidLine4.Text"> </text>
+<text index="124" name="SolidLine5.Text"> </text>
+<text index="125" name="SolidLine6.Text">_________________________________________</text>
+<text index="126" name="SolidLine7.Text"> </text>
+<text index="127" name="SolidLine8.Text"> </text>
+<text index="128" name="SolidLine9.Text"> </text>
+<text index="129" name="SolidLine10.Text"> </text>
+<text index="130" name="SolidLine11.Text"> </text>
+<text index="131" name="SolidLine12.Text"> </text>
+<text index="132" name="SolidLine13.Text"> </text>
+<text index="133" name="SolidLine14.Text"> </text>
+<text index="134" name="SolidLine15.Text"> </text>
+<text index="135" name="SolidLine16.Text"> </text>
+<text index="136" name="SolidLine17.Text"> </text>
+<text index="137" name="SolidLine18.Text"> </text>
+<text index="138" name="SolidLine19.Text"> </text>
+<text index="139" name="DottedLine1.Text"> </text>
+<text index="140" name="DottedLine2.Text"> </text>
+<text index="141" name="DottedLine3.Text"> </text>
+<text index="142" name="DottedLine4.Text"> </text>
+<text index="143" name="DottedLine5.Text"> </text>
+<text index="144" name="DottedLine6.Text"> </text>
+<text index="145" name="DottedLine7.Text"> </text>
+<text index="146" name="DottedLine8.Text"> </text>
+<text index="147" name="DottedLine9.Text"> </text>
+<text index="148" name="DottedLine10.Text">--------------------------------------------------------------------</text>
+<text index="149" name="DottedLine11.Text"> </text>
+<text index="150" name="DottedLine12.Text"> </text>
+<text index="151" name="DottedLine13.Text"> </text>
+<text index="152" name="DottedLine14.Text"> </text>
+<text index="153" name="DottedLine15.Text"> </text>
+<text index="154" name="DottedLine16.Text"> </text>
+<text index="155" name="DottedLine17.Text"> </text>
+<text index="156" name="DottedLine18.Text">--------------------------------------------------------------------</text>
+<text index="157" name="DottedLine19.Text"> </text>
+<text index="158" name="Headline.Text">HOCKEYETTAN NORRA</text>
+<image index="0" name="Team01.Source">https://vmix-new.hockeyettan.se/scoreImages/HUD.png</image>
+<image index="1" name="Team02.Source">https://vmix-new.hockeyettan.se/scoreImages/LIN.png</image>
+<image index="2" name="Team03.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+<image index="3" name="Team04.Source">https://vmix-new.hockeyettan.se/scoreImages/BRL.png</image>
+<image index="4" name="Team05.Source">https://vmix-new.hockeyettan.se/scoreImages/FOR.png</image>
+<image index="5" name="Team06.Source">https://vmix-new.hockeyettan.se/scoreImages/BOD.png</image>
+<image index="6" name="Team07.Source">https://vmix-new.hockeyettan.se/scoreImages/STR.png</image>
+<image index="7" name="Team08.Source">https://vmix-new.hockeyettan.se/scoreImages/PIT.png</image>
+<image index="8" name="Team09.Source">https://vmix-new.hockeyettan.se/scoreImages/SUR.png</image>
+<image index="9" name="Team10.Source">https://vmix-new.hockeyettan.se/scoreImages/SOL.png</image>
+<image index="10" name="Team11.Source">https://vmix-new.hockeyettan.se/scoreImages/NOR.png</image>
+<image index="11" name="Team12.Source">https://vmix-new.hockeyettan.se/scoreImages/ÖRN.png</image>
+<image index="12" name="Team13.Source">https://vmix-new.hockeyettan.se/scoreImages/FAL.png</image>
+<image index="13" name="Team14.Source">https://vmix-new.hockeyettan.se/scoreImages/KIR.png</image>
+<image index="14" name="Team15.Source">https://vmix-new.hockeyettan.se/scoreImages/KAL.png</image>
+<image index="15" name="Team16.Source">https://vmix-new.hockeyettan.se/scoreImages/VHF.png</image>
+<image index="16" name="Team17.Source">https://vmix-new.hockeyettan.se/scoreImages/WIN.png</image>
+<image index="17" name="Team18.Source">https://vmix-new.hockeyettan.se/scoreImages/VÄIK.png</image>
+<image index="18" name="Team19.Source">https://vmix-new.hockeyettan.se/scoreImages/ENK.png</image>
+<image index="19" name="Team20.Source">https://vmix-new.hockeyettan.se/scoreImages/CHC.png</image>
+</input>
+<input key="44dcfd69-4fd7-49fd-bbc5-6000abc2e268" number="34" type="GT" title="SERIE2" shortTitle="SERIE2" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+SERIE2
+<text index="0" name="Headline.Text">DAGENS MATCHER HOCKEYETTAN NORRA</text>
+<text index="1" name="G1Result.Text">5 - 3</text>
+<text index="2" name="G1HomeName.Text">Bodens HF</text>
+<text index="3" name="G1AwayName.Text">Örnsköldsvik HF</text>
+<text index="4" name="G2Result.Text">(4 - 1)</text>
+<text index="5" name="G2HomeName.Text">IF Sundsvall Hockey</text>
+<text index="6" name="G2AwayName.Text">Clemensnäs HC</text>
+<text index="7" name="G3Result.Text">(1 - 4)</text>
+<text index="8" name="G3HomeName.Text">Falu IF</text>
+<text index="9" name="G3AwayName.Text">Sollentuna HC</text>
+<text index="10" name="G4Result.Text"/>
+<text index="11" name="G4HomeName.Text"/>
+<text index="12" name="G4AwayName.Text"/>
+<text index="13" name="G5Result.Text"/>
+<text index="14" name="G5HomeName.Text"/>
+<text index="15" name="G5AwayName.Text"/>
+<text index="16" name="G6Result.Text"/>
+<text index="17" name="G6HomeName.Text"/>
+<text index="18" name="G6AwayName.Text"/>
+<text index="19" name="G7Result.Text"/>
+<text index="20" name="G7HomeName.Text"/>
+<text index="21" name="G7AwayName.Text"/>
+<text index="22" name="G8Result.Text"/>
+<text index="23" name="G8HomeName.Text"/>
+<text index="24" name="G8AwayName.Text"/>
+<text index="25" name="G9Result.Text"/>
+<text index="26" name="G9HomeName.Text"/>
+<text index="27" name="G9AwayName.Text"/>
+<text index="28" name="G10Result.Text"/>
+<text index="29" name="G10HomeName.Text"/>
+<text index="30" name="G10AwayName.Text"/>
+<image index="0" name="G1HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/BOD.png</image>
+<image index="1" name="G1AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/ÖRN.png</image>
+<image index="2" name="G1Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="3" name="G2HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+<image index="4" name="G2AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/CHC.png</image>
+<image index="5" name="G2Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="6" name="G3HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/FAL.png</image>
+<image index="7" name="G3AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SOL.png</image>
+<image index="8" name="G3Background.Source">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</image>
+<image index="9" name="G4HomeLogo.Source"/>
+<image index="10" name="G4AwayLogo.Source"/>
+<image index="11" name="G4Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="12" name="G5HomeLogo.Source"/>
+<image index="13" name="G5AwayLogo.Source"/>
+<image index="14" name="G5Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="15" name="G6HomeLogo.Source"/>
+<image index="16" name="G6AwayLogo.Source"/>
+<image index="17" name="G6Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="18" name="G7HomeLogo.Source"/>
+<image index="19" name="G7AwayLogo.Source"/>
+<image index="20" name="G7Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="21" name="G8HomeLogo.Source"/>
+<image index="22" name="G8AwayLogo.Source"/>
+<image index="23" name="G8Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="24" name="G9HomeLogo.Source"/>
+<image index="25" name="G9AwayLogo.Source"/>
+<image index="26" name="G9Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+<image index="27" name="G10HomeLogo.Source"/>
+<image index="28" name="G10AwayLogo.Source"/>
+<image index="29" name="G10Background.Source">https://vmix-new.hockeyettan.se/scoreImages/=TOM LOGO.png</image>
+</input>
+<input key="3e291558-6b0a-4d91-9fb1-87d5777773c7" number="35" type="GT" title="TABELL-SERIE2" shortTitle="TABELL-SERIE2" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+TABELL-SERIE2
+<position panY="-0.09" zoomX="0.9" zoomY="0.9"/>
+<text index="0" name="Team01t.Text"/>
+<text index="1" name="Pos01.Text">1</text>
+<text index="2" name="LastTrend01.Text">31</text>
+<text index="3" name="M01.Text">15</text>
+<text index="4" name="D01.Text">31</text>
+<text index="5" name="P01.Text">37</text>
+<text index="6" name="Team02t.Text">Lindlövens IF</text>
+<text index="7" name="Pos02.Text">2</text>
+<text index="8" name="LastTrend02.Text">13</text>
+<text index="9" name="M02.Text">13</text>
+<text index="10" name="D02.Text">35</text>
+<text index="11" name="P02.Text">34</text>
+<text index="12" name="Team03t.Text">Borlänge HF</text>
+<text index="13" name="Pos03.Text">3</text>
+<text index="14" name="LastTrend03.Text">3</text>
+<text index="15" name="M03.Text">12</text>
+<text index="16" name="D03.Text">26</text>
+<text index="17" name="P03.Text">29</text>
+<text index="18" name="Team04t.Text">IF Sundsvall Hockey</text>
+<text index="19" name="Pos04.Text">4</text>
+<text index="20" name="LastTrend04.Text">https://vmix-new.hockeyettan.se/scoreImages/frame.png</text>
+<text index="21" name="M04.Text">13</text>
+<text index="22" name="D04.Text">22</text>
+<text index="23" name="P04.Text">28</text>
+<text index="24" name="Team05t.Text">Forshaga IF</text>
+<text index="25" name="Pos05.Text">5</text>
+<text index="26" name="LastTrend05.Text">IF Sundsvall Hockey</text>
+<text index="27" name="M05.Text">12</text>
+<text index="28" name="D05.Text">20</text>
+<text index="29" name="P05.Text">25</text>
+<text index="30" name="Team06t.Text">Bodens HF</text>
+<text index="31" name="Pos06.Text">6</text>
+<text index="32" name="LastTrend06.Text">https://vmix-new.hockeyettan.se/scoreImages/FOR.png</text>
+<text index="33" name="M06.Text">11</text>
+<text index="34" name="D06.Text">13</text>
+<text index="35" name="P06.Text">22</text>
+<text index="36" name="Team07t.Text">Strömsbro IF</text>
+<text index="37" name="Pos07.Text">7</text>
+<text index="38" name="LastTrend07.Text">22</text>
+<text index="39" name="M07.Text">12</text>
+<text index="40" name="D07.Text">9</text>
+<text index="41" name="P07.Text">21</text>
+<text index="42" name="Team08t.Text">Piteå HC</text>
+<text index="43" name="Pos08.Text">8</text>
+<text index="44" name="LastTrend08.Text">9</text>
+<text index="45" name="M08.Text">12</text>
+<text index="46" name="D08.Text">10</text>
+<text index="47" name="P08.Text">20</text>
+<text index="48" name="Team09t.Text">Surahammars IF</text>
+<text index="49" name="Pos09.Text">9</text>
+<text index="50" name="LastTrend09.Text">12</text>
+<text index="51" name="M09.Text">12</text>
+<text index="52" name="D09.Text">2</text>
+<text index="53" name="P09.Text">20</text>
+<text index="54" name="Team10t.Text">Norrtälje IK</text>
+<text index="55" name="Pos10.Text">10</text>
+<text index="56" name="LastTrend10.Text">9</text>
+<text index="57" name="M10.Text">12</text>
+<text index="58" name="D10.Text">0</text>
+<text index="59" name="P10.Text">18</text>
+<text index="60" name="Team11t.Text">Sollentuna HC</text>
+<text index="61" name="Pos11.Text">11</text>
+<text index="62" name="LastTrend11.Text">https://vmix-new.hockeyettan.se/scoreImages/frame.png</text>
+<text index="63" name="M11.Text">12</text>
+<text index="64" name="D11.Text">-2</text>
+<text index="65" name="P11.Text">17</text>
+<text index="66" name="Team12t.Text">Örnsköldsvik HF</text>
+<text index="67" name="Pos12.Text">12</text>
+<text index="68" name="LastTrend12.Text">Norrtälje IK</text>
+<text index="69" name="M12.Text">13</text>
+<text index="70" name="D12.Text">-7</text>
+<text index="71" name="P12.Text">16</text>
+<text index="72" name="Team13t.Text">Falu IF</text>
+<text index="73" name="Pos13.Text">13</text>
+<text index="74" name="LastTrend13.Text">https://vmix-new.hockeyettan.se/scoreImages/SOL.png</text>
+<text index="75" name="M13.Text">13</text>
+<text index="76" name="D13.Text">-4</text>
+<text index="77" name="P13.Text">15</text>
+<text index="78" name="Team14t.Text">Kiruna IF</text>
+<text index="79" name="Pos14.Text">14</text>
+<text index="80" name="LastTrend14.Text">16</text>
+<text index="81" name="M14.Text">13</text>
+<text index="82" name="D14.Text">-12</text>
+<text index="83" name="P14.Text">14</text>
+<text index="84" name="Team15t.Text">Kalix HC</text>
+<text index="85" name="Pos15.Text">15</text>
+<text index="86" name="LastTrend15.Text">-4</text>
+<text index="87" name="M15.Text">12</text>
+<text index="88" name="D15.Text">-13</text>
+<text index="89" name="P15.Text">12</text>
+<text index="90" name="Team16t.Text">Vallentuna Hockey</text>
+<text index="91" name="Pos16.Text">16</text>
+<text index="92" name="LastTrend16.Text">13</text>
+<text index="93" name="M16.Text">15</text>
+<text index="94" name="D16.Text">-35</text>
+<text index="95" name="P16.Text">11</text>
+<text index="96" name="Team17t.Text">Wings HC Arlanda</text>
+<text index="97" name="Pos17.Text">17</text>
+<text index="98" name="LastTrend17.Text">15</text>
+<text index="99" name="M17.Text">11</text>
+<text index="100" name="D17.Text">-19</text>
+<text index="101" name="P17.Text">10</text>
+<text index="102" name="Team18t.Text">Väsby IK HK</text>
+<text index="103" name="Pos18.Text">18</text>
+<text index="104" name="LastTrend18.Text">https://vmix-new.hockeyettan.se/scoreImages/frame.png</text>
+<text index="105" name="M18.Text">12</text>
+<text index="106" name="D18.Text">-20</text>
+<text index="107" name="P18.Text">9</text>
+<text index="108" name="Team19t.Text">Enköpings SK HK</text>
+<text index="109" name="Pos19.Text">19</text>
+<text index="110" name="LastTrend19.Text">Vallentuna Hockey</text>
+<text index="111" name="M19.Text">12</text>
+<text index="112" name="D19.Text">-24</text>
+<text index="113" name="P19.Text">7</text>
+<text index="114" name="Team20t.Text">Clemensnäs HC</text>
+<text index="115" name="Pos20.Text">20</text>
+<text index="116" name="LastTrend20.Text">https://vmix-new.hockeyettan.se/scoreImages/WIN.png</text>
+<text index="117" name="M20.Text">11</text>
+<text index="118" name="D20.Text">-32</text>
+<text index="119" name="P20.Text">6</text>
+<text index="120" name="SolidLine1.Text"/>
+<text index="121" name="SolidLine2.Text"/>
+<text index="122" name="SolidLine3.Text"/>
+<text index="123" name="SolidLine4.Text"/>
+<text index="124" name="SolidLine5.Text"/>
+<text index="125" name="SolidLine6.Text">_________________________________________</text>
+<text index="126" name="SolidLine7.Text"/>
+<text index="127" name="SolidLine8.Text"/>
+<text index="128" name="SolidLine9.Text"/>
+<text index="129" name="SolidLine10.Text"/>
+<text index="130" name="SolidLine11.Text"/>
+<text index="131" name="SolidLine12.Text"/>
+<text index="132" name="SolidLine13.Text"/>
+<text index="133" name="SolidLine14.Text"/>
+<text index="134" name="SolidLine15.Text"/>
+<text index="135" name="SolidLine16.Text"/>
+<text index="136" name="SolidLine17.Text"/>
+<text index="137" name="SolidLine18.Text"/>
+<text index="138" name="SolidLine19.Text"/>
+<text index="139" name="DottedLine1.Text"/>
+<text index="140" name="DottedLine2.Text"/>
+<text index="141" name="DottedLine3.Text"/>
+<text index="142" name="DottedLine4.Text"/>
+<text index="143" name="DottedLine5.Text"/>
+<text index="144" name="DottedLine6.Text"/>
+<text index="145" name="DottedLine7.Text"/>
+<text index="146" name="DottedLine8.Text"/>
+<text index="147" name="DottedLine9.Text"/>
+<text index="148" name="DottedLine10.Text">--------------------------------------------------------------------</text>
+<text index="149" name="DottedLine11.Text"/>
+<text index="150" name="DottedLine12.Text"/>
+<text index="151" name="DottedLine13.Text"/>
+<text index="152" name="DottedLine14.Text"/>
+<text index="153" name="DottedLine15.Text"/>
+<text index="154" name="DottedLine16.Text"/>
+<text index="155" name="DottedLine17.Text"/>
+<text index="156" name="DottedLine18.Text">--------------------------------------------------------------------</text>
+<text index="157" name="DottedLine19.Text"/>
+<text index="158" name="Headline.Text">HOCKEYETTAN NORRA</text>
+<image index="0" name="Team01.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="1" name="Team02.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="2" name="Team03.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="3" name="Team04.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="4" name="Team05.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="5" name="Team06.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="6" name="Team07.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="7" name="Team08.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="8" name="Team09.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="9" name="Team10.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="10" name="Team11.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="11" name="Team12.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="12" name="Team13.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="13" name="Team14.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="14" name="Team15.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="15" name="Team16.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="16" name="Team17.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="17" name="Team18.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="18" name="Team19.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+<image index="19" name="Team20.Source">fb3e7f25-2474-4e0d-8259-e7140b2bd411\Team1.png</image>
+</input>
+<input key="9d6bd245-3f1f-4ec7-ae7f-e5b6b929c772" number="36" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="f8cf0dc5-ee9c-42fe-9909-feaf93a97547" number="37" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="09bb580e-0edf-48da-9860-839beec1f264" number="38" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="840174d0-c02f-4c42-8944-2948356a47a0" number="39" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="d4466d1d-7ea4-4547-a9c4-960934a50201" number="40" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="efbd658d-e302-4ad3-b738-4b0de09d6170" number="41" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="625d776e-3173-4b07-98d7-d6722c341ee5" number="42" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="ffa19e9e-fd70-45d1-8d67-55b25dd09101" number="43" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="fdacf922-6afd-42d2-8ae2-04f646b0b8d7" number="44" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="25e0f464-b2c7-4216-97e3-271ed3dc8031" number="45" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="4ec6a944-f706-4636-bb3b-df0d0d6b53be" number="46" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="f4b04e29-cc31-436a-b707-fa6760b34554" number="47" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="a6453dc4-062d-43fc-a480-676e6daacf28" number="48" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="36c23415-8486-44d0-9f3e-97a59d08144e" number="49" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="094f39db-4fd0-495a-93fa-0e8d976519a4" number="50" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="2930fdce-1d19-468a-a119-25011d70f260" number="51" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="24a3ebf6-c629-4c8e-8eb0-962979e16792" number="52" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="a89d02d3-a69d-4d6f-a21a-c1f01cc7b209" number="53" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="30ccf0f3-b033-4614-843a-6891398d2a93" number="54" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="2bba2155-9ee6-4d1f-a24b-124d35339f92" number="55" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="941c499c-cb43-40db-a150-84dd4afea7f1" number="56" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="b8d41be6-2e54-4179-8048-528fa8b69e76" number="57" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="4eae04d7-94bd-4387-819b-813e1f518f12" number="58" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="a51e2122-2da2-475e-9738-5e1aa0aa52e2" number="59" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="45f2f18b-38b3-4af6-973d-4097fbd20fbd" number="60" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="739ab2be-2804-4ec1-b95d-e56c02b778db" number="61" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="d0252aa3-1dcf-4f0f-8815-1aa2bc4c270e" number="62" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="d8bb4155-b4d3-49ec-a7bd-44503f5f8ce6" number="63" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="79adcbf3-2466-4fda-aa9d-b69257b27658" number="64" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="c290c513-f0ac-45a8-905d-5fd607ec818c" number="65" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="be758429-4d3a-400c-80a5-a2417b899371" number="66" type="Virtual" title="PTZ - CAM 2 LEFT SIDE" shortTitle="CAM 2 LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 2 LEFT SIDE
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="22057511-7a73-41d1-ab65-7695614de527" number="67" type="Virtual" title="PTZ - CAM 4 RIGHT SIDE" shortTitle="CAM 4 RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - CAM 4 RIGHT SIDE
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="8448c997-cf82-429c-a5d1-317d609c588d" number="68" type="Virtual" title="PTZ - JUNIOR SKOTT LEFT SIDE" shortTitle="JUNIOR SKOTT LEFT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - JUNIOR SKOTT LEFT SIDE
+<overlay index="0" key="7b8d7b5a-a447-4d65-bba3-4fbb905959b7"/>
+<cc liftR="-0.01999998" liftG="0.01999998" liftB="0" liftY="0"/>
+</input>
+<input key="d93c77c1-edd7-4269-9423-914fc86688e8" number="69" type="Virtual" title="PTZ - JUNIOR SKOTT RIGHT SIDE" shortTitle="JUNIOR SKOTT RIGHT SIDE" state="Paused" position="0" duration="0" loop="False">
+PTZ - JUNIOR SKOTT RIGHT SIDE
+<overlay index="0" key="7b8d7b5a-a447-4d65-bba3-4fbb905959b7"/>
+<overlay index="1" key="635dc33a-6e43-4c40-8433-b25d9d6b2fe1"/>
+<cc liftR="-0.01118016" liftG="0.01118016" liftB="-0.009900153" liftY="0" gainR="1.005" gainG="0.995" gainB="0.9999994" gainY="1"/>
+</input>
+<input key="9ef84cac-969a-45fa-914c-c9639e289fb5" number="70" type="GT" title="PENALTY Over AWAY" shortTitle="PENALTY Over AWAY" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+PENALTY Over AWAY
+<overlay index="1" key="6b2891df-b355-49bd-a6a9-b000305e8f0e">
+<position panX="0.7985417" panY="-0.7977778" zoomX="0.193125" zoomY="0.193125" x="1541.2" y="866.5" width="370.8" height="208.6"/>
+</overlay>
+</input>
+<input key="eaba5756-9495-457a-92d0-e0464bf2086d" number="71" type="GT" title="PENALTY Over HOME" shortTitle="PENALTY Over HOME" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+PENALTY Over HOME
+<overlay index="1" key="05062016-4c3b-483b-a71d-9c405ec4171b">
+<position panX="-0.7953125" panY="-0.8074074" zoomX="0.1926042" zoomY="0.1925926" x="11.6" y="872" width="369.8" height="208"/>
+</overlay>
+</input>
+<input key="635dc33a-6e43-4c40-8433-b25d9d6b2fe1" number="72" type="Colour" title="FEEDBACK View Operator" shortTitle="FEEDBACK View Operator" state="Paused" position="0" duration="0" loop="False">
+FEEDBACK View Operator
+<overlay index="0" key="1b096684-ccfa-48a8-b005-c18d84d5926e">
+<position panX="0.0005729198" panY="0.009259261" zoomX="0.9536979" zoomY="0.9537037" x="45" y="20" width="1831.1" height="1030"/>
+<crop X1="0.0156" Y1="0.0278" X2="0.9844" Y2="0.9722"/>
+</overlay>
+<overlay index="1" key="67c0fa83-2481-44a1-a7d9-6f86afe49450">
+<position panX="0.0005729198" panY="0.009259261" zoomX="0.9536979" zoomY="0.9537037" x="45" y="20" width="1831.1" height="1030"/>
+<crop X1="0.0156" Y1="0.0278" X2="0.9844" Y2="0.9722"/>
+</overlay>
+<overlay index="2" key="cfb4d898-8d97-40bb-8431-03cbf35c0cff">
+<position panX="0.0005729198" panY="0.009259261" zoomX="0.9536979" zoomY="0.9537037" x="45" y="20" width="1831.1" height="1030"/>
+<crop X1="0.0156" Y1="0.0278" X2="0.9844" Y2="0.9722"/>
+</overlay>
+<overlay index="3" key="5b0ba67b-07eb-4a99-be79-9b28a8afb751">
+<position panX="0.0005729198" panY="0.009259261" zoomX="0.9536979" zoomY="0.9537037" x="45" y="20" width="1831.1" height="1030"/>
+<crop X1="0.0156" Y1="0.0278" X2="0.9844" Y2="0.9722"/>
+</overlay>
+<overlay index="4" key="ae460538-23e1-4689-b8ce-de4965baa0b7">
+<position panX="0.0005729198" panY="0.009259261" zoomX="0.9536979" zoomY="0.9537037" x="45" y="20" width="1831.1" height="1030"/>
+<crop X1="0.0156" Y1="0.0278" X2="0.9844" Y2="0.9722"/>
+</overlay>
+</input>
+<input key="feb92bb8-a956-47d3-bd88-8b90dcf58a4d" number="73" type="GT" title="PREGAME" shortTitle="PREGAME" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+PREGAME
+<text index="0" name="Time.Text">{0:15:50|mm:ss}</text>
+<text index="1" name="pre_Headline.Text">MATCHSTART 16:00</text>
+<text index="2" name="TeamNameHome.Text">IF SUNDSVALL HOCKEY</text>
+<text index="3" name="TeamNameAway.Text">CLEMENSNÄS HC</text>
+<text index="4" name="Textrad1.Text">LIVE FRÅN BRANDCODE CENTER</text>
+<text index="5" name="Textrad2.Text">HOCKEYETTAN NORRA</text>
+<image index="0" name="LogoHome.Source">https://vmix-new.hockeyettan.se/premagesLogo/SUN.png</image>
+<image index="1" name="LogoAway.Source">https://vmix-new.hockeyettan.se/premagesLogo/CHC.png</image>
+</input>
+<input key="f55f03fd-8bf6-4d69-b24c-48311546285c" number="74" type="GT" title="MATCHSTATISTIK" shortTitle="MATCHSTATISTIK" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+MATCHSTATISTIK
+<text index="0" name="StatsAwayPen.Text">6 min</text>
+<text index="1" name="StatsAwayPP.Text">0%</text>
+<text index="2" name="StatsAwaySav.Text">36</text>
+<text index="3" name="StatsAwayShots.Text">14 (4, 10, 0)</text>
+<text index="4" name="StatsAwayGoals.Text">1</text>
+<text index="5" name="StatsHomePen.Text">8 min</text>
+<text index="6" name="StatsHomePP.Text">33%</text>
+<text index="7" name="StatsHomeSav.Text">13</text>
+<text index="8" name="StatsHomeShots.Text">40 (16, 24, 0)</text>
+<text index="9" name="StatsHomeGoals.Text">4</text>
+<text index="10" name="Headline.Text">MATCHSTATISTIK</text>
+<text index="11" name="TeamNameHome.Text">IF SUNDSVALL HOCKEY</text>
+<text index="12" name="TeamNameAway.Text">CLEMENSNÄS HC</text>
+<text index="13" name="HeadlineGoals.Text">MÅL</text>
+<text index="14" name="HeadlineShots.Text">SKOTT</text>
+<text index="15" name="HeadlineSav.Text">RÄDDNINGAR</text>
+<text index="16" name="HeadlinePP.Text">POWERPLAY</text>
+<text index="17" name="HeadlinePen.Text">UTVISNINGAR</text>
+<image index="0" name="LogoHome.Source">https://vmix-new.hockeyettan.se/premagesLogo/SUN.png</image>
+<image index="1" name="LogoAway.Source">https://vmix-new.hockeyettan.se/premagesLogo/CHC.png</image>
+</input>
+<input key="387b95e0-fee8-4ee7-970b-0904d51cec76" number="75" type="GT" title="NAMNSKYLT MED Nr" shortTitle="NAMNSKYLT MED Nr" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+NAMNSKYLT MED Nr
+<text index="0" name="ShirtNR.Text"/>
+<text index="1" name="Titel.Text">IF Sundsvall Hockey</text>
+<text index="2" name="Namn.Text"/>
+<image index="0" name="Logo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+</input>
+<input key="c9b6293e-d817-411c-81c0-d374871e6874" number="76" type="GT" title="NAMNSKYLT TRÄNARE" shortTitle="NAMNSKYLT TRÄNARE" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+NAMNSKYLT TRÄNARE
+<text index="0" name="ShirtNR.Text">4</text>
+<text index="1" name="Namn.Text">Axel Abrahamsson</text>
+<image index="0" name="Logo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+</input>
+<input key="9ddf4292-d17b-4694-bea8-9eaf0a564d76" number="77" type="GT" title="NAMNSKYLT KOMMENTATOR" shortTitle="NAMNSKYLT KOMMENTATOR" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+NAMNSKYLT KOMMENTATOR
+<text index="0" name="Kommentator1/1.Text">DENNIS OLSSON</text>
+<text index="1" name="Titel1/1.Text">KOMMENTATOR</text>
+<text index="2" name="Kommentator1/2.Text">DENNIS OLSSON</text>
+<text index="3" name="Titel1/2.Text">KOMMENTATOR</text>
+<text index="4" name="Kommentator2/2.Text">JOAKIM WAHLQVIST</text>
+<text index="5" name="Titel2/2.Text">EXPERTKOMMENTATOR</text>
+<image index="0" name="Bild1/1.Source">3e485c4e-ae0e-484b-850a-bc6a888a6c45\användare.png</image>
+<image index="1" name="Bild1/2.Source">3e485c4e-ae0e-484b-850a-bc6a888a6c45\användare.png</image>
+<image index="2" name="Bild2/2.Source">3e485c4e-ae0e-484b-850a-bc6a888a6c45\användare.png</image>
+</input>
+<input key="474a0401-9636-4ccd-b536-74001448fcab" number="78" type="GT" title="NAMNSKYLT DOMARE 3st" shortTitle="NAMNSKYLT DOMARE 3st" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+NAMNSKYLT DOMARE 3st
+<text index="0" name="DomareNamn1.Text">FILIP WOLLBERG</text>
+<text index="1" name="DomareNamn2.Text">TONY RUNDSTRÖM</text>
+<text index="2" name="DomareNamn3.Text">BISHARA MARZOUKA</text>
+<text index="3" name="DomareTitel1.Text">REFEREE</text>
+<text index="4" name="DomareTitel2.Text">LINESMAN</text>
+<text index="5" name="DomareTitel3.Text">LINESMAN</text>
+</input>
+<input key="53f7eb9e-d299-4ca7-a12c-6e6251912046" number="79" type="GT" title="NAMNSKYLT DOMARE 4st" shortTitle="NAMNSKYLT DOMARE 4st" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+NAMNSKYLT DOMARE 4st
+<text index="0" name="DomareNamn1.Text">FILIP WOLLBERG</text>
+<text index="1" name="DomareNamn2.Text">TONY RUNDSTRÖM</text>
+<text index="2" name="DomareNamn3.Text">BISHARA MARZOUKA</text>
+<text index="3" name="DomareNamn4.Text">IF SUNDSVALL HOCKEY</text>
+<text index="4" name="DomareTitel1.Text">REFEREE</text>
+<text index="5" name="DomareTitel2.Text">LINESMAN</text>
+<text index="6" name="DomareTitel3.Text">LINESMAN</text>
+<text index="7" name="DomareTitel4.Text">RÄDDNINGAR</text>
+</input>
+<input key="66639187-de23-4738-818c-6c7f6e133788" number="80" type="AudioFile" title="Goal-Pling" shortTitle="Goal-Pling" state="Completed" position="1560" duration="1560" loop="False" muted="False" volume="15.75296" balance="0.06" solo="False" soloPFL="False" audiobusses="M,A,B,E,F" meterF1="0" meterF2="0" gainDb="0">Goal-Pling</input>
+<input key="5aabde87-f524-47ac-84c7-9a6874030a2c" number="81" type="Colour" title="GoalServiceTitle" shortTitle="GoalServiceTitle" state="Paused" position="0" duration="0" loop="False">
+GoalServiceTitle
+<overlay index="0" key="4ee03537-23ac-4892-990e-5f9cafe85c86"/>
+</input>
+<input key="4ee03537-23ac-4892-990e-5f9cafe85c86" number="82" type="GT" title="GoalService" shortTitle="GoalService" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+GoalService
+<overlay index="0" key="0195d00f-591a-4474-bd84-0182bd880030"/>
+<overlay index="1" key="a28377d1-84ea-4608-a8f8-ce3d9e2f33d0"/>
+<text index="0" name="G1HomeName.Text">Kalix HC</text>
+<text index="1" name="G1AwayName.Text">Nyköpings SK</text>
+<text index="2" name="G1Result.Text">(0 - 0)</text>
+<text index="3" name="G2HomeName.Text">Järfälla HC</text>
+<text index="4" name="G2AwayName.Text">Tranås AIF</text>
+<text index="5" name="G2Result.Text">(0 - 1)</text>
+<text index="6" name="G3HomeName.Text">Halmstad Hammers HC</text>
+<text index="7" name="G3AwayName.Text">Västerviks IK</text>
+<text index="8" name="G3Result.Text">(2 - 0)</text>
+<text index="9" name="G4HomeName.Text">HC Vita Hästen</text>
+<text index="10" name="G4AwayName.Text">Kungälvs IK</text>
+<text index="11" name="G4Result.Text">(0 - 0)</text>
+<text index="12" name="G5HomeName.Text">Borås HC</text>
+<text index="13" name="G5AwayName.Text">Mariestad BoIS HC</text>
+<text index="14" name="G5Result.Text">(0 - 0)</text>
+<text index="15" name="G6HomeName.Text"/>
+<text index="16" name="G6AwayName.Text"/>
+<text index="17" name="G6Result.Text"/>
+<text index="18" name="G7HomeName.Text"/>
+<text index="19" name="G7AwayName.Text"/>
+<text index="20" name="G7Result.Text"/>
+<text index="21" name="G8HomeName.Text"/>
+<text index="22" name="G8AwayName.Text"/>
+<text index="23" name="G8Result.Text"/>
+<text index="24" name="Matchstart.Text">MATCHSTART</text>
+<text index="25" name="Nedsläpp.Text">NEDSLÄPP</text>
+<text index="26" name="Mål.Text">MÅL</text>
+<text index="27" name="Slutresultat.Text">SLUTRESULTAT</text>
+<image index="0" name="G1HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/KHK.png</image>
+<image index="1" name="G1AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/NSK.png</image>
+<image index="2" name="G2HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/JÄR.png</image>
+<image index="3" name="G2AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/TRA.png</image>
+<image index="4" name="G3HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/HHHC.png</image>
+<image index="5" name="G3AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/VÄS.png</image>
+<image index="6" name="G4HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/VIT.png</image>
+<image index="7" name="G4AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/KUN.png</image>
+<image index="8" name="G5HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/BRS.png</image>
+<image index="9" name="G5AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/MAR.png</image>
+<image index="10" name="G6HomeLogo.Source"/>
+<image index="11" name="G6AwayLogo.Source"/>
+<image index="12" name="G7HomeLogo.Source"/>
+<image index="13" name="G7AwayLogo.Source"/>
+<image index="14" name="G8HomeLogo.Source"/>
+<image index="15" name="G8AwayLogo.Source"/>
+<color index="0" name="Rectangle.Fill.Color">https://vmix-new.hockeyettan.se/scoreImages/VIT.png</color>
+<color index="1" name="Rectangle2.Fill.Color">https://vmix-new.hockeyettan.se/premagesLogo/VIT.png</color>
+</input>
+<input key="0195d00f-591a-4474-bd84-0182bd880030" number="83" type="GT" title="SERIE1-GoalService" shortTitle="SERIE1-GoalService" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+SERIE1-GoalService
+<text index="0" name="G8Games.Text"/>
+<text index="1" name="G8HomeName.Text"/>
+<text index="2" name="G8AwayName.Text"/>
+<text index="3" name="G8Result.Text"/>
+<text index="4" name="G7Games.Text">Karlskrona HK</text>
+<text index="5" name="G7HomeName.Text"/>
+<text index="6" name="G7AwayName.Text"/>
+<text index="7" name="G7Result.Text"/>
+<text index="8" name="G6Games.Text">https://vmix-new.hockeyettan.se/scoreImages/KHK.png</text>
+<text index="9" name="G6HomeName.Text"/>
+<text index="10" name="G6AwayName.Text"/>
+<text index="11" name="G6Result.Text"/>
+<text index="12" name="G5Games.Text">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</text>
+<text index="13" name="G5HomeName.Text">Borås HC</text>
+<text index="14" name="G5AwayName.Text">Mariestad BoIS HC</text>
+<text index="15" name="G5Result.Text">(0 - 0)</text>
+<text index="16" name="G4Games.Text">Järfälla HC</text>
+<text index="17" name="G4HomeName.Text">HC Vita Hästen</text>
+<text index="18" name="G4AwayName.Text">Kungälvs IK</text>
+<text index="19" name="G4Result.Text">(0 - 0)</text>
+<text index="20" name="G3Games.Text">https://vmix-new.hockeyettan.se/scoreImages/JÄR.png</text>
+<text index="21" name="G3HomeName.Text">Halmstad Hammers HC</text>
+<text index="22" name="G3AwayName.Text">Västerviks IK</text>
+<text index="23" name="G3Result.Text">(2 - 0)</text>
+<text index="24" name="G2Games.Text">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</text>
+<text index="25" name="G2HomeName.Text">Järfälla HC</text>
+<text index="26" name="G2AwayName.Text">Tranås AIF</text>
+<text index="27" name="G2Result.Text">(0 - 1)</text>
+<text index="28" name="G1Games.Text">Halmstad Hammers HC</text>
+<text index="29" name="G1HomeName.Text">Karlskrona HK</text>
+<text index="30" name="G1AwayName.Text">Nyköpings SK</text>
+<text index="31" name="G1Result.Text">(0 - 0)</text>
+<text index="32" name="Matchstart.Text">MATCHSTART</text>
+<text index="33" name="Nedsläpp.Text">NEDSLÄPP</text>
+<text index="34" name="Mål.Text">MÅL</text>
+<text index="35" name="Slutresultat.Text">SLUTRESULTAT</text>
+<image index="0" name="G8HomeLogo.Source"/>
+<image index="1" name="G8AwayLogo.Source"/>
+<image index="2" name="G7HomeLogo.Source"/>
+<image index="3" name="G7AwayLogo.Source"/>
+<image index="4" name="G6HomeLogo.Source"/>
+<image index="5" name="G6AwayLogo.Source"/>
+<image index="6" name="G5HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/BRS.png</image>
+<image index="7" name="G5AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/MAR.png</image>
+<image index="8" name="G4HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/VIT.png</image>
+<image index="9" name="G4AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/KUN.png</image>
+<image index="10" name="G3HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/HHHC.png</image>
+<image index="11" name="G3AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/VÄS.png</image>
+<image index="12" name="G2HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/JÄR.png</image>
+<image index="13" name="G2AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/TRA.png</image>
+<image index="14" name="G1HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/KHK.png</image>
+<image index="15" name="G1AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/NSK.png</image>
+<color index="0" name="Rectangle.Fill.Color">Borås HC</color>
+<color index="1" name="Rectangle2.Fill.Color">BRS</color>
+</input>
+<input key="a28377d1-84ea-4608-a8f8-ce3d9e2f33d0" number="84" type="GT" title="SERIE2-GoalService" shortTitle="SERIE2-GoalService" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+SERIE2-GoalService
+<text index="0" name="G8Games.Text">5 - 3</text>
+<text index="1" name="G8HomeName.Text"/>
+<text index="2" name="G8AwayName.Text"/>
+<text index="3" name="G8Result.Text"/>
+<text index="4" name="G7Games.Text">Bodens HF</text>
+<text index="5" name="G7HomeName.Text"/>
+<text index="6" name="G7AwayName.Text"/>
+<text index="7" name="G7Result.Text"/>
+<text index="8" name="G6Games.Text">https://vmix-new.hockeyettan.se/scoreImages/BOD.png</text>
+<text index="9" name="G6HomeName.Text"/>
+<text index="10" name="G6AwayName.Text"/>
+<text index="11" name="G6Result.Text"/>
+<text index="12" name="G5Games.Text">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</text>
+<text index="13" name="G5HomeName.Text"/>
+<text index="14" name="G5AwayName.Text"/>
+<text index="15" name="G5Result.Text"/>
+<text index="16" name="G4Games.Text">IF Sundsvall Hockey</text>
+<text index="17" name="G4HomeName.Text"/>
+<text index="18" name="G4AwayName.Text"/>
+<text index="19" name="G4Result.Text"/>
+<text index="20" name="G3Games.Text">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</text>
+<text index="21" name="G3HomeName.Text">Falu IF</text>
+<text index="22" name="G3AwayName.Text">Sollentuna HC</text>
+<text index="23" name="G3Result.Text">(1 - 4)</text>
+<text index="24" name="G2Games.Text">https://vmix-new.hockeyettan.se/scoreImages/skylt.png</text>
+<text index="25" name="G2HomeName.Text">IF Sundsvall Hockey</text>
+<text index="26" name="G2AwayName.Text">Clemensnäs HC</text>
+<text index="27" name="G2Result.Text">(4 - 1)</text>
+<text index="28" name="G1Games.Text">Falu IF</text>
+<text index="29" name="G1HomeName.Text">Bodens HF</text>
+<text index="30" name="G1AwayName.Text">Örnsköldsvik HF</text>
+<text index="31" name="G1Result.Text">5 - 3</text>
+<text index="32" name="Matchstart.Text">MATCHSTART</text>
+<text index="33" name="Nedsläpp.Text">NEDSLÄPP</text>
+<text index="34" name="Mål.Text">MÅL</text>
+<text index="35" name="Slutresultat.Text">SLUTRESULTAT</text>
+<image index="0" name="G8HomeLogo.Source"/>
+<image index="1" name="G8AwayLogo.Source"/>
+<image index="2" name="G7HomeLogo.Source"/>
+<image index="3" name="G7AwayLogo.Source"/>
+<image index="4" name="G6HomeLogo.Source"/>
+<image index="5" name="G6AwayLogo.Source"/>
+<image index="6" name="G5HomeLogo.Source"/>
+<image index="7" name="G5AwayLogo.Source"/>
+<image index="8" name="G4HomeLogo.Source"/>
+<image index="9" name="G4AwayLogo.Source"/>
+<image index="10" name="G3HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/FAL.png</image>
+<image index="11" name="G3AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SOL.png</image>
+<image index="12" name="G2HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/SUN.png</image>
+<image index="13" name="G2AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/CHC.png</image>
+<image index="14" name="G1HomeLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/BOD.png</image>
+<image index="15" name="G1AwayLogo.Source">https://vmix-new.hockeyettan.se/scoreImages/ÖRN.png</image>
+<color index="0" name="Rectangle.Fill.Color"/>
+<color index="1" name="Rectangle2.Fill.Color"/>
+</input>
+<input key="c6fdd268-f024-4319-968d-b752085034c6" number="85" type="GT" title="SLUTSPEL-GoalService" shortTitle="SLUTSPEL-GoalService" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+SLUTSPEL-GoalService
+<text index="0" name="G8Games.Text">0 - 0</text>
+<text index="1" name="G8HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="2" name="G8AwayName.Text">HANVIKEN</text>
+<text index="3" name="G8Result.Text"/>
+<text index="4" name="G7Games.Text">0 - 0</text>
+<text index="5" name="G7HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="6" name="G7AwayName.Text">HANVIKEN</text>
+<text index="7" name="G7Result.Text"/>
+<text index="8" name="G6Games.Text">0 - 0</text>
+<text index="9" name="G6HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="10" name="G6AwayName.Text">HANVIKEN</text>
+<text index="11" name="G6Result.Text"/>
+<text index="12" name="G5Games.Text">0 - 0</text>
+<text index="13" name="G5HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="14" name="G5AwayName.Text">HANVIKEN</text>
+<text index="15" name="G5Result.Text"/>
+<text index="16" name="G4Games.Text">0 - 0</text>
+<text index="17" name="G4HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="18" name="G4AwayName.Text">HANVIKEN</text>
+<text index="19" name="G4Result.Text"/>
+<text index="20" name="G3Games.Text">0 - 0</text>
+<text index="21" name="G3HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="22" name="G3AwayName.Text">HANVIKEN</text>
+<text index="23" name="G3Result.Text"/>
+<text index="24" name="G2Games.Text">0 - 0</text>
+<text index="25" name="G2HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="26" name="G2AwayName.Text">HANVIKEN</text>
+<text index="27" name="G2Result.Text"/>
+<text index="28" name="G1Games.Text">0 - 0</text>
+<text index="29" name="G1HomeName.Text">Brödernas/Väsby IK HK</text>
+<text index="30" name="G1AwayName.Text">HANVIKEN</text>
+<text index="31" name="G1Result.Text"/>
+<text index="32" name="Matchstart.Text">MATCHSTART</text>
+<text index="33" name="Nedsläpp.Text"/>
+<text index="34" name="Mål.Text"/>
+<text index="35" name="Slutresultat.Text"/>
+<image index="0" name="G8HomeLogo.Source"/>
+<image index="1" name="G8AwayLogo.Source"/>
+<image index="2" name="G7HomeLogo.Source"/>
+<image index="3" name="G7AwayLogo.Source"/>
+<image index="4" name="G6HomeLogo.Source"/>
+<image index="5" name="G6AwayLogo.Source"/>
+<image index="6" name="G5HomeLogo.Source"/>
+<image index="7" name="G5AwayLogo.Source"/>
+<image index="8" name="G4HomeLogo.Source"/>
+<image index="9" name="G4AwayLogo.Source"/>
+<image index="10" name="G3HomeLogo.Source"/>
+<image index="11" name="G3AwayLogo.Source"/>
+<image index="12" name="G2HomeLogo.Source"/>
+<image index="13" name="G2AwayLogo.Source"/>
+<image index="14" name="G1HomeLogo.Source"/>
+<image index="15" name="G1AwayLogo.Source"/>
+<color index="0" name="Rectangle.Fill.Color">#0070C0</color>
+<color index="1" name="Rectangle2.Fill.Color">#0070C0</color>
+</input>
+<input key="26d249f2-8b7c-4f8d-9795-8d68c0716863" number="86" type="VideoList" title="REKLAMBLOCK 1 - Mer OPA2.mp4" shortTitle="REKLAMBLOCK 1" state="Completed" position="37060" duration="37560" loop="False" muted="True" volume="62.74224" balance="0" solo="False" soloPFL="False" audiobusses="M,E,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="5">
+REKLAMBLOCK 1 - Mer OPA2.mp4
+<list>
+<item>C:\H1_Grafikpaket\VIDEOS\ReklamBUMP-OUT(till reklam).mp4</item>
+<item>D:\VMIX\Hockey\Reklam\Matchsponsorer\Sändningssponsorer 25-26.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\2.REKLAM_FÖRE_MATCH\REKLAMFILMER\BAUHAUS The Van - Part 1.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\2.REKLAM_FÖRE_MATCH\REKLAMFILMER\Länna Sport Cycklar 48 sek.mp4</item>
+<item selected="true">D:\VMIX\Hockey\Reklam\Företag\Fontana\Mer OPA2.mp4</item>
+</list>
+</input>
+<input key="ecf7f401-de62-4c94-a1aa-7429e470fd6d" number="87" type="VideoList" title="DAGENS MATCHVÄRD - ReklamBUMP-IN(tillbaka till sändning).mp4" shortTitle="DAGENS MATCHVÄRD" state="Completed" position="3000" duration="3480" loop="False" muted="True" volume="92.23682" balance="0" solo="False" soloPFL="False" audiobusses="M,E,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="2">
+DAGENS MATCHVÄRD - ReklamBUMP-IN(tillbaka till sändning).mp4
+<list>
+<item>D:\VMIX\Hockey\Reklam\Matchsponsorer\Matchssponsorer Bauhaus.mp4</item>
+<item selected="true">C:\H1_Grafikpaket\VIDEOS\ReklamBUMP-IN(tillbaka till sändning).mp4</item>
+</list>
+</input>
+<input key="bd34b44f-52f3-4d7f-8d6a-b2b0ae4bb7c1" number="88" type="VideoList" title="VINJETT (I SAMARBETE MED) - HE_Vinjett_12sek_Sve_Största_H-Liga.mp4" shortTitle="VINJETT (I SAMARBETE MED)" state="Completed" position="12000" duration="12040" loop="False" muted="True" volume="43.04672" balance="0" solo="False" soloPFL="False" audiobusses="M,A,B,E,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="1">
+VINJETT (I SAMARBETE MED) - HE_Vinjett_12sek_Sve_Största_H-Liga.mp4
+<list>
+<item selected="true">D:\VMIX\Hockey\KÖRSCHEMA\4.VINJETT\HE_Vinjett_12sek_Sve_Största_H-Liga.mp4</item>
+</list>
+</input>
+<input key="dfec12ab-514b-4823-9a05-e9f25f09f028" number="89" type="VideoList" title="DRÖNARE - Drönarstart Tyresöhallen.mp4" shortTitle="DRÖNARE" state="Paused" position="0" duration="23560" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="A,B" meterF1="0" meterF2="0" gainDb="0" selectedIndex="1">
+DRÖNARE - Drönarstart Tyresöhallen.mp4
+<list>
+<item selected="true">D:\VMIX\Hockey\IntroOutro\Drönarstart Tyresöhallen.mp4</item>
+</list>
+</input>
+<input key="f1561dce-660f-4691-b626-a0607171f860" number="90" type="VideoList" title="REKLAMBLOCK 2 - ReklamBUMP-IN(tillbaka till sändning).mp4" shortTitle="REKLAMBLOCK 2" state="Completed" position="3000" duration="3480" loop="False" muted="True" volume="62.74224" balance="0" solo="False" soloPFL="False" audiobusses="M,E,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="6">
+REKLAMBLOCK 2 - ReklamBUMP-IN(tillbaka till sändning).mp4
+<list>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\5.REKLAM_PERIODVILA_1-2\ReklamBUMP-OUT(till reklam).mp4</item>
+<item>D:\VMIX\Hockey\Reklam\Företag\Fontana\1980 Frixos.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\5.REKLAM_PERIODVILA_1-2\REKLAMFILMER\Montana Crystal Rock aka skidslipen2.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\5.REKLAM_PERIODVILA_1-2\REKLAMFILMER\LIONS Projekt 37 sek.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\5.REKLAM_PERIODVILA_1-2\REKLAMFILMER\BAUHAUS Doften - Long version.mp4</item>
+<item selected="true">D:\VMIX\Hockey\KÖRSCHEMA\5.REKLAM_PERIODVILA_1-2\ReklamBUMP-IN(tillbaka till sändning).mp4</item>
+</list>
+</input>
+<input key="a27c9a9d-4e04-406d-81f7-df6d30fdeb29" number="91" type="VideoList" title="REKLAMBLOCK 3 - ReklamBUMP-IN(tillbaka till sändning).mp4" shortTitle="REKLAMBLOCK 3" state="Completed" position="3000" duration="3480" loop="False" muted="True" volume="43.04672" balance="0" solo="False" soloPFL="False" audiobusses="M,E,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="5">
+REKLAMBLOCK 3 - ReklamBUMP-IN(tillbaka till sändning).mp4
+<list>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\6.REKLAM_PERIODVILA_2-3\ReklamBUMP-OUT(till reklam).mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\6.REKLAM_PERIODVILA_2-3\REKLAMFILMER\Länna Sport Cycklar 48 sek.mp4</item>
+<item>D:\VMIX\Hockey\Reklam\Företag\Fontana\The Greek.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\6.REKLAM_PERIODVILA_2-3\REKLAMFILMER\BAUHAUS Vänskap.avi</item>
+<item selected="true">D:\VMIX\Hockey\KÖRSCHEMA\6.REKLAM_PERIODVILA_2-3\ReklamBUMP-IN(tillbaka till sändning).mp4</item>
+</list>
+</input>
+<input key="453c78af-ea9a-4c0b-8ec2-b9cbfc9e5ac2" number="92" type="VideoList" title="REKLAMBLOCK 4 - HE_Vinjett_12sek.mp4" shortTitle="REKLAMBLOCK 4" state="Completed" position="12000" duration="12080" loop="False" muted="True" volume="81.45061" balance="0.06" solo="False" soloPFL="False" audiobusses="M,E,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="5">
+REKLAMBLOCK 4 - HE_Vinjett_12sek.mp4
+<list>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\8.EFTER_MATCH\ReklamBUMP-OUT(till reklam).mp4</item>
+<item>D:\VMIX\Hockey\Reklam\Företag\Fontana\MER OPA - Möt familjen Fontana.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\8.EFTER_MATCH\REKLAMFILMER\BAUHAUS Badrummet 45 sekund.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\8.EFTER_MATCH\ReklamBUMP-IN(tillbaka till sändning).mp4</item>
+<item selected="true">D:\VMIX\Hockey\KÖRSCHEMA\8.EFTER_MATCH\HE_Vinjett_12sek.mp4</item>
+</list>
+</input>
+<input key="c871e7f5-ee44-4c2b-8883-7796e85c3de9" number="93" type="Colour" title="PERIODVILA" shortTitle="PERIODVILA" state="Paused" position="0" duration="0" loop="False">
+PERIODVILA
+<overlay index="0" key="eab1c088-3aab-45e1-be27-ae4c64e39f69"/>
+<overlay index="1" key="1b05ba70-5488-4ab2-ad71-ee4e51b29385"/>
+<overlay index="2" key="1b096684-ccfa-48a8-b005-c18d84d5926e"/>
+<overlay index="8" key="970d40e5-99c0-43b1-9a8e-632a983681c2"/>
+</input>
+<input key="1e53c7f4-76fe-4a7e-be8f-a9328a72aa9f" number="94" type="Audio" title="OB-Bus Mic1" shortTitle="OB-Bus Mic1" state="Running" position="0" duration="0" loop="False" muted="False" volume="37.01505" balance="0" solo="False" soloPFL="False" audiobusses="C" meterF1="0.0001456554" meterF2="0.0001456554" gainDb="15">OB-Bus Mic1</input>
+<input key="563c3027-6a73-455a-a8f7-7ea7c1391c9d" number="95" type="Audio" title="OB-Bus Mic2" shortTitle="OB-Bus Mic2" state="Running" position="0" duration="0" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="D" meterF1="0" meterF2="0" gainDb="0">OB-Bus Mic2</input>
+<input key="613b35f7-e4eb-4c17-a57d-dab49116b01d" number="96" type="ImageSequence" title="STINGER" shortTitle="STINGER" state="Completed" position="0" duration="50" loop="False">STINGER</input>
+<input key="de3a405f-f0c5-4740-9199-d8c5678a8b8a" number="97" type="VideoList" title="LAST GAME HIGHLIGHTS - HighLights_Borta.mp4" shortTitle="LAST GAME HIGHLIGHTS" state="Paused" position="0" duration="45020" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0" selectedIndex="1">
+LAST GAME HIGHLIGHTS - HighLights_Borta.mp4
+<list>
+<item selected="true">D:\VMIX\Hockey\LAST-GAME-HighLights\HighLights_Borta.mp4</item>
+</list>
+</input>
+<input key="e8e7bfb7-216d-48ad-a673-a28e87ac705d" number="98" type="Video" title="Hockeyettan_animerad_bakgrund_40sek_LOOP.mp4" shortTitle="Hockeyettan_animerad_bakgrund_40sek_LOOP.mp4" state="Running" position="14440" duration="40000" loop="True" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="M" meterF1="0" meterF2="0">Hockeyettan_animerad_bakgrund_40sek_LOOP.mp4</input>
+<input key="7b8d7b5a-a447-4d65-bba3-4fbb905959b7" number="99" type="GT" title="LOGO H1" shortTitle="LOGO H1" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+LOGO H1
+<image index="0" name="sorgeband.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\sorgeband.png</image>
+<image index="1" name="rosabandet.Source">C:\H1_Grafikpaket\TITLES\RESOURCES\rosabandet.png</image>
+<image index="2" name="mustasch.Source">3747c98c-50d2-4a34-89e4-ffd51355f65c\mustasch.png</image>
+</input>
+<input key="46e6be77-2a79-465f-9158-cee9551703d7" number="100" type="Colour" title="Production Team" shortTitle="Production Team" state="Paused" position="0" duration="0" loop="False">
+Production Team
+<overlay index="0" key="1b096684-ccfa-48a8-b005-c18d84d5926e">
+<position panY="0.194" zoomY="0.80525" x="0" y="0.4" width="1920" height="869.7"/>
+</overlay>
+<overlay index="2" key="cbe94490-cf6d-44d2-aeef-4bc880f796d7"/>
+</input>
+<input key="cbe94490-cf6d-44d2-aeef-4bc880f796d7" number="101" type="GT" title="PRODUCTIONS INFO" shortTitle="PRODUCTIONS INFO" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+PRODUCTIONS INFO
+<position zoomX="1.003" zoomY="1.003"/>
+<text index="0" name="Reporter.Text"/>
+<text index="1" name="Ansvarig Utgiva.Text">NIKLAS SAHLIN</text>
+<text index="2" name="Kamerateam.Text">NIKLAS SAHLIN, </text>
+<text index="3" name="Kommentator.Text">DENNIS OLSSON, JOAKIM WAHLQVIST</text>
+<text index="4" name="Producent.Text">ELLEN SAHLIN</text>
+<text index="5" name="mailadress.Text">info@st-broadcasting.se</text>
+<text index="6" name="Rubrik Reporter.Text">REPORTER</text>
+<text index="7" name="Rubrik Ansvarig.Text">ANSVARIG UTGIVARE</text>
+<text index="8" name="Rubrik Kamera.Text">KAMERATEAM</text>
+<text index="9" name="Rubrik Kommenta.Text">KOMMENTATOR</text>
+<text index="10" name="Rubrik Producen.Text">BILDPRODUCENT</text>
+</input>
+<input key="d4429cc1-4294-4624-9b66-3e18719af201" number="102" type="VideoList" title="POWERBREAK - ReklamBUMP-OUT2.mp4" shortTitle="POWERBREAK" state="Paused" position="0" duration="3480" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="M,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="1">
+POWERBREAK - ReklamBUMP-OUT2.mp4
+<list>
+<item selected="true">D:\VMIX\Hockey\KÖRSCHEMA\3.DAGENSMATCHVÄRD-POWERBREAK\ReklamBUMP-OUT2.mp4</item>
+<item>D:\VMIX\Hockey\Reklam\Matchsponsorer\Matchssponsorer Bauhaus.mp4</item>
+<item>D:\VMIX\Hockey\KÖRSCHEMA\3.DAGENSMATCHVÄRD-POWERBREAK\ReklamBUMP-IN2.mp4</item>
+</list>
+</input>
+<input key="fc8ecf7f-ae13-4583-b667-17fc46a69785" number="103" type="VideoList" title="OUTRO END BROADCAST - STB-Overlay.mp4" shortTitle="OUTRO END BROADCAST" state="Paused" position="3000" duration="7600" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="M,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="1">
+OUTRO END BROADCAST - STB-Overlay.mp4
+<list>
+<item selected="true">D:\VMIX\Hockey\IntroOutro\STB-Overlay.mp4</item>
+</list>
+</input>
+<input key="f2cb8837-523e-4eef-83c2-6f9aac10a74e" number="104" type="GT" title="REPORTER I SÄNDNING" shortTitle="REPORTER I SÄNDNING" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+REPORTER I SÄNDNING
+<text index="0" name="Ticker.Text">REPORTER I SÄNDNING</text>
+</input>
+<input key="09111257-ad3a-476b-9499-561c977b33bd" number="105" type="GT" title="KOMMENTATOR ON-MUTE" shortTitle="KOMMENTATOR ON-MUTE" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+KOMMENTATOR ON-MUTE
+<text index="0" name="Ticker1.Text">Vi kör highlights innan pausen</text>
+</input>
+<input key="909e13bb-59b6-4e8b-8b6c-7264487fddec" number="106" type="GT" title="BROADCAST INFO" shortTitle="BROADCAST INFO" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+BROADCAST INFO
+<text index="0" name="TIME.Text">TIME</text>
+<text index="1" name="Date.Text">2025-11-29</text>
+<text index="2" name="Date1.Text">DATE</text>
+<text index="3" name="Start Time.Text">15:45</text>
+<text index="4" name="Start Time1.Text">START TIME</text>
+<text index="5" name="End Time.Text">18:50</text>
+<text index="6" name="End Time1.Text">END TIME</text>
+<text index="7" name="Clock.Text">{0:HH:mm:ss}</text>
+<text index="8" name="VIDEO.Text">VIDEO</text>
+<text index="9" name="Broadcast Info.Text">Hanvikens SK - Tingsryd AIF TYRESÖ Ishall MatchNr 1010326</text>
+<text index="10" name="Video Format.Text">H264</text>
+<text index="11" name="Video Format1.Text">FORMAT</text>
+<text index="12" name="Profile.Text">High</text>
+<text index="13" name="Profile1.Text">PROFILE</text>
+<text index="14" name="Level.Text">3.1</text>
+<text index="15" name="Level1.Text">LEVEL</text>
+<text index="16" name="Video Bit Rate.Text">9000</text>
+<text index="17" name="Video Bit Rate1.Text">BIT RATE</text>
+<text index="18" name="Encoder Size.Text">1920 x 1080</text>
+<text index="19" name="Encoder Size1.Text">ENCODER SIZE</text>
+<text index="20" name="AUDIO.Text">AUDIO</text>
+<text index="21" name="TESTTONE.Text">1kHz 441Hz 6 dBfs</text>
+<text index="22" name="Audio Format.Text">AAC</text>
+<text index="23" name="Audio Format1.Text">FORMAT</text>
+<text index="24" name="Audio Bit Rate.Text">128</text>
+<text index="25" name="Audio Bit Rate1.Text">BIT RATE</text>
+<text index="26" name="Ticker.Text"/>
+<image index="0" name="Main Background.Source">1af13bde-f707-4cd2-8ba9-cc61783ef3ae\STB_LIVE-Media.gif</image>
+<color index="0" name="Rectangle1.Fill.Color">#000000</color>
+<color index="1" name="Ticker Backgr.Fill.Color">#FF0000</color>
+</input>
+<input key="3f0a0cf3-170f-4c83-afa1-d79f891c4f16" number="107" type="NDI" title="BROADCAST INFO + TEST TONE" shortTitle="BROADCAST INFO + TEST TONE" state="Running" position="0" duration="0" loop="False" muted="True" volume="0" balance="0" solo="False" soloPFL="False" audiobusses="M" meterF1="0" meterF2="0" gainDb="0">
+BROADCAST INFO + TEST TONE
+<overlay index="0" key="909e13bb-59b6-4e8b-8b6c-7264487fddec"/>
+<overlay index="1" key="bf05f839-889e-453c-9b08-4841d0d21392"/>
+</input>
+<input key="bf05f839-889e-453c-9b08-4841d0d21392" number="108" type="AudioFile" title="1kHz_441Hz" shortTitle="1kHz_441Hz" state="Paused" position="147792" duration="1805996" loop="True" muted="True" volume="49.78713" balance="0" solo="False" soloPFL="False" audiobusses="M" meterF1="0" meterF2="0" gainDb="0">1kHz_441Hz</input>
+<input key="b39ee901-2ef9-49f5-a349-6c6bafa5df90" number="109" type="VideoList" title="List - loopen_version1.wav" shortTitle="List" state="Paused" position="8488" duration="68308" loop="True" muted="True" volume="40.96" balance="0" solo="False" soloPFL="False" audiobusses="M,F" meterF1="0" meterF2="0" gainDb="0" selectedIndex="1">
+List - loopen_version1.wav
+<list>
+<item selected="true">D:\VMIX\Hockey\Ljudfiler\loopen_version1.wav</item>
+</list>
+</input>
+<input key="83188a5a-7d1b-4103-8115-49e6e0859eec" number="110" type="AudioFile" title="ES_Between Worlds_extended.wav" shortTitle="ES_Between Worlds_extended.wav" state="Paused" position="183327" duration="335013" loop="True" muted="False" volume="4.100624" balance="0" solo="False" soloPFL="False" audiobusses="M,B,E,F,G" meterF1="0" meterF2="0" gainDb="0">ES_Between Worlds_extended.wav</input>
+<input key="e447bc79-5e35-4e73-8972-6fcca82e40a9" number="111" type="GT" title="message_2_studio.gtzip" shortTitle="message_2_studio.gtzip" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+message_2_studio.gtzip
+<text index="0" name="message1.Text">POWERBREAK</text>
+<text index="1" name="message2.Text">GÅ TILL!</text>
+</input>
+<input key="9b548228-de3a-4099-900d-07e607118724" number="112" type="GT" title="StartBanner" shortTitle="StartBanner" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+StartBanner
+<text index="0" name="Time.Text">{0:15:50|mm:ss}</text>
+<text index="1" name="HomeName.Text">IF SUNDSVALL HOCKEY</text>
+<text index="2" name="AwayName.Text">CLEMENSNÄS HC</text>
+<image index="0" name="LogoHome.Source">https://vmix-new.hockeyettan.se/premagesLogo/SUN.png</image>
+<image index="1" name="LogoAway.Source">https://vmix-new.hockeyettan.se/premagesLogo/CHC.png</image>
+<image index="2" name="QR-code.Source">24121ace-1d09-4a2f-b3e6-5ca95f841e55\qrKod.png</image>
+</input>
+<input key="166ab229-635f-4604-aecf-bdbcf99662b7" number="113" type="GT" title="NÄSTA INSLAG.gtzip" shortTitle="NÄSTA INSLAG.gtzip" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+NÄSTA INSLAG.gtzip
+<text index="0" name="Headline.Text">GÅ TILL STUDIO!!!</text>
+<text index="1" name="Description.Text">UPPVÄMNINGSBILDER + LAGUPPSTÄLLNING HEMMALAG</text>
+</input>
+<input key="577af443-6104-40be-b622-5edbe33e203f" number="114" type="GT" title="PLAYERINFO" shortTitle="PLAYERINFO" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+PLAYERINFO
+<text index="0" name="PlayerNr.Text">4</text>
+<text index="1" name="PlayerName.Text">Axel Abrahamsson</text>
+<text index="2" name="AgeData.Text">27</text>
+<text index="3" name="PositionData.Text">LD</text>
+<text index="4" name="HeightData.Text">186</text>
+<text index="5" name="L-RData.Text">L</text>
+<image index="0" name="PlayerImage.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+</input>
+<input key="bc442ded-7ff9-461a-888f-2a209915765d" number="115" type="Colour" title="50-50" shortTitle="50-50" state="Paused" position="0" duration="0" loop="False">
+50-50
+<overlay index="0" key="1b096684-ccfa-48a8-b005-c18d84d5926e">
+<position panX="0.622" panY="0.595" zoomX="0.35175" zoomY="0.35175" x="1219.4" y="28.8" width="675.4" height="379.9"/>
+</overlay>
+<overlay index="1" key="68f1e97e-7d7f-42a8-83dc-fcf2ba06d933"/>
+</input>
+<input key="68f1e97e-7d7f-42a8-83dc-fcf2ba06d933" number="116" type="GT" title="50-50-lotter.gtzip" shortTitle="50-50-lotter.gtzip" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+50-50-lotter.gtzip
+<overlay index="0" key="e6f947fc-90c3-48d8-b201-246b46b31b7c">
+<position panX="-0.615" panY="-0.329" zoomX="0.6295" zoomY="0.628" x="-234.7" y="378.5" width="1208.6" height="678.2"/>
+<crop X1="0" Y1="0" X2="0.9953" Y2="0.9956"/>
+</overlay>
+<text index="0" name="CurrentSold.Text">0</text>
+<text index="1" name="st.Text">st</text>
+<text index="2" name="SÅLDA-LOTTER.Text">SÅLDA LOTTER</text>
+<text index="3" name="kr.Text">kr</text>
+<text index="4" name="CurrentValue.Text">0</text>
+<text index="5" name="AKTUELLT-VÄRDE.Text">AKTUELLT VÄRDE</text>
+<text index="6" name="SKANNA-KOD.Text">< SKANNA QR-KOD</text>
+<text index="7" name="HeadLine.Text">STÖD Hanviken KÖP 50/50 Lotten Vinnare meddelas i Powerbreak PERIOD 3</text>
+<image index="0" name="LOGO.Source">bc4ec0ba-545d-44b6-a7e6-2ee6c38e2bb1\Team1.png</image>
+<image index="1" name="QR-Kod.Source"/>
+<color index="0" name="FEED.Fill.Color">#04F404</color>
+</input>
+<input key="e6f947fc-90c3-48d8-b201-246b46b31b7c" number="117" type="Image" title="BILD QR-KOD" shortTitle="BILD QR-KOD" state="Paused" position="0" duration="0" loop="False">BILD QR-KOD</input>
+<input key="e5080e32-a167-4b8d-ab2e-16e0b01f7589" number="118" type="Video" title="ReklamBUMP-OUT 50-50-LOTTEN" shortTitle="ReklamBUMP-OUT 50-50-LOTTEN" state="Completed" position="3000" duration="3480" loop="False" muted="False" volume="5.764801" balance="0" solo="False" soloPFL="False" audiobusses="M,A,F" meterF1="0" meterF2="0" gainDb="0">ReklamBUMP-OUT 50-50-LOTTEN</input>
+<input key="c90c44cf-7e67-4e14-be5f-ed83a678801e" number="119" type="Video" title="ReklamBUMP-IN 50-50-LOTTEN" shortTitle="ReklamBUMP-IN 50-50-LOTTEN" state="Completed" position="3000" duration="3480" loop="False" muted="False" volume="8.503057" balance="0" solo="False" soloPFL="False" audiobusses="M,A,F" meterF1="0" meterF2="0" gainDb="0">ReklamBUMP-IN 50-50-LOTTEN</input>
+<input key="3e1eb213-a761-45c8-af1b-ace58257f95c" number="120" type="GT" title="VINNARE 50-50-LOTTEN" shortTitle="VINNARE 50-50-LOTTEN" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+VINNARE 50-50-LOTTEN
+<text index="0" name="Ticker.Text">VINNANDE LOTTEN i 50/50 LOTTEN ÄR nr GRATTIS! Summan swishas snart in på ditt konto!</text>
+</input>
+<input key="6f5a37d6-a2c0-4a72-bbc5-fca93bf90a12" number="121" type="GT" title="MÅÅL" shortTitle="MÅÅL" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">MÅÅL</input>
+<input key="4b3c11c2-49ed-48c4-b9a3-4b9ddf8b2f54" number="122" type="Telestrator" title="Telestrator" shortTitle="Telestrator" state="Running" position="0" duration="0" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="" meterF1="0" meterF2="0" gainDb="0">Telestrator</input>
+<input key="4452a8ff-c695-43dd-acab-a8ef1cf16eba" number="123" type="GT" title="TIMER" shortTitle="TIMER" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+TIMER
+<position panX="-1.946" panY="-1.964" zoomX="3.28" zoomY="3.28"/>
+<text index="0" name="Timer.Text">00</text>
+</input>
+<input key="607ea96f-09ef-4271-baba-c11ea77f9dc5" number="124" type="GT" title="DAGENS MATCHER SÖDRA Low 3rd" shortTitle="DAGENS MATCHER SÖDRA Low 3rd" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+DAGENS MATCHER SÖDRA Low 3rd
+<text index="0" name="G1Result.Text"/>
+<text index="1" name="G1NameHome.Text">KHK</text>
+<text index="2" name="G1NameAway.Text">NSK</text>
+<text index="3" name="G2Result.Text">(0 - 1)</text>
+<text index="4" name="G2NameHome.Text">JÄR</text>
+<text index="5" name="G2NameAway.Text">TRA</text>
+<text index="6" name="G3Result.Text">(2 - 0)</text>
+<text index="7" name="G3NameHome.Text">HHHC</text>
+<text index="8" name="G3NameAway.Text">VÄS</text>
+<text index="9" name="G4Result.Text">(0 - 0)</text>
+<text index="10" name="G4NameHome.Text">VIT</text>
+<text index="11" name="G4NameAway.Text">KUN</text>
+<text index="12" name="G5Result.Text">(0 - 0)</text>
+<text index="13" name="G5NameHome.Text">BRS</text>
+<text index="14" name="G5NameAway.Text">MAR</text>
+<text index="15" name="G6Result.Text"/>
+<text index="16" name="G6NameHome.Text"/>
+<text index="17" name="G6NameAway.Text"/>
+<text index="18" name="G7Result.Text"/>
+<text index="19" name="G7NameHome.Text"/>
+<text index="20" name="G7NameAway.Text"/>
+<image index="0" name="G1LogoHome.Source">b3c66482-9195-4d29-a9f2-66c3587ec7d6\Team1.png</image>
+<image index="1" name="G1LogoAway.Source">9e239289-e408-4c78-a292-8313cc94da79\Team2.png</image>
+<image index="2" name="G2LogoHome.Source">b3c66482-9195-4d29-a9f2-66c3587ec7d6\Team1.png</image>
+<image index="3" name="G2LogoAway.Source">9e239289-e408-4c78-a292-8313cc94da79\Team2.png</image>
+<image index="4" name="G3LogoHome.Source">b3c66482-9195-4d29-a9f2-66c3587ec7d6\Team1.png</image>
+<image index="5" name="G3LogoAway.Source">9e239289-e408-4c78-a292-8313cc94da79\Team2.png</image>
+<image index="6" name="G4LogoHome.Source">b3c66482-9195-4d29-a9f2-66c3587ec7d6\Team1.png</image>
+<image index="7" name="G4LogoAway.Source">9e239289-e408-4c78-a292-8313cc94da79\Team2.png</image>
+<image index="8" name="G5LogoHome.Source">b3c66482-9195-4d29-a9f2-66c3587ec7d6\Team1.png</image>
+<image index="9" name="G5LogoAway.Source">9e239289-e408-4c78-a292-8313cc94da79\Team2.png</image>
+<image index="10" name="G6LogoHome.Source">b3c66482-9195-4d29-a9f2-66c3587ec7d6\Team1.png</image>
+<image index="11" name="G6LogoAway.Source">9e239289-e408-4c78-a292-8313cc94da79\Team2.png</image>
+<image index="12" name="G7LogoHome.Source">b3c66482-9195-4d29-a9f2-66c3587ec7d6\Team1.png</image>
+<image index="13" name="G7LogoAway.Source">9e239289-e408-4c78-a292-8313cc94da79\Team2.png</image>
+</input>
+<input key="10ede2cd-ab8f-408b-85fc-23799ea77dbe" number="125" type="GT" title="uppsnack.gtzip" shortTitle="uppsnack.gtzip" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">uppsnack.gtzip</input>
+<input key="6333424b-197c-4a5a-8326-f553a513a91a" number="126" type="GT" title="uppsnack2.gtzip" shortTitle="uppsnack2.gtzip" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">uppsnack2.gtzip</input>
+<input key="11d29959-e443-43df-b015-68099516ba34" number="127" type="VirtualSet" title="SPLIT-SCREEN" shortTitle="SPLIT-SCREEN" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+SPLIT-SCREEN
+<overlay index="0" key="e8e7bfb7-216d-48ad-a673-a28e87ac705d"/>
+<overlay index="1" key="6333424b-197c-4a5a-8326-f553a513a91a"/>
+<overlay index="6" key="281702da-b611-45cd-aff2-2627725b4334">
+<position panX="-0.6566146" panY="0.4287037" zoomX="0.3163021" zoomY="0.3162963" x="26" y="137.7" width="607.3" height="341.6"/>
+</overlay>
+<overlay index="7" key="dc24f5e9-6267-4644-b8b0-176a98f8be23">
+<position panX="-0.6566146" panY="-0.23" zoomX="0.3163021" zoomY="0.3162963" x="26" y="493.4" width="607.3" height="341.6"/>
+</overlay>
+<overlay index="8" key="b0f8d221-2b9a-49d7-ade6-02f801df9b72">
+<position panX="0.3270833" panY="0.1005556" zoomX="0.65" zoomY="0.65" x="650" y="134.7" width="1248" height="702"/>
+</overlay>
+<overlay index="9" key="10ede2cd-ab8f-408b-85fc-23799ea77dbe"/>
+</input>
+<input key="281702da-b611-45cd-aff2-2627725b4334" number="128" type="Mix" title="Mix2" shortTitle="Mix2" state="Paused" position="0" duration="0" loop="False">Mix2</input>
+<input key="dc24f5e9-6267-4644-b8b0-176a98f8be23" number="129" type="Mix" title="Mix3" shortTitle="Mix3" state="Paused" position="0" duration="0" loop="False">Mix3</input>
+<input key="b0f8d221-2b9a-49d7-ade6-02f801df9b72" number="130" type="Mix" title="Mix4" shortTitle="Mix4" state="Paused" position="0" duration="0" loop="False">Mix4</input>
+<input key="7c420d72-c5ac-4088-a186-b1fc830efb4c" number="131" type="GT" title="LINEUP HOME 3D" shortTitle="LINEUP HOME 3D" state="Paused" position="0" duration="0" loop="False" selectedIndex="2">
+LINEUP HOME 3D
+<text index="0" name="H_GK1_name.Text">ADAM OHRE</text>
+<text index="1" name="H_GK1_number.Text">30</text>
+<text index="2" name="H_GK2_name.Text">JONATHAN REINHOLDT</text>
+<text index="3" name="H_GK2_number.Text">1</text>
+<text index="4" name="H_LD1_name.Text">NILS NORDH</text>
+<text index="5" name="H_LD1_number.Text">39</text>
+<text index="6" name="H_LD2_name.Text">AXEL ABRAHAMSSON</text>
+<text index="7" name="H_LD2_number.Text">4</text>
+<text index="8" name="H_LD3_name.Text">KEVIN RÖNNELÖW</text>
+<text index="9" name="H_LD3_number.Text">38</text>
+<text index="10" name="H_LD4_name.Text"/>
+<text index="11" name="H_LD4_number.Text"/>
+<text index="12" name="H_LD5_name.Text"/>
+<text index="13" name="H_LD5_number.Text"/>
+<text index="14" name="H_RD1_name.Text">EMIL MELANDER</text>
+<text index="15" name="H_RD1_number.Text">25</text>
+<text index="16" name="H_RD2_name.Text">JONATHAN LIDMAN</text>
+<text index="17" name="H_RD2_number.Text">28</text>
+<text index="18" name="H_RD3_name.Text">LEON HÄGGSTRÖM</text>
+<text index="19" name="H_RD3_number.Text">11</text>
+<text index="20" name="H_RD4_name.Text">EMIL WENGELIN</text>
+<text index="21" name="H_RD4_number.Text">9</text>
+<text index="22" name="H_RD5_name.Text"/>
+<text index="23" name="H_RD5_number.Text"/>
+<text index="24" name="H_LW1_name.Text">FILIP WIBERG</text>
+<text index="25" name="H_LW1_number.Text">12</text>
+<text index="26" name="H_LW2_name.Text">ERIK HEDLUND</text>
+<text index="27" name="H_LW2_number.Text">34</text>
+<text index="28" name="H_LW3_name.Text">FABIAN WESTLING ALM</text>
+<text index="29" name="H_LW3_number.Text">71</text>
+<text index="30" name="H_LW4_name.Text">EDVIN MODIN</text>
+<text index="31" name="H_LW4_number.Text">10</text>
+<text index="32" name="H_LW5_name.Text"/>
+<text index="33" name="H_LW5_number.Text"/>
+<text index="34" name="H_C1_name.Text">JOHAN LINDHOLM</text>
+<text index="35" name="H_C1_number.Text">22</text>
+<text index="36" name="H_C2_name.Text">MARTIN ARPE</text>
+<text index="37" name="H_C2_number.Text">24</text>
+<text index="38" name="H_C3_name.Text">LUDVIG WESTERLUND</text>
+<text index="39" name="H_C3_number.Text">14</text>
+<text index="40" name="H_C4_name.Text">HUGO BERGENDAL</text>
+<text index="41" name="H_C4_number.Text">15</text>
+<text index="42" name="H_C5_name.Text"/>
+<text index="43" name="H_C5_number.Text"/>
+<text index="44" name="H_RW1_name.Text">EMIL LINDBLOM</text>
+<text index="45" name="H_RW1_number.Text">68</text>
+<text index="46" name="H_RW2_name.Text">MATHIAS WIKUDD</text>
+<text index="47" name="H_RW2_number.Text">8</text>
+<text index="48" name="H_RW3_name.Text">OLIVER SUNDBERG</text>
+<text index="49" name="H_RW3_number.Text">21</text>
+<text index="50" name="H_RW4_name.Text">OSKAR LARSSON</text>
+<text index="51" name="H_RW4_number.Text">37</text>
+<text index="52" name="H_RW5_name.Text"/>
+<text index="53" name="H_RW5_number.Text"/>
+<image index="0" name="H_GK1_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="1" name="H_GK2_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="2" name="H_LD1_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="3" name="H_LD2_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="4" name="H_LD3_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="5" name="H_LD4_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="6" name="H_LD5_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="7" name="H_RD1_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="8" name="H_RD2_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="9" name="H_RD3_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="10" name="H_RD4_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="11" name="H_RD5_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="12" name="H_LW1_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="13" name="H_LW2_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="14" name="H_LW3_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="15" name="H_LW4_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="16" name="H_LW5_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="17" name="H_C1_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="18" name="H_C2_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="19" name="H_C3_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="20" name="H_C4_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="21" name="H_C5_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="22" name="H_RW1_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="23" name="H_RW2_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="24" name="H_RW3_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="25" name="H_RW4_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="26" name="H_RW5_picture.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="27" name="Sponsor1.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="28" name="Sponsor2.Source">4f23e66f-f7d2-4cf5-97fa-795f9857d995\SPLOPG-300x300.jpg</image>
+<image index="29" name="Sponsor3.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="30" name="Sponsor4.Source">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</image>
+<image index="31" name="Sponsor5.Source">https://vmix-new.hockeyettan.se/Players/empty2.png</image>
+<image index="32" name="H_LogoTeam.Source">https://vmix-new.hockeyettan.se/premagesLogo/SUN.png</image>
+<color index="0" name="H_GK1_namebg.Fill.Color">10</color>
+<color index="1" name="H_GK2_namebg.Fill.Color">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</color>
+<color index="2" name="H_LD1_namebg.Fill.Color">https://vmix-new.hockeyettan.se/Players/empty2.png</color>
+<color index="3" name="H_LD2_namebg.Fill.Color">ANTON LUNDSTRÖM</color>
+<color index="4" name="H_LD3_namebg.Fill.Color">13</color>
+<color index="5" name="H_LD4_namebg.Fill.Color">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</color>
+<color index="6" name="H_LD5_namebg.Fill.Color">https://vmix-new.hockeyettan.se/Players/empty2.png</color>
+<color index="7" name="H_RD1_namebg.Fill.Color"/>
+<color index="8" name="H_RD2_namebg.Fill.Color"/>
+<color index="9" name="H_RD3_namebg.Fill.Color"/>
+<color index="10" name="H_RD4_namebg.Fill.Color">https://vmix-new.hockeyettan.se/Players/empty2.png</color>
+<color index="11" name="H_RD5_namebg.Fill.Color">ELIS HEDLUND</color>
+<color index="12" name="H_LW1_namebg.Fill.Color">17</color>
+<color index="13" name="H_LW2_namebg.Fill.Color">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</color>
+<color index="14" name="H_LW3_namebg.Fill.Color">https://vmix-new.hockeyettan.se/Players/empty2.png</color>
+<color index="15" name="H_LW4_namebg.Fill.Color">KEVIN KARIANDER</color>
+<color index="16" name="H_LW5_namebg.Fill.Color">11</color>
+<color index="17" name="H_C1_namebg.Fill.Color">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</color>
+<color index="18" name="H_C2_namebg.Fill.Color">https://vmix-new.hockeyettan.se/Players/empty2.png</color>
+<color index="19" name="H_C3_namebg.Fill.Color">KIAN MORÉN</color>
+<color index="20" name="H_C4_namebg.Fill.Color">21</color>
+<color index="21" name="H_C5_namebg.Fill.Color">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</color>
+<color index="22" name="H_RW1_namebg.Fill.Color">https://vmix-new.hockeyettan.se/Players/empty2.png</color>
+<color index="23" name="H_RW2_namebg.Fill.Color">VIKTOR MEYER</color>
+<color index="24" name="H_RW3_namebg.Fill.Color">20</color>
+<color index="25" name="H_RW4_namebg.Fill.Color">https://vmix-new.hockeyettan.se/scoreImages/lineup-PLATE.png</color>
+<color index="26" name="H_RW5_namebg.Fill.Color">https://vmix-new.hockeyettan.se/Players/empty2.png</color>
+</input>
+<input key="afe7c55f-121c-4050-a823-7b5f2dec64a1" number="132" type="GT" title="INFO2VIEWERS" shortTitle="INFO2VIEWERS" state="Running" position="0" duration="0" loop="False" selectedIndex="0">
+INFO2VIEWERS
+<text index="0" name="Info2Viewer.Text">MATCHEN PAUSAD, ÅTERUPPTAS KL 21:58</text>
+</input>
+<input key="f68eecec-273c-42c1-a420-4dd24820ec6d" number="133" type="Preview" title="Preview" shortTitle="Preview" state="Paused" position="0" duration="0" loop="False">Preview</input>
+<input key="5b99a33e-8441-4f7f-8569-0a63bd2e7829" number="134" type="Colour" title="Colour" shortTitle="Colour" state="Paused" position="0" duration="0" loop="False">
+Colour
+<overlay index="0" key="05062016-4c3b-483b-a71d-9c405ec4171b">
+<position panX="-0.5" zoomX="0.5" zoomY="0.5" x="0" y="270" width="960" height="540"/>
+</overlay>
+<overlay index="1" key="6b2891df-b355-49bd-a6a9-b000305e8f0e">
+<position panX="0.5" zoomX="0.5" zoomY="0.5" x="960" y="270" width="960" height="540"/>
+</overlay>
+</input>
+<input key="f81154fd-cf1b-4630-9f71-0c37c684a6f9" number="135" type="GT" title="ON-OFF-AIR-STUDIO3" shortTitle="ON-OFF-AIR-STUDIO3" state="Paused" position="0" duration="0" loop="False" selectedIndex="0">
+ON-OFF-AIR-STUDIO3
+<position panX="-0.024" panY="1.839"/>
+<text index="0" name="AIR-ON.Text">STUDIO 3 ON-AIR</text>
+<text index="1" name="ON-AIR.Text">g</text>
+<text index="2" name="OFF-AIR.Text">c</text>
+<text index="3" name="AIR-OFF.Text">STUDIO 3 OFF-AIR</text>
+</input>
+<input key="9e073a27-5d20-4e6e-858a-fae7dc63f2f9" number="136" type="VLC" title="DRONE_RTMP" shortTitle="DRONE_RTMP" state="Running" position="0" duration="0" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="M" meterF1="0" meterF2="0" gainDb="0">DRONE_RTMP</input>
+<input key="b0fed6f2-27e4-491b-bd47-b4aa62c5f8a8" number="137" type="Video" title="THH HighLigts Burn.mp4" shortTitle="THH HighLigts Burn.mp4" state="Completed" position="5000" duration="5100" loop="False" muted="True" volume="100" balance="0" solo="False" soloPFL="False" audiobusses="M,E" meterF1="0" meterF2="0" gainDb="0">THH HighLigts Burn.mp4</input>
+</inputs>
+<outputs>
+<output type="fullscreen" number="1" source="Output"/>
+<output type="fullscreen" number="2" source="Output"/>
+<output type="output" number="1" source="Output" ndi="True"/>
+<output type="output" number="2" source="Input" inputNumber="31"/>
+<output type="output" number="3" source="Input" inputNumber="7"/>
+<output type="output" number="4" source="Input" inputNumber="72"/>
+</outputs>
+<overlays>
+<overlay number="1">1</overlay>
+<overlay number="2"/>
+<overlay number="3">99</overlay>
+<overlay number="4"/>
+<overlay number="5"/>
+<overlay number="6"/>
+<overlay number="7"/>
+<overlay number="8"/>
+<overlay number="9"/>
+<overlay number="10"/>
+<overlay number="11"/>
+<overlay number="12"/>
+<overlay number="13"/>
+<overlay number="14"/>
+<overlay number="15"/>
+<overlay number="16"/>
+</overlays>
+<preview>1</preview>
+<active>20</active>
+<fadeToBlack>False</fadeToBlack>
+<transitions>
+<transition number="1" effect="Fade" duration="500"/>
+<transition number="2" effect="Merge" duration="1000"/>
+<transition number="3" effect="Stinger1" duration="1000"/>
+<transition number="4" effect="CrossZoom" duration="1000"/>
+</transitions>
+<recording>False</recording>
+<external>False</external>
+<streaming>False</streaming>
+<playList>False</playList>
+<multiCorder>False</multiCorder>
+<fullscreen>True</fullscreen>
+<mix number="2">
+<preview>12</preview>
+<active>9</active>
+</mix>
+<mix number="3">
+<preview>20</preview>
+<active>17</active>
+</mix>
+<mix number="4">
+<preview>12</preview>
+<active>10</active>
+</mix>
+<audio>
+<master volume="100" muted="False" meterF1="0" meterF2="0" headphonesVolume="0"/>
+<busA volume="100" muted="False" meterF1="0" meterF2="0" name="STUDIOs" solo="False" sendToMaster="False"/>
+<busB volume="68.57497" muted="False" meterF1="0" meterF2="0" name="InterCom" solo="False" sendToMaster="False"/>
+<busC volume="100" muted="False" meterF1="0.0001689801" meterF2="0.0001689801" name="OB-Bus mic1" solo="False" sendToMaster="False"/>
+<busD volume="88.52929" muted="False" meterF1="0" meterF2="0" name="OB-Bus Mic2" solo="False" sendToMaster="False"/>
+<busE volume="100" muted="False" meterF1="0" meterF2="0" name="REPLAY" solo="False" sendToMaster="False"/>
+<busF volume="100" muted="False" meterF1="0" meterF2="0" name="Högt. OB-Buss" solo="False" sendToMaster="False"/>
+<busG volume="100" muted="False" meterF1="0" meterF2="0" name="Hörl. OB-Buss" solo="False" sendToMaster="False"/>
+</audio>
+<dynamic>
+<input1>CAM 9 Field CAM 1</input1>
+<input2>TABELL-SERIE1</input2>
+<input3>SPLIT-SCREEN</input3>
+<input4/>
+<value1/>
+<value2/>
+<value3/>
+<value4/>
+</dynamic>
+</vmix>

@@ -1,110 +1,75 @@
-"""
-ClockController
-----------------
-
-Ansvar:
-- Starta / stoppa / pausa matchklockan
-- Återställa periodtid
-- Hantera overtime
-- Uppdatera scoreboard-inputs med aktuell tid
-- All vMix-interaktion via VMixClient
-"""
-
-from __future__ import annotations
-from typing import Optional, Dict, Any
-
+import time
+from typing import Dict
 from scoreboard_app.core.vmix_client import VMixClient
 
 
 class ClockController:
     """
-    Kontrollerar matchklockan i vMix.
-
-    All XML/HTTP talk sker enbart genom VMixClient.
+    Handles match clock logic and communication with the vMix scoreboard graphic.
     """
 
-    def __init__(self, client: VMixClient, cfg: Dict[str, Any]):
+    def __init__(self, client: VMixClient, cfg: Dict):
         self.client = client
         self.cfg = cfg
 
-        # pointers till fält i scoreboard
-        self.scoreboard_input_name = cfg["scoreboard"]["input"]
-        self.period_field = cfg["scoreboard"]["fields"]["period"]
-        self.clock_field = cfg["scoreboard"]["fields"]["clock"]
+        # NEW: scoreboard input ID from config
+        self.scoreboard_input = cfg["inputs"]["scoreboard"]
 
-        # standardvärden
-        self.default_period_time: str = cfg["clock"].get("default_period_time", "20:00")
-        self.overtime_time: str = cfg["clock"].get("default_overtime_time", "05:00")
+        # NEW: field mapping from config (correct location)
+        self.clock_field = cfg["mapping"]["scoreboard"]["clock"]
+        self.period_field = cfg["mapping"]["scoreboard"]["period"]
 
-    # -----------------------------------------------------------------
-    # EXPOSED ACTIONS
-    # -----------------------------------------------------------------
+        # refresh timing from config
+        self.refresh_ms = cfg["defaults"]["clock_refresh_ms"]
 
-    def start(self) -> bool:
-        """Starta matchklockan."""
-        return self.client.set_clock_running(True)
 
-    def stop(self) -> bool:
-        """Stoppa matchklockan."""
-        return self.client.set_clock_running(False)
-
-    def reset_period(self) -> bool:
-        """Återställ klockan till periodens originaltid."""
-        return self.set_time(self.default_period_time)
-
-    def reset_overtime(self) -> bool:
-        """Återställ klockan till overtime-standard."""
-        return self.set_time(self.overtime_time)
-
-    # -----------------------------------------------------------------
-
-    def toggle(self) -> bool:
+    # ------------------------------------------------------------
+    def update_clock(self, clock_text: str):
         """
-        Start/Stop toggle baserat på status från vMix.
+        Update the visible game clock on the scoreboard.
         """
-        running = self.client.get_clock_running()
-        return self.client.set_clock_running(not running)
 
-    # -----------------------------------------------------------------
+        if not self.scoreboard_input:
+            raise RuntimeError("No scoreboard input configured")
 
-    def set_time(self, mmss: str) -> bool:
-        """
-        Sätt klockan till ett specificerat MM:SS värde.
-        """
-        ok = self.client.set_clock_time(mmss)
-        if ok:
-            self.refresh_scoreboard_time()
-        return ok
-
-    # -----------------------------------------------------------------
-
-    def set_scoreboard_period(self, value: str) -> bool:
-        """
-        Uppdatera periodfältet i scoreboardgrafiken.
-        """
-        return self.client.set_text(
-            input_name=self.scoreboard_input_name,
-            field_name=self.period_field,
-            value=value,
-        )
-
-    # -----------------------------------------------------------------
-
-    def refresh_scoreboard_time(self) -> bool:
-        """
-        Läs nuvarande klocktid från vMix och uppdatera scoreboard-grafiken.
-        """
-        time_str = self.client.get_clock_time()
-        return self.client.set_text(
-            input_name=self.scoreboard_input_name,
+        self.client.set_text(
+            input_key=self.scoreboard_input,
             field_name=self.clock_field,
-            value=time_str,
+            value=clock_text,
         )
 
-    # -----------------------------------------------------------------
 
-    def full_refresh(self):
+    # ------------------------------------------------------------
+    def update_period(self, period_text: str):
         """
-        Force-refresh av alla grafiska fält kopplade till klockan.
+        Update the visible match period.
         """
-        self.refresh_scoreboard_time()
+
+        if not self.scoreboard_input:
+            raise RuntimeError("No scoreboard input configured")
+
+        self.client.set_text(
+            input_key=self.scoreboard_input,
+            field_name=self.period_field,
+            value=period_text,
+        )
+
+
+    # ------------------------------------------------------------
+    def auto_refresh_loop(self, generator_fn):
+        """
+        Run a loop where generator_fn() yields new clock values (ex: countdown logic)
+
+        generator_fn must return: (clock_text, period_text)
+        """
+
+        while True:
+            clock_str, period_str = generator_fn()
+
+            if clock_str is not None:
+                self.update_clock(clock_str)
+
+            if period_str is not None:
+                self.update_period(period_str)
+
+            time.sleep(self.refresh_ms / 1000.0)

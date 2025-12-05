@@ -36,7 +36,6 @@ class PenaltyController:
         self._run_auto = True
 
         # Start worker thread style
-        self.client.set_tk_safe_update(False)
         self._start_background_poll()
 
     # -------------------------------------------------------------

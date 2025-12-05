@@ -1,75 +1,135 @@
-import time
-from typing import Dict
+from __future__ import annotations
+from typing import Any, Dict
+
 from scoreboard_app.core.vmix_client import VMixClient
 
 
 class ClockController:
     """
-    Handles match clock logic and communication with the vMix scoreboard graphic.
+    Controls the period and match clock inside a scoreboard GT input.
     """
 
-    def __init__(self, client: VMixClient, cfg: Dict):
+    def __init__(self, client: VMixClient, cfg: Dict[str, Any]):
         self.client = client
         self.cfg = cfg
 
-        # NEW: scoreboard input ID from config
-        self.scoreboard_input = cfg["inputs"]["scoreboard"]
+        # --------------------------------------------
+        # INPUT + FIELD MAPPING FROM CONFIG
+        # --------------------------------------------
+        try:
+            sc = cfg["inputs"]["scoreboard"]                     # input key
+            mp = cfg["mapping"]["scoreboard"]                    # mapping keys
+            self.clock_field = mp["clock"]
+            self.period_field = mp["period"]
+        except Exception:
+            raise KeyError(
+                "ClockController: your config.json is missing scoreboard.clock or scoreboard.period mapping"
+            )
 
-        # NEW: field mapping from config (correct location)
-        self.clock_field = cfg["mapping"]["scoreboard"]["clock"]
-        self.period_field = cfg["mapping"]["scoreboard"]["period"]
+        self.scoreboard_input = sc
 
-        # refresh timing from config
-        self.refresh_ms = cfg["defaults"]["clock_refresh_ms"]
+        # refresh delay (optional)
+        self.delay_ms = cfg["defaults"].get("clock_refresh_ms", 500)
 
+    # ========================================================================
+    # BASICS — CLOCK CONTROL
+    # ========================================================================
 
-    # ------------------------------------------------------------
-    def update_clock(self, clock_text: str):
+    def start_clock(self) -> None:
         """
-        Update the visible game clock on the scoreboard.
+        Starts the countdown timer in the scoreboard.
         """
+        try:
+            self.client.set_countdown_start(
+                input_name=self.scoreboard_input,
+                field_name=self.clock_field,
+            )
+        except Exception as e:
+            print("[ClockController] start_clock ERROR:", e)
 
-        if not self.scoreboard_input:
-            raise RuntimeError("No scoreboard input configured")
-
-        self.client.set_text(
-            input_key=self.scoreboard_input,
-            field_name=self.clock_field,
-            value=clock_text,
-        )
-
-
-    # ------------------------------------------------------------
-    def update_period(self, period_text: str):
+    def stop_clock(self) -> None:
         """
-        Update the visible match period.
+        Pauses the countdown timer.
         """
+        try:
+            self.client.set_countdown_pause(
+                input_name=self.scoreboard_input,
+                field_name=self.clock_field,
+            )
+        except Exception as e:
+            print("[ClockController] stop_clock ERROR:", e)
 
-        if not self.scoreboard_input:
-            raise RuntimeError("No scoreboard input configured")
-
-        self.client.set_text(
-            input_key=self.scoreboard_input,
-            field_name=self.period_field,
-            value=period_text,
-        )
-
-
-    # ------------------------------------------------------------
-    def auto_refresh_loop(self, generator_fn):
+    def reset_clock(self, seconds: int | None = None) -> None:
         """
-        Run a loop where generator_fn() yields new clock values (ex: countdown logic)
+        Reset to a specific total time or default period length.
 
-        generator_fn must return: (clock_text, period_text)
+        If seconds is None -> resets to period default in config.
         """
+        try:
+            if seconds is None:
+                period_minutes = int(self.cfg["defaults"].get("period_minutes", 20))
+                seconds = period_minutes * 60
 
-        while True:
-            clock_str, period_str = generator_fn()
+            self.client.set_text(
+                input_name=self.scoreboard_input,
+                field_name=self.clock_field,
+                value=self._format_seconds(seconds),
+            )
 
-            if clock_str is not None:
-                self.update_clock(clock_str)
+            # reset countdown engine inside vMix
+            self.client.set_countdown_reset(
+                input_name=self.scoreboard_input,
+                field_name=self.clock_field,
+            )
 
-            if period_str is not None:
-                self.update_period(period_str)
+        except Exception as e:
+            print("[ClockController] reset_clock ERROR:", e)
 
-            time.sleep(self.refresh_ms / 1000.0)
+    # ========================================================================
+    # PERIOD CONTROL
+    # ========================================================================
+
+    def set_period(self, period_index: int) -> None:
+        """
+        Update the period field in the scoreboard.
+
+        GUI calls: period_index = 1, 2, 3, 4...
+        """
+        try:
+            self.client.set_text(
+                input_name=self.scoreboard_input,
+                field_name=self.period_field,
+                value=str(period_index),
+            )
+        except Exception as e:
+            print("[ClockController] set_period ERROR:", e)
+
+    # ========================================================================
+    # CLOCK TEXT ACCESS
+    # ========================================================================
+
+    def get_clock_text(self) -> str:
+        """
+        Returns current clock text, like '12:33' or '' if missing.
+        """
+        try:
+            value = self.client.get_text(
+                input_name=self.scoreboard_input,
+                field_name=self.clock_field,
+            )
+            return value or ""
+        except Exception:
+            return ""
+
+    # ========================================================================
+    # HELPER
+    # ========================================================================
+
+    @staticmethod
+    def _format_seconds(total: int) -> str:
+        """
+        Converts seconds → mm:ss format
+        """
+        m = total // 60
+        s = total % 60
+        return f"{m:02}:{s:02}"

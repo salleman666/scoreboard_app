@@ -14,17 +14,17 @@ from scoreboard_app.config.vmix_config import load_config
 from scoreboard_app.gui.goal_panel import GoalPanel
 from scoreboard_app.gui.clock_panel import ClockPanel
 from scoreboard_app.gui.penalty_panel import PenaltyPanel
-from scoreboard_app.gui.settings_dialog import open_settings_dialog
 from scoreboard_app.gui.emptygoal_panel import EmptyGoalPanel
 from scoreboard_app.gui.scoreboard_panel import ScoreboardPanel
 from scoreboard_app.gui.lineup_panel import LineupPanel
+from scoreboard_app.gui.settings_dialog import open_settings_dialog
 
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Scoreboard Controller – NEW ENGINE")
-        self.geometry("1150x750")
+        self.geometry("1400x820")
 
         # -----------------------------
         # Load config + client
@@ -42,7 +42,7 @@ class MainWindow(tk.Tk):
         self.teams = TeamController(self.client, self.cfg)
 
         # -----------------------------
-        # GUI layout frames
+        # GUI layout
         # -----------------------------
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
@@ -52,12 +52,15 @@ class MainWindow(tk.Tk):
         top.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
         top.columnconfigure(2, weight=1)
 
-        ttk.Button(top, text="⚙ INSTÄLLNINGAR",
-                   command=lambda: open_settings_dialog(self, self.cfg)
-                   ).grid(row=0, column=0, padx=5)
+        ttk.Button(
+            top, text="⚙ INSTÄLLNINGAR",
+            command=lambda: open_settings_dialog(self, self.cfg)
+        ).grid(row=0, column=0, padx=5)
 
-        ttk.Button(top, text="↻ Uppdatera Inputs",
-                   command=self.refresh_inputs).grid(row=0, column=1, padx=5)
+        ttk.Button(
+            top, text="↻ Uppdatera Inputs",
+            command=self.refresh_inputs
+        ).grid(row=0, column=1, padx=5)
 
         self.status_lbl = tk.Label(
             top, text="Ej ansluten", fg="red", font=("Segoe UI", 10)
@@ -67,9 +70,10 @@ class MainWindow(tk.Tk):
         # BODY
         body = tk.Frame(self)
         body.grid(row=1, column=0, sticky="nsew", padx=10)
-        body.columnconfigure(0, weight=1)
-        body.columnconfigure(1, weight=1)
-        body.columnconfigure(2, weight=1)
+        for i in range(3):
+            body.columnconfigure(i, weight=1)
+        for i in range(2):
+            body.rowconfigure(i, weight=1)
 
         # -----------------------------
         # GUI-Panels
@@ -92,10 +96,8 @@ class MainWindow(tk.Tk):
         self.lineup_panel = LineupPanel(body, self.teams)
         self.lineup_panel.grid(row=1, column=2, sticky="nsew", padx=5, pady=5)
 
-        # -----------------------------
-        # Start connection test
-        # -----------------------------
-        self.after(300, self._connect_test)
+        # Start connection monitor
+        self.after(400, self._connect_test)
 
     # ------------------------------------------------------------
     def _connect_test(self):
@@ -105,7 +107,7 @@ class MainWindow(tk.Tk):
         except Exception as e:
             self.status_lbl.config(text=f"Fel: {e}", fg="red")
 
-        self.after(2000, self._connect_test)
+        self.after(3000, self._connect_test)
 
     # ------------------------------------------------------------
     def refresh_inputs(self):

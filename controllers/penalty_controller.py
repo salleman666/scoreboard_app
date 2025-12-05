@@ -1,197 +1,148 @@
-# scoreboard_app/controllers/penalty_controller.py
-import time
-from typing import Dict, Optional
+"""
+PenaltyController
+Handles penalty timing, Auto MV overlays, and GUI extraction
+"""
 
+from __future__ import annotations
+from typing import Dict, Optional, Tuple
 from scoreboard_app.core.vmix_client import VMixClient
-
-
-class PenaltyState:
-    """Håller koll på penalty-tider och aktiva overlay states."""
-
-    def __init__(self):
-        self.h1 = 0
-        self.h2 = 0
-        self.a1 = 0
-        self.a2 = 0
-
-        self.home_overlay_on = False
-        self.away_overlay_on = False
-        self.scoreboard_overlay_on = False
-
-        self.period_timer_last_zero = False
-        self.period_trigger_armed = False
 
 
 class PenaltyController:
     """
-    Automatik för utvisningar baserat på scoreboard-fält i vMix.
-    Denna logik ersätter tidigare VB-Script.
+    Tracks penalty data and exposes it to GUI panels.
+    Provides auto-timing and multi-view overlay support.
     """
 
-    def __init__(self, client: VMixClient, config: Dict):
-        self.client = client
-        self.cfg = config
-        self.state = PenaltyState()
+    def __init__(self, vmix: VMixClient, cfg: dict):
+        self.vmix = vmix
+        self.cfg = cfg
 
-        self.input_name = self.cfg["inputs"]["scoreboard"]
-        self.overlay_channel = self.cfg["mapping"]["scoreboard"].get("overlay_channel", 1)
+        # penalty mapping path
+        self.mapping = self.cfg["mapping"]["penalties"]
 
-        self.pen_map = self.cfg["mapping"]["penalties"]
-        self.period_start_time = str(self.cfg["defaults"]["period_minutes"]) + ":00"
+        # scoreboard input number
+        self.scoreboard_input = self.cfg["inputs"]["scoreboard"]
 
-        self.use_auto_hide = True
-        self.use_auto_multiview = True
-        self.use_auto_overlay = True
+        # background MV indexes (configurable later)
+        self.mv_home = 9
+        self.mv_away = 10
 
-    # -------------------------
-    # helpers
-    # -------------------------
+        self.overlay_home_on = False
+        self.overlay_away_on = False
 
-    def _read_time(self, s: str) -> int:
+    # ---------------------------------------------------------------------
+    # READ ALL PENALTIES FOR GUI
+    # ---------------------------------------------------------------------
+
+    def _read_penalty(self, side: str, slot: str) -> Dict[str, str]:
         """
-        Konvertera text t.ex. '1:20' eller '00:05' -> sekunder
-        Riktigt robust, precis som VB-scriptet gjorde.
+        Reads one penalty slot (home or away, P1 or P2)
+        Returns dict:
+            {
+                "number": "...",
+                "name":   "...",
+                "time":   "..."
+            }
         """
+        fields = self.mapping[side][slot]
+        out = {}
 
-        if not s:
+        for name, vm_field in fields.items():
+            try:
+                value = self.vmix.get_text(self.scoreboard_input, vm_field)
+                if value is None:
+                    value = ""
+                out[name] = value.strip()
+            except Exception:
+                out[name] = ""
+
+        return out
+
+    # ---------------------------------------------------------------------
+    # REQUIRED BY PENALTY_PANEL
+    # ---------------------------------------------------------------------
+
+    def get_all_penalty_status(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        """
+        Returns a 4-penalty structure for GUI:
+
+        {
+            "home": { "p1": {...}, "p2": {...} },
+            "away": { "p1": {...}, "p2": {...} }
+        }
+        """
+        return {
+            "home": {
+                "p1": self._read_penalty("home", "p1"),
+                "p2": self._read_penalty("home", "p2"),
+            },
+            "away": {
+                "p1": self._read_penalty("away", "p1"),
+                "p2": self._read_penalty("away", "p2"),
+            }
+        }
+
+    # ---------------------------------------------------------------------
+    # AUTO OVERLAY LOGIC (OPTIONAL)
+    # ---------------------------------------------------------------------
+
+    def _time_to_seconds(self, t: str) -> int:
+        """
+        Converts "MM:SS" or "S" to total seconds.
+        """
+        if not t:
             return 0
+        t = t.strip()
 
-        s = s.strip()
-
-        if s in ("0", "0:00", "00:00", "0.0", "00.0"):
-            return 0
-
-        if ":" in s:
-            parts = s.split(":")
+        if ":" in t:
+            parts = t.split(":")
             if len(parts) == 2:
                 try:
                     m = int(parts[0])
-                    sec = int(parts[1])
-                    return m * 60 + sec
-                except:
+                    s = int(parts[1])
+                    return m * 60 + s
+                except ValueError:
                     return 0
-            return 0
-
-        try:
-            v = int(s)
-            return max(0, v)
-        except:
-            return 0
-
-    # -------------------------------------------------------------
-    def _get_penalty_times(self) -> None:
-        """
-        Läser penalty-fält från scoreboard-grafiken och lagrar dem i self.state
-        """
-
-        def read_side(side_cfg):
-            num = self.client.get_text(self.input_name, side_cfg["number"])
-            name = self.client.get_text(self.input_name, side_cfg["name"])
-            t = self.client.get_text(self.input_name, side_cfg["time"])
-            return {
-                "number": num or "",
-                "name": name or "",
-                "seconds": self._read_time(t or "")
-            }
-
-        home1 = read_side(self.pen_map["home"]["p1"])
-        home2 = read_side(self.pen_map["home"]["p2"])
-        away1 = read_side(self.pen_map["away"]["p1"])
-        away2 = read_side(self.pen_map["away"]["p2"])
-
-        self.state.h1 = home1["seconds"]
-        self.state.h2 = home2["seconds"]
-        self.state.a1 = away1["seconds"]
-        self.state.a2 = away2["seconds"]
-
-    # -------------------------------------------------------------
-    def _multiview_logic(self):
-        """
-        Samma logik som VB-scriptet:
-        * Om en penalty <= 5 sek → visa MV overlay för det laget
-        * Om ingen penalty aktiv → släck MV overlay
-        """
-
-        if not self.use_auto_multiview:
-            return
-
-        # HOME RULE
-        home_alert = (
-            (self.state.h1 > 0 and self.state.h1 <= 5)
-            or (self.state.h2 > 0 and self.state.h2 <= 5)
-        )
-
-        if home_alert and not self.state.home_overlay_on:
-            self.client.overlay_on(self.input_name, "9")
-            self.state.home_overlay_on = True
-
-        elif not home_alert and self.state.home_overlay_on:
-            self.client.overlay_off(self.input_name, "9")
-            self.state.home_overlay_on = False
-
-        # AWAY RULE
-        away_alert = (
-            (self.state.a1 > 0 and self.state.a1 <= 5)
-            or (self.state.a2 > 0 and self.state.a2 <= 5)
-        )
-
-        if away_alert and not self.state.away_overlay_on:
-            self.client.overlay_on(self.input_name, "10")
-            self.state.away_overlay_on = True
-
-        elif not away_alert and self.state.away_overlay_on:
-            self.client.overlay_off(self.input_name, "10")
-            self.state.away_overlay_on = False
-
-    # -------------------------------------------------------------
-    def _auto_hide_logic(self):
-        """
-        Precis som i VB-scriptet:
-        Om penalty = 0 → släck text + BG + Nummer + Nummer-BG
-        """
-
-        if not self.use_auto_hide:
-            return
-
-        for side in ("home", "away"):
-            for p in ("p1", "p2"):
-                cfg = self.pen_map[side][p]
-                seconds = self._read_time(
-                    self.client.get_text(self.input_name, cfg["time"]) or ""
-                )
-
-                if seconds == 0:
-                    # time
-                    self.client.set_text_visible(self.input_name, cfg["time"], False)
-
-                    # TODO: when config is updated with BG fields…
-                    # self.client.set_image_visible(...)
-
-    # -------------------------------------------------------------
-    def update(self) -> None:
-        """
-        UPDATE-LOOP:
-        * läs nya penalty-tider
-        * slå på/av MV overlays
-        * auto-hide om aktiverat
-        """
-
-        self._get_penalty_times()
-        self._multiview_logic()
-        self._auto_hide_logic()
-
-    # -------------------------------------------------------------
-    def run_loop(self, interval_ms: int = 500):
-        """
-        Kör samma sak som Do While VB-scriptet.
-        Kör tills applikationen avslutas.
-        GUI kan köra detta i egen thread.
-        """
-
-        while True:
+        else:
             try:
-                self.update()
-            except Exception as e:
-                print("Penalty update error:", e)
+                return int(t)
+            except ValueError:
+                return 0
 
-            time.sleep(interval_ms / 1000.0)
+        return 0
+
+    def auto_refresh_mv(self):
+        """
+        Checks remaining times and toggles MV overlays on scoreboard input.
+        Home: MV index 9
+        Away: MV index 10
+        """
+
+        status = self.get_all_penalty_status()
+
+        # HOME penalty alert
+        h1 = self._time_to_seconds(status["home"]["p1"]["time"])
+        h2 = self._time_to_seconds(status["home"]["p2"]["time"])
+        has_home = (0 < h1 <= 5) or (0 < h2 <= 5)
+
+        if has_home and not self.overlay_home_on:
+            self.vmix.set_multiview_overlay_on(self.scoreboard_input, self.mv_home)
+            self.overlay_home_on = True
+
+        elif (not has_home) and self.overlay_home_on:
+            self.vmix.set_multiview_overlay_off(self.scoreboard_input, self.mv_home)
+            self.overlay_home_on = False
+
+        # AWAY penalty alert
+        a1 = self._time_to_seconds(status["away"]["p1"]["time"])
+        a2 = self._time_to_seconds(status["away"]["p2"]["time"])
+        has_away = (0 < a1 <= 5) or (0 < a2 <= 5)
+
+        if has_away and not self.overlay_away_on:
+            self.vmix.set_multiview_overlay_on(self.scoreboard_input, self.mv_away)
+            self.overlay_away_on = True
+
+        elif (not has_away) and self.overlay_away_on:
+            self.vmix.set_multiview_overlay_off(self.scoreboard_input, self.mv_away)
+            self.overlay_away_on = False

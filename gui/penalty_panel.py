@@ -1,116 +1,148 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import simpledialog
+from tkinter import ttk, messagebox
 
-class PlayerSelectDialog(simpledialog.Dialog):
+from scoreboard_app.controllers.penalty_controller import PenaltyController
+
+
+class PenaltyPanel(tk.LabelFrame):
     """
-    Popup-dialog som listar alla spelare i laget.
-    Ingen rullista – en knapp per spelare.
+    GUI-panel för att kontrollera alla 4 penalty-fält:
+        Home P1, Home P2, Away P1, Away P2
+
+    - Live visar:
+        nummer
+        namn (om finns)
+        återstående tid
+    - Kan:
+        starta nedräkning
+        pausa nedräkning
+        rensa penalty
+        auto-refresh varje sekund
     """
-    def __init__(self, parent, title, players, slot):
-        self.players = players     # list of dicts: {"number": "21", "name": "J. Karlsson"}
-        self.slot = slot
-        self.selected_number = ""
-        self.selected_name = ""
-        self.time_str = "02:00"
-        super().__init__(parent, title)
 
-    def body(self, frame):
-        tk.Label(frame, text=f"Välj spelare för {self.slot}", font=("Segoe UI", 12, "bold")).pack(pady=5)
+    REFRESH_MS = 1000
 
-        list_frame = tk.Frame(frame)
-        list_frame.pack(pady=5)
+    def __init__(self, parent, controller: PenaltyController):
+        super().__init__(parent, text="Utv PAC (Penalties)", padx=6, pady=6)
 
-        for p in self.players:
-            b = tk.Button(
-                list_frame,
-                text=f"{p['number']}  {p['name']}",
-                width=25,
-                command=lambda num=p['number'], nm=p['name']: self._select_player(num, nm)
-            )
-            b.pack(pady=2)
-
-        # Ingen spelare
-        tk.Button(
-            frame,
-            text="Ingen spelare (visa bara tid)",
-            fg="red",
-            command=lambda: self._select_player("", "")
-        ).pack(pady=5)
-
-        # Tidsfält
-        time_row = tk.Frame(frame)
-        time_row.pack(pady=5)
-
-        tk.Label(time_row, text="Tid (MM:SS): ").grid(row=0, column=0)
-        self.time_entry = tk.Entry(time_row, width=6)
-        self.time_entry.insert(0, "02:00")
-        self.time_entry.grid(row=0, column=1)
-
-        return None
-
-    def _select_player(self, num, name):
-        self.selected_number = num
-        self.selected_name = name
-
-    def apply(self):
-        self.time_str = self.time_entry.get()
-
-
-class PenaltyPanel:
-    """
-    Panelen med knappar för H1, H2, A1, A2.
-    Öppnar PlayerSelectDialog vid klick.
-    """
-    def __init__(self, parent, controller, home_players, away_players):
-        self.parent = parent
         self.controller = controller
-        self.home_players = home_players
-        self.away_players = away_players
 
-        self.frame = tk.Frame(parent)
+        # -------------------------------
+        # UI LAYOUT
+        # -------------------------------
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
-        tk.Label(self.frame, text="UTVISNINGAR", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, columnspan=4)
+        # HOME
+        ttk.Label(self, text="HEMMA").grid(row=0, column=0, sticky="w")
 
-        self.buttons = {}
+        self.h1_label = ttk.Label(self, text="H1 – tid: --:--  nr: --")
+        self.h1_label.grid(row=1, column=0, sticky="w")
 
-        col = 0
-        for slot in ["H1", "H2", "A1", "A2"]:
-            b = tk.Button(
-                self.frame,
-                text=f"{slot}\n00:00",
-                width=8,
-                height=3,
-                command=lambda s=slot: self.open_dialog(s)
-            )
-            b.grid(row=1, column=col, padx=6, pady=6)
-            self.buttons[slot] = b
-            col += 1
+        self.h2_label = ttk.Label(self, text="H2 – tid: --:--  nr: --")
+        self.h2_label.grid(row=2, column=0, sticky="w")
 
-    def open_dialog(self, slot):
-        if slot.startswith("H"):
-            players = self.home_players
-        else:
-            players = self.away_players
+        # AWAY
+        ttk.Label(self, text="BORTE").grid(row=0, column=1, sticky="w")
 
-        dlg = PlayerSelectDialog(self.frame, f"Utvisning {slot}", players, slot)
+        self.a1_label = ttk.Label(self, text="A1 – tid: --:--  nr: --")
+        self.a1_label.grid(row=1, column=1, sticky="w")
 
-        # Om användaren klickar Cancel:
-        if dlg.selected_number is None:
+        self.a2_label = ttk.Label(self, text="A2 – tid: --:--  nr: --")
+        self.a2_label.grid(row=2, column=1, sticky="w")
+
+        # -------------------------------
+        # KONTROLLKNAPPAR
+        # -------------------------------
+        btns = tk.Frame(self)
+        btns.grid(row=3, column=0, columnspan=2, pady=5)
+
+        ttk.Button(
+            btns, text="Start alla", command=self.start_all
+        ).grid(row=0, column=0, padx=4)
+
+        ttk.Button(
+            btns, text="Pausa alla", command=self.pause_all
+        ).grid(row=0, column=1, padx=4)
+
+        ttk.Button(
+            btns, text="Rensa alla", command=self.clear_all
+        ).grid(row=0, column=2, padx=4)
+
+        # -------------------------------
+        # AUTO REFRESH
+        # -------------------------------
+        self.after(self.REFRESH_MS, self._refresh)
+
+    # ============================================================
+    # BUTTON ACTIONS
+    # ============================================================
+
+    def start_all(self):
+        try:
+            self.controller.start_all_penalties()
+        except Exception as e:
+            messagebox.showerror("Fel", str(e))
+
+    def pause_all(self):
+        try:
+            self.controller.pause_all_penalties()
+        except Exception as e:
+            messagebox.showerror("Fel", str(e))
+
+    def clear_all(self):
+        if not messagebox.askyesno("Bekräfta", "Rensa alla utvisningar?"):
             return
 
-        num = dlg.selected_number
-        name = dlg.selected_name
-        tid = dlg.time_str
-
-        # Uppdatera knappens text
-        self.buttons[slot].config(text=f"{slot}\n{tid}")
-
-        # Skicka till controller
         try:
-            self.controller.set_penalty(slot, num, name, tid)
+            self.controller.clear_home_penalties()
+            self.controller.clear_away_penalties()
         except Exception as e:
-            print(f"[ERROR] set_penalty misslyckades: {e}")
+            messagebox.showerror("Fel", str(e))
 
-    def pack(self, **kwargs):
-        self.frame.pack(**kwargs)
+    # ============================================================
+    # REFRESH DISPLAY
+    # ============================================================
+
+    def _refresh(self):
+        """
+        Hämtar penalty status från controller och uppdaterar UI.
+        """
+        try:
+            status = self.controller.get_all_penalty_status()
+            # status = {
+            #   "home": { "p1": {...}, "p2": {...} },
+            #   "away": { "p1": {...}, "p2": {...} }
+            # }
+
+            # HOME
+            h1 = status["home"]["p1"]
+            h2 = status["home"]["p2"]
+
+            self.h1_label.config(
+                text=f"H1 – tid: {h1['time']}  nr: {h1['number']}"
+            )
+
+            self.h2_label.config(
+                text=f"H2 – tid: {h2['time']}  nr: {h2['number']}"
+            )
+
+            # AWAY
+            a1 = status["away"]["p1"]
+            a2 = status["away"]["p2"]
+
+            self.a1_label.config(
+                text=f"A1 – tid: {a1['time']}  nr: {a1['number']}"
+            )
+
+            self.a2_label.config(
+                text=f"A2 – tid: {a2['time']}  nr: {a2['number']}"
+            )
+
+        except Exception as e:
+            # visa, men krascha inte GUI
+            print("[PenaltyPanel] refresh error:", e)
+
+        finally:
+            # loop
+            self.after(self.REFRESH_MS, self._refresh)

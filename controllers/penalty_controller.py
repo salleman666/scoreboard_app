@@ -29,17 +29,17 @@ class PenaltyController:
         self.a1_nr = mapping["away"]["p1"]["number"]
         self.a2_nr = mapping["away"]["p2"]["number"]
 
-        # Background images — we use them to hide empty penalties
+        # Background images — correct JSON key is nr_bg
         self.h1_bg = mapping["home"]["p1"]["bg"]
         self.h2_bg = mapping["home"]["p2"]["bg"]
         self.a1_bg = mapping["away"]["p1"]["bg"]
         self.a2_bg = mapping["away"]["p2"]["bg"]
 
-        # Number backgrounds
-        self.h1_nr_bg = mapping["home"]["p1"]["nrbg"]
-        self.h2_nr_bg = mapping["home"]["p2"]["nrbg"]
-        self.a1_nr_bg = mapping["away"]["p1"]["nrbg"]
-        self.a2_nr_bg = mapping["away"]["p2"]["nrbg"]
+        # Number backgrounds — correct JSON key is nr_bg
+        self.h1_nr_bg = mapping["home"]["p1"]["nr_bg"]
+        self.h2_nr_bg = mapping["home"]["p2"]["nr_bg"]
+        self.a1_nr_bg = mapping["away"]["p1"]["nr_bg"]
+        self.a2_nr_bg = mapping["away"]["p2"]["nr_bg"]
 
         # scoreboard input name
         self.input_name = cfg["inputs"]["scoreboard"]
@@ -113,7 +113,8 @@ class PenaltyController:
 
     def get_penalties(self) -> Dict[str, Dict[str, Any]]:
         """Return current penalty state for GUI refresh."""
-        def pack(name, nr_field, time_field):
+
+        def pack(nr_field, time_field):
             return {
                 "number": self._get_text(nr_field),
                 "time": self._get_text(time_field),
@@ -122,37 +123,37 @@ class PenaltyController:
 
         return {
             "home": {
-                "p1": pack("H1", self.h1_nr, self.h1_time),
-                "p2": pack("H2", self.h2_nr, self.h2_time),
+                "p1": pack(self.h1_nr, self.h1_time),
+                "p2": pack(self.h2_nr, self.h2_time),
             },
             "away": {
-                "p1": pack("A1", self.a1_nr, self.a1_time),
-                "p2": pack("A2", self.a2_nr, self.a2_time),
+                "p1": pack(self.a1_nr, self.a1_time),
+                "p2": pack(self.a2_nr, self.a2_time),
             },
         }
 
     # -----------------------
-    # AUTO VISIBILITY + CAMERA ALERTS
+    # AUTO VISIBILITY
     # -----------------------
 
     def _loop(self):
-        """Optional automatic hiding and overlay logic."""
+        """Automatic hiding logic."""
         while not self._stop_loop:
             try:
                 data = self.get_penalties()
 
-                # automatically hide empty penalties
                 for side in ["home", "away"]:
                     for pid in ["p1", "p2"]:
                         item = data[side][pid]
-                        bg = getattr(self, f"{side[0]}{pid[1]}_bg")
-                        nrbg = getattr(self, f"{side[0]}{pid[1]}_nr_bg")
                         time_field = getattr(self, f"{side[0]}{pid[1]}_time")
+                        bg_field = getattr(self, f"{side[0]}{pid[1]}_bg")
+                        nrbg_field = getattr(self, f"{side[0]}{pid[1]}_nr_bg")
 
                         empty = (item["seconds"] == 0)
+
                         self._set_visible(time_field, not empty)
-                        self._set_visible(bg, not empty)
-                        self._set_visible(nrbg, not empty)
+                        self._set_visible(bg_field, not empty)
+                        self._set_visible(nrbg_field, not empty)
 
             except Exception as e:
                 print("[PenaltyController] loop error:", e)
@@ -165,7 +166,6 @@ class PenaltyController:
 
     @staticmethod
     def _parse_time(text: str) -> int:
-        """Convert 'mm:ss' to seconds."""
         if not text or text.strip() == "":
             return 0
         try:

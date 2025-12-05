@@ -1,162 +1,145 @@
-# scoreboard_controller.py (Model B)
-
-from __future__ import annotations
-from typing import Dict, Any
+from typing import Optional, Dict, Any
 from scoreboard_app.core.vmix_client import VMixClient
-from scoreboard_app.config.vmix_config import load_config
-
-
-def _parse_mmss(text: str) -> int:
-    """Returnerar sekunder."""
-    try:
-        m, s = text.strip().split(":")
-        return int(m) * 60 + int(s)
-    except:
-        return 0
-
-
-def _format_mmss(sec: int) -> str:
-    if sec < 0: 
-        sec = 0
-    return f"{sec//60:02d}:{sec%60:02d}"
 
 
 class ScoreboardController:
     """
-    Model-B version: ren logik, ingen GUI-koppling.
-    GUI anropar controller → controller skriver till vMix.
+    High-level API for updating scoreboard-related graphics on vMix.
+
+    This controller is responsible for:
+    - Score updates
+    - Team names
+    - Logos
+    - Overlay control
+    - Empty goal graphics (home/away)
+
+    It uses VMixClient as backend for TCP control.
     """
-    def __init__(self, client: VMixClient, cfg: Dict[str, Any]):
+
+    def __init__(self, client: VMixClient, cfg: Dict[str, Any]) -> None:
+        """
+        Args:
+            client: Active VMixClient instance
+            cfg: Parsed config dict loaded from vmix_config.json
+        """
         self.client = client
         self.cfg = cfg
-        self.sb = cfg["scoreboard"]
 
-        # Cache:
-        self._last_state: Dict[str, Any] = {}
-
-    # ---------------------------------------------------------
-    # PUBLIC API (används av GUI)
-    # ---------------------------------------------------------
-
-    def get_state(self) -> Dict[str, Any]:
+    # ------------------------------------------------------------
+    # SCORE UPDATES
+    # ------------------------------------------------------------
+    def set_score(self, home: int, away: int) -> bool:
         """
-        Läser scoreboard från vMix och returnerar som dictionary.
+        Update scoreboard score values.
+
+        Args:
+            home: home team score
+            away: away team score
+
+        Returns:
+            True if both fields sent successfully
         """
-        input_id = self.sb["input"]
+        board = self.cfg["scoreboard"]
+        input_name = board["input"]
 
-        state = {}
+        ok1 = self.client.set_text(input_name, board["home_score_field"], str(home))
+        ok2 = self.client.set_text(input_name, board["away_score_field"], str(away))
+        return ok1 and ok2
 
-        state["clock"] = self.client.get_text_field(input_id, self.sb["clock_field"])
-        state["home_score"] = self.client.get_text_field(input_id, self.sb["home_score_field"])
-        state["away_score"] = self.client.get_text_field(input_id, self.sb["away_score_field"])
-        state["period"] = self.client.get_text_field(input_id, self.sb["period_field"])
-
-        # Empty goal
-        state["empty_home"] = self.client.get_text_field(input_id, self.sb["home_empty_field"])
-        state["empty_away"] = self.client.get_text_field(input_id, self.sb["away_empty_field"])
-
-        # Penalties lämnas åt penalty_controller
-
-        self._last_state = state
-        return state
-
-    # ---------------------------------------------------------
-    # CLOCK
-    # ---------------------------------------------------------
-
-    def adjust_clock(self, delta_sec: int):
-        """Justera tid på scoreboard."""
-        input_id = self.sb["input"]
-        field = self.sb["clock_field"]
-
-        current = self.client.get_text_field(input_id, field)
-        sec = _parse_mmss(current)
-        sec += delta_sec
-        self.client.set_text(input_id, field, _format_mmss(sec))
-
-    # ---------------------------------------------------------
-    # SCORE
-    # ---------------------------------------------------------
-
-    def adjust_score(self, home: bool, delta: int):
-        field = self.sb["home_score_field"] if home else self.sb["away_score_field"]
-        input_id = self.sb["input"]
-
-        try:
-            val = int(self.client.get_text_field(input_id, field))
-        except:
-            val = 0
-
-        val += delta
-        if val < 0:
-            val = 0
-
-        self.client.set_text(input_id, field, str(val))
-
-    # ---------------------------------------------------------
-    # PERIOD
-    # ---------------------------------------------------------
-
-    def set_period(self, period: int):
-        input_id = self.sb["input"]
-        field = self.sb["period_field"]
-        self.client.set_text(input_id, field, str(period))
-
-    # ---------------------------------------------------------
-    # EMPTY GOAL
-    # ---------------------------------------------------------
-
-    def set_empty_goal(self, home: bool, active: bool, text: str):
+    # ------------------------------------------------------------
+    # TEAM NAMES
+    # ------------------------------------------------------------
+    def set_team_names(self, home_name: str, away_name: str) -> bool:
         """
-        active=True → visa text och bakgrund
-        active=False → rensa text och bakgrund
-        """
-        input_id = self.sb["input"]
+        Set team names shown on scoreboard input.
 
-        if home:
-            field = self.sb["home_empty_field"]
-            bg = self.sb["home_empty_bg_field"]
+        Args:
+            home_name: name for home team
+            away_name: name for away team
+
+        Returns:
+            True on full success
+        """
+        board = self.cfg["scoreboard"]
+        input_name = board["input"]
+
+        ok1 = self.client.set_text(input_name, board["home_team_field"], home_name)
+        ok2 = self.client.set_text(input_name, board["away_team_field"], away_name)
+        return ok1 and ok2
+
+    # ------------------------------------------------------------
+    # TEAM LOGOS
+    # ------------------------------------------------------------
+    def set_team_logos(self, home_logo: str, away_logo: str) -> bool:
+        """
+        Set team logos for scoreboard.
+
+        Args:
+            home_logo: path or URL to home team logo
+            away_logo: path or URL to away team logo
+
+        Returns:
+            True if both set successfully
+        """
+        board = self.cfg["scoreboard"]
+        input_name = board["input"]
+
+        ok1 = self.client.set_source(input_name, board["home_logo_field"], home_logo)
+        ok2 = self.client.set_source(input_name, board["away_logo_field"], away_logo)
+        return ok1 and ok2
+
+    # ------------------------------------------------------------
+    # OVERLAY CONTROL
+    # ------------------------------------------------------------
+    def show_scoreboard(self) -> bool:
+        """
+        Show scoreboard input as overlay 1 (default)
+        """
+        overlay = self.cfg["scoreboard"]["overlay"]
+        return self.client.set_overlay(overlay, self.cfg["scoreboard"]["input"])
+
+    def hide_scoreboard(self) -> bool:
+        """
+        Hide scoreboard overlay channel
+        """
+        overlay = self.cfg["scoreboard"]["overlay"]
+        return self.client.clear_overlay(overlay)
+
+    # ------------------------------------------------------------
+    # EMPTY GOAL GRAPHICS
+    # ------------------------------------------------------------
+    def set_empty_goal_home(self, enabled: bool) -> bool:
+        """
+        Display / clear empty goal indicator for home team.
+
+        Args:
+            enabled: True = show graphic, False = hide
+
+        Returns:
+            True on success
+        """
+        goal = self.cfg["emptygoal"]
+        field = goal["home_field"]
+
+        if enabled:
+            return self.client.set_text(goal["input"], field, goal["home_text"])
         else:
-            field = self.sb["away_empty_field"]
-            bg = self.sb["away_empty_bg_field"]
+            return self.client.set_text(goal["input"], field, goal["blank_text"])
 
-        if active:
-            self.client.set_text(input_id, field, text)
-            self.client.set_image(input_id, bg, bg)  # kräver GUI-mappning senare
+    def set_empty_goal_away(self, enabled: bool) -> bool:
+        """
+        Display / clear empty goal indicator for away team.
+
+        Args:
+            enabled: True = show graphic, False = hide
+
+        Returns:
+            True on success
+        """
+        goal = self.cfg["emptygoal"]
+        field = goal["away_field"]
+
+        if enabled:
+            return self.client.set_text(goal["input"], field, goal["away_text"])
         else:
-            self.client.set_text(input_id, field, "")
-            self.client.set_image(input_id, bg, "")
-
-    # ---------------------------------------------------------
-    # GOAL GRAPHICS
-    # ---------------------------------------------------------
-
-    def trigger_goal_graphic(self, home: bool):
-        graphic = self.sb["goal_graphic_input"]
-        channel = self.sb["goal_overlay_channel"]
-
-        self.client.overlay_on(graphic, channel)
-
-    def trigger_after_goal(self):
-        graphic = self.sb["after_goal_graphic_input"]
-        channel = self.sb["after_goal_overlay_channel"]
-        duration_ms = self.sb["after_goal_duration_ms"]
-
-        self.client.overlay_on(graphic, channel)
-        return duration_ms
-
-    # ---------------------------------------------------------
-    # OVERLAY
-    # ---------------------------------------------------------
-
-    def toggle_scoreboard_overlay(self):
-        input_id = self.sb["input"]
-        ch = self.sb["overlay_channel"]
-
-        active = self.client.is_overlay_active(input_id, ch)
-        if active:
-            self.client.overlay_off(ch)
-            return False
-        else:
-            self.client.overlay_on(input_id, ch)
-            return True
+            return self.client.set_text(goal["input"], field, goal["blank_text"])

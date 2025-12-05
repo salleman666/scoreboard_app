@@ -1,187 +1,203 @@
-import socket
+"""
+VMixClient
+==========
+
+Minimal core client wrapper for vMix XML HTTP API.
+
+Responsibility:
+- Request XML status from vMix
+- Parse XML into pythonic structures (not controllers!)
+- Offer helper calls: list_inputs(), get_text(), set_text(), etc.
+
+This module MUST NOT include GUI logic or controller logic.
+"""
+
+from __future__ import annotations
+import requests
 import xml.etree.ElementTree as ET
-from typing import Optional, Dict
+from typing import Dict, List, Optional
 
 
 class VMixClient:
     """
-    Ny VMixClient – ren & stabil
-    - Connect
-    - get_status_xml()
-    - set_text()
-    - set_source()
-    - overlay_on/off
+    Core HTTP client for communicating with vMix.
+
+    Parameters
+    ----------
+    host : str
+        Hostname or IP address of vMix machine
+    port : int
+        vMix API port (usually 8088)
+
+    Notes
+    -----
+    All API calls are synchronous HTTP calls.
+    Errors propagate upwards (controllers must handle them).
     """
 
-    def __init__(self, host="127.0.0.1", port=8099):
+    def __init__(self, host: str, port: int):
         self.host = host
         self.port = port
-        self.sock: Optional[socket.socket] = None
 
-    # ---------------------------------------------------------
-    # CONNECT
-    # ---------------------------------------------------------
-    def connect(self) -> bool:
-        """Öppna TCP-socket till vMix"""
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.settimeout(2)
-            self.sock.connect((self.host, self.port))
+    # ----------------------------------------------------------------------
+    def _build_url(self, command: str) -> str:
+        """Return vMix HTTP API URL for a given command."""
+        return f"http://{self.host}:{self.port}/api/?{command}"
 
-            # Prova handshake
-            self.send("VERSION")
-            return True
-
-        except Exception as e:
-            print(f"[VMixClient][ERROR] connect(): {e}")
-            return False
-
-    # ---------------------------------------------------------
-    def send(self, cmd: str) -> str:
-        """Skicka kommando och hämta svar"""
-        if not self.sock:
-            raise ConnectionError("VMixClient not connected")
-
-        cmd_bytes = (cmd + "\r\n").encode("utf-8")
-
-        self.sock.sendall(cmd_bytes)
-        reply = self.sock.recv(4096)
-
-        try:
-            return reply.decode("utf-8", errors="ignore")
-        except:
-            return ""
-
-    # ---------------------------------------------------------
-    # XML STATUS
-    # ---------------------------------------------------------
-    def get_status_xml(self) -> Optional[ET.Element]:
+    # ----------------------------------------------------------------------
+    def _get_xml(self, command: Optional[str] = None) -> ET.Element:
         """
-        Hämtar hela status-XML från VMIX
-        -> RETURNERAR en ElementRoot
+        Perform a GET request to vMix API and return top-level XML element.
+
+        Parameters
+        ----------
+        command : str, optional
+            API command (e.g. "Function=FadeToBlack")
+
+        Returns
+        -------
+        ET.Element
+            Parsed XML root element
+
+        Raises
+        ------
+        Exception
+            If HTTP fails or XML is malformed
         """
+
+        if command:
+            url = self._build_url(command)
+        else:
+            url = f"http://{self.host}:{self.port}/api/"
+
+        r = requests.get(url, timeout=3)
+        r.raise_for_status()
+
         try:
-            raw = self.send("XML")
+            xml_root = ET.fromstring(r.text)
+        except ET.ParseError as e:
+            raise Exception(f"VMixClient: XML parse error ({e})")  # noqa
 
-            # Leta efter första "<"
-            pos = raw.find("<")
-            if pos < 0:
-                print(f"[VMixClient] No XML start found in reply: {raw[:60]}")
-                return None
+        return xml_root
 
-            xml_data = raw[pos:]
-            root = ET.fromstring(xml_data)
-            return root
+    # ----------------------------------------------------------------------
+    def get_status_xml(self) -> ET.Element:
+        """
+        Get entire XML state from vMix.
 
-        except Exception as e:
-            print(f"[VMixClient] XML parse error: {e}")
+        Returns
+        -------
+        ET.Element
+            Root XML document
+
+        Example use
+        -----------
+        xml = client.get_status_xml()
+        """
+        return self._get_xml()
+
+    # ----------------------------------------------------------------------
+    def list_inputs(self) -> List[Dict[str, str]]:
+        """
+        Return a simplified list of vMix inputs (title, key, type).
+
+        Returns
+        -------
+        List[Dict[str, str]]
+            Each element is: { "title": "...", "key": "...", "type": "GT" }
+        """
+
+        xml = self.get_status_xml()
+
+        inputs = []
+        for inp in xml.findall("inputs/input"):
+            inputs.append(
+                {
+                    "title": inp.get("title", ""),
+                    "key": inp.get("key", ""),
+                    "type": inp.get("type", ""),
+                }
+            )
+        return inputs
+
+    # ----------------------------------------------------------------------
+    def get_text(self, input_key: str, field_name: str) -> Optional[str]:
+        """
+        Get a GT text field from vMix.
+
+        Parameters
+        ----------
+        input_key : str
+            vMix input key (GUID)
+        field_name : str
+            Title text field, must end with ".Text"
+
+        Returns
+        -------
+        Optional[str]
+            Field content or None if not found
+        """
+
+        command = f"Input={input_key}&Value&Function=GetText&SelectedName={field_name}"
+        xml = self._get_xml(command)
+
+        node = xml.find("text")
+        if node is None:
             return None
+        return node.text or ""
 
-    # ---------------------------------------------------------
-    # BASIC SETTERS
-    # ---------------------------------------------------------
-    def set_text(self, input_key: str, field_name: str, value: str) -> bool:
+    # ----------------------------------------------------------------------
+    def set_text(self, input_key: str, field_name: str, value: str) -> None:
         """
-        input_key = GT Input GUID
-        field_name = t.ex. HomeScore.Text
-        """
-        try:
-            cmd = f"FUNCTION SetText Input={input_key}&Value={value}&SelectedName={field_name}"
-            self.send(cmd)
-            return True
-        except Exception as e:
-            print(f"[VMixClient][ERROR] set_text(): {e}")
-            return False
+        Set a GT text field value in vMix.
 
-    def set_source(self, input_key: str, field_name: str, source: str) -> bool:
-        """
-        Set image source (PNG etc)
-        """
-        try:
-            cmd = f"FUNCTION SetImage Input={input_key}&SelectedName={field_name}&Value={source}"
-            self.send(cmd)
-            return True
-        except Exception as e:
-            print(f"[VMixClient][ERROR] set_source(): {e}")
-            return False
+        Parameters
+        ----------
+        input_key : str
+        field_name : str
+        value : str
 
-    # ---------------------------------------------------------
-    # OVERLAY CONTROL
-    # ---------------------------------------------------------
-    def overlay_on(self, index: int) -> bool:
-        try:
-            self.send(f"FUNCTION OverlayInput{index}On")
-            return True
-        except Exception as e:
-            print(f"[VMixClient][ERROR] overlay_on(): {e}")
-            return False
-
-    def overlay_off(self, index: int) -> bool:
-        try:
-            self.send(f"FUNCTION OverlayInput{index}Off")
-            return True
-        except Exception as e:
-            print(f"[VMixClient][ERROR] overlay_off(): {e}")
-            return False
-
-    # ---------------------------------------------------------
-    # SCOREBOARD HELPERS
-    # ---------------------------------------------------------
-    def update_score(self, input_key: str, home: str, away: str,
-                     home_field="HomeScore.Text",
-                     away_field="AwayScore.Text"):
-
-        self.set_text(input_key, home_field, home)
-        self.set_text(input_key, away_field, away)
-
-    # ---------------------------------------------------------
-    # PENALTIES
-    # ---------------------------------------------------------
-    def set_penalty(self, input_key: str, number: str, name: str,
-                    time_str: str,
-                    num_field="P1_Number.Text",
-                    name_field="P1_Name.Text",
-                    time_field="P1_Time.Text",
-                    plate_field="P1_NumberBg.Source"):
-
-        """
-        No-player logic:
-        - number == "" => hide plate
+        Notes
+        -----
+        Controllers must handle errors.
         """
 
-        # time always visible
-        self.set_text(input_key, time_field, time_str)
+        safe_val = value.replace("&", "&amp;")
+        command = (
+            f"Input={input_key}&Function=SetText&SelectedName={field_name}"
+            f"&Value={safe_val}"
+        )
+        self._get_xml(command)
 
-        if number:
-            self.set_text(input_key, num_field, number)
-            self.set_source(input_key, plate_field, "visible")
-        else:
-            self.set_text(input_key, num_field, "")
-            self.set_source(input_key, plate_field, "")   # hides plate
-
-        if name:
-            self.set_text(input_key, name_field, name)
-        else:
-            self.set_text(input_key, name_field, "")
-
-    # ---------------------------------------------------------
-    # EMPTY GOAL
-    # ---------------------------------------------------------
-    def set_empty_goal(self, input_key: str, is_active: bool,
-                       field_name="EmptyGoal.Text",
-                       plate="EmptyGoalBg.Source",
-                       override=""):
-
+    # ----------------------------------------------------------------------
+    def trigger_function(self, function_name: str) -> None:
         """
-        is_active = True => show EMPTY or override text
-        override = custom text (max 10 chars)
+        Trigger a vMix API function, e.g. "FadeToBlack", "Start", etc.
+
+        Parameters
+        ----------
+        function_name : str
+            Must match documented vMix API function names
         """
 
-        if is_active:
-            txt = override if override else "EMPTY"
-            self.set_text(input_key, field_name, txt)
-            self.set_source(input_key, plate, "visible")
-        else:
-            self.set_text(input_key, field_name, "")
-            self.set_source(input_key, plate, "")
+        command = f"Function={function_name}"
+        self._get_xml(command)
 
+    # ----------------------------------------------------------------------
+    def overlay_on(self, overlay_number: int) -> None:
+        """
+        Turn on overlay.
+
+        Parameters
+        ----------
+        overlay_number : int
+            1-4 (vMix overlay channels)
+        """
+        command = f"Function=OverlayInput{overlay_number}On"
+        self._get_xml(command)
+
+    # ----------------------------------------------------------------------
+    def overlay_off(self, overlay_number: int) -> None:
+        """Turn off overlay channel."""
+        command = f"Function=OverlayInput{overlay_number}Off"
+        self._get_xml(command)

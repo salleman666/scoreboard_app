@@ -162,3 +162,34 @@ class VMixClient:
         Alias for get_state_xml() to support older code calling get_status_xml().
         """
         return self.get_state_xml()
+    # ------------------------------------------------------------
+    # COUNTDOWN CONTROL FOR GT FIELDS (Clock, Penalties, etc.)
+    # ------------------------------------------------------------
+    def set_countdown_start(self, input_name: str, field: str):
+        """
+        Start a countdown for a specific GT text field.
+        Example field: "ClockTime.Text"
+        """
+        self._call_api("StartCountdown", {
+            "Input": input_name,
+            "SelectedName": field
+        })
+
+    def set_countdown_pause(self, input_name: str, field: str):
+        """
+        Pause countdown for a specific GT text field.
+        """
+        self._call_api("PauseCountdown", {
+            "Input": input_name,
+            "SelectedName": field
+        })
+
+    def set_countdown_reset(self, input_name: str, field: str):
+        """
+        Reset a countdown field to default text (usually period start)
+        """
+        self._call_api("ResetCountdown", {
+            "Input": input_name,
+            "SelectedName": field
+        })
+

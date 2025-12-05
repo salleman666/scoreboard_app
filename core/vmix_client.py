@@ -1,203 +1,164 @@
-"""
-VMixClient
-==========
-
-Minimal core client wrapper for vMix XML HTTP API.
-
-Responsibility:
-- Request XML status from vMix
-- Parse XML into pythonic structures (not controllers!)
-- Offer helper calls: list_inputs(), get_text(), set_text(), etc.
-
-This module MUST NOT include GUI logic or controller logic.
-"""
-
-from __future__ import annotations
-import requests
+import socket
 import xml.etree.ElementTree as ET
-from typing import Dict, List, Optional
+from typing import Optional
 
 
 class VMixClient:
     """
-    Core HTTP client for communicating with vMix.
+    Client for communicating with vMix via TCP API.
 
-    Parameters
-    ----------
-    host : str
-        Hostname or IP address of vMix machine
-    port : int
-        vMix API port (usually 8088)
-
-    Notes
-    -----
-    All API calls are synchronous HTTP calls.
-    Errors propagate upwards (controllers must handle them).
+    Methods allow setting text/image fields on inputs, overlay control,
+    and retrieving the full vMix state as XML.
     """
 
-    def __init__(self, host: str, port: int):
-        self.host = host
-        self.port = port
-
-    # ----------------------------------------------------------------------
-    def _build_url(self, command: str) -> str:
-        """Return vMix HTTP API URL for a given command."""
-        return f"http://{self.host}:{self.port}/api/?{command}"
-
-    # ----------------------------------------------------------------------
-    def _get_xml(self, command: Optional[str] = None) -> ET.Element:
+    def __init__(self, host: str = "127.0.0.1", port: int = 8099) -> None:
         """
-        Perform a GET request to vMix API and return top-level XML element.
+        Initialize VMixClient.
 
-        Parameters
-        ----------
-        command : str, optional
-            API command (e.g. "Function=FadeToBlack")
-
-        Returns
-        -------
-        ET.Element
-            Parsed XML root element
-
-        Raises
-        ------
-        Exception
-            If HTTP fails or XML is malformed
+        Args:
+            host: vMix host IP or hostname.
+            port: vMix TCP API port.
         """
+        self.host: str = host
+        self.port: int = port
+        self.sock: Optional[socket.socket] = None
+        self.connected: bool = False
 
-        if command:
-            url = self._build_url(command)
-        else:
-            url = f"http://{self.host}:{self.port}/api/"
+    def connect(self) -> bool:
+        """
+        Connect to vMix TCP API server.
 
-        r = requests.get(url, timeout=3)
-        r.raise_for_status()
-
+        Returns:
+            True if connection successful, False otherwise.
+        """
         try:
-            xml_root = ET.fromstring(r.text)
-        except ET.ParseError as e:
-            raise Exception(f"VMixClient: XML parse error ({e})")  # noqa
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.connect((self.host, self.port))
+            self.connected = True
+            return True
+        except Exception as e:
+            print(f"[VMixClient] Could not connect: {e}")
+            self.connected = False
+            return False
 
-        return xml_root
-
-    # ----------------------------------------------------------------------
-    def get_status_xml(self) -> ET.Element:
+    def _send(self, command: str) -> bool:
         """
-        Get entire XML state from vMix.
+        Send a command to vMix via TCP.
 
-        Returns
-        -------
-        ET.Element
-            Root XML document
+        Args:
+            command: The command string to send (without CRLF).
 
-        Example use
-        -----------
-        xml = client.get_status_xml()
+        Returns:
+            True if the send succeeded, False otherwise.
         """
-        return self._get_xml()
+        if not self.connected or self.sock is None:
+            return False
+        try:
+            msg = (command + "\r\n").encode("utf-8")
+            self.sock.sendall(msg)
+            return True
+        except Exception as e:
+            print(f"[VMixClient] Send error: {e}")
+            return False
 
-    # ----------------------------------------------------------------------
-    def list_inputs(self) -> List[Dict[str, str]]:
+    def set_text(self, input_name: str, field: str, value: str) -> bool:
         """
-        Return a simplified list of vMix inputs (title, key, type).
+        Set a text field on a vMix input.
 
-        Returns
-        -------
-        List[Dict[str, str]]
-            Each element is: { "title": "...", "key": "...", "type": "GT" }
+        Args:
+            input_name: The name (or GUID) of the vMix input.
+            field: The name of the text field (SelectedName).
+            value: The text value to set.
+
+        Returns:
+            True on success, False otherwise.
         """
-
-        xml = self.get_status_xml()
-
-        inputs = []
-        for inp in xml.findall("inputs/input"):
-            inputs.append(
-                {
-                    "title": inp.get("title", ""),
-                    "key": inp.get("key", ""),
-                    "type": inp.get("type", ""),
-                }
-            )
-        return inputs
-
-    # ----------------------------------------------------------------------
-    def get_text(self, input_key: str, field_name: str) -> Optional[str]:
-        """
-        Get a GT text field from vMix.
-
-        Parameters
-        ----------
-        input_key : str
-            vMix input key (GUID)
-        field_name : str
-            Title text field, must end with ".Text"
-
-        Returns
-        -------
-        Optional[str]
-            Field content or None if not found
-        """
-
-        command = f"Input={input_key}&Value&Function=GetText&SelectedName={field_name}"
-        xml = self._get_xml(command)
-
-        node = xml.find("text")
-        if node is None:
-            return None
-        return node.text or ""
-
-    # ----------------------------------------------------------------------
-    def set_text(self, input_key: str, field_name: str, value: str) -> None:
-        """
-        Set a GT text field value in vMix.
-
-        Parameters
-        ----------
-        input_key : str
-        field_name : str
-        value : str
-
-        Notes
-        -----
-        Controllers must handle errors.
-        """
-
-        safe_val = value.replace("&", "&amp;")
-        command = (
-            f"Input={input_key}&Function=SetText&SelectedName={field_name}"
-            f"&Value={safe_val}"
+        return self._send(
+            f'FUNCTION SetText Input="{input_name}" SelectedName="{field}" Value="{value}"'
         )
-        self._get_xml(command)
 
-    # ----------------------------------------------------------------------
-    def trigger_function(self, function_name: str) -> None:
+    def set_image(self, input_name: str, field: str, value: str) -> bool:
         """
-        Trigger a vMix API function, e.g. "FadeToBlack", "Start", etc.
+        Set an image (source) field on a vMix input.
 
-        Parameters
-        ----------
-        function_name : str
-            Must match documented vMix API function names
+        Args:
+            input_name: The name (or GUID) of the vMix input.
+            field: The name of the image field (SelectedName).
+            value: The image source path or URL.
+
+        Returns:
+            True on success, False otherwise.
         """
+        return self._send(
+            f'FUNCTION SetImage Input="{input_name}" SelectedName="{field}" Value="{value}"'
+        )
 
-        command = f"Function={function_name}"
-        self._get_xml(command)
-
-    # ----------------------------------------------------------------------
-    def overlay_on(self, overlay_number: int) -> None:
+    def set_source(self, input_name: str, field: str, value: str) -> bool:
         """
-        Turn on overlay.
+        Alias for set_image. Many controllers call set_source().
 
-        Parameters
-        ----------
-        overlay_number : int
-            1-4 (vMix overlay channels)
+        Args same as set_image().
         """
-        command = f"Function=OverlayInput{overlay_number}On"
-        self._get_xml(command)
+        return self.set_image(input_name, field, value)
 
-    # ----------------------------------------------------------------------
-    def overlay_off(self, overlay_number: int) -> None:
-        """Turn off overlay channel."""
-        command = f"Function=OverlayInput{overlay_number}Off"
-        self._get_xml(command)
+    def set_overlay(self, channel: int, input_name: str) -> bool:
+        """
+        Enable overlay of an input on a given overlay channel.
+
+        Args:
+            channel: Overlay channel number (e.g. 0, 1, 2...).
+            input_name: The input you want to overlay.
+
+        Returns:
+            True on success, False otherwise.
+        """
+        return self._send(
+            f'FUNCTION OverlayInput{channel} Input="{input_name}"'
+        )
+
+    def clear_overlay(self, channel: int) -> bool:
+        """
+        Disable overlay on the given channel.
+
+        Args:
+            channel: Overlay channel number to clear.
+
+        Returns:
+            True on success, False otherwise.
+        """
+        return self._send(f'FUNCTION OverlayInput{channel}Off')
+
+    def get_state_xml(self) -> Optional[ET.Element]:
+        """
+        Request vMix to send full state as XML, parse and return it.
+
+        Ignores any leading non-XML response (e.g. 'VERSION OK').
+
+        Returns:
+            ElementTree root of XML response, or None if parse failed or no XML yet.
+        """
+        if not self._send("XML"):
+            return None
+        try:
+            raw = self.sock.recv(999999)
+            if not raw:
+                print("[VMixClient] Empty XML reply")
+                return None
+            text = raw.decode("utf-8", errors="ignore").strip()
+            if text.startswith("VERSION OK"):
+                return None
+            if "<" not in text:
+                print("[VMixClient] No XML yet")
+                return None
+            xml_start = text[text.index("<"):]
+            root = ET.fromstring(xml_start)
+            return root
+        except Exception as e:
+            print(f"[VMixClient] XML parse error: {e}")
+            return None
+
+    def get_status_xml(self) -> Optional[ET.Element]:
+        """
+        Alias for get_state_xml() to support older code calling get_status_xml().
+        """
+        return self.get_state_xml()

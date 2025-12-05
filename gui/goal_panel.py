@@ -1,75 +1,61 @@
 import tkinter as tk
 from tkinter import ttk
+from scoreboard_app.controllers.goal_controller import GoalController
+from scoreboard_app.gui.player_select_dialog import PlayerSelectDialog
 
-from scoreboard_app.gui.popup_player_picker import pick_player
 
-
-class GoalPanel(ttk.LabelFrame):
+class GoalPanel(tk.Frame):
     """
-    Goal control panel with player picker popup.
+    GUI for entering goals (home/away teams) and optionally selecting the scoring player.
     """
 
-    def __init__(self, app, parent):
-        super().__init__(parent, text="GOAL")
-        self.app = app
-        self.controller = app.controller
+    def __init__(self, master, controller: GoalController):
+        super().__init__(master, relief="groove", bd=2)
+        self.controller = controller
 
-        self.frame = ttk.Frame(self)
-        self.frame.pack(fill="both", expand=True, padx=10, pady=10)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
-        # --- Buttons ---
-        ttk.Button(self.frame, text="HOME GOAL", command=self._goal_home).pack(
-            fill="x", pady=5
+        title = tk.Label(self, text="MÅL", font=("Segoe UI", 12, "bold"))
+        title.grid(row=0, column=0, columnspan=2, pady=5)
+
+        # -------- HOME GOAL ---------
+        self.btn_home_goal = ttk.Button(
+            self,
+            text="➕ HEMMA MÅL",
+            command=lambda: self._register_goal("home")
         )
-        ttk.Button(self.frame, text="AWAY GOAL", command=self._goal_away).pack(
-            fill="x", pady=5
+        self.btn_home_goal.grid(row=1, column=0, sticky="ew", padx=5, pady=5)
+
+        # -------- AWAY GOAL ---------
+        self.btn_away_goal = ttk.Button(
+            self,
+            text="➕ BORTA MÅL",
+            command=lambda: self._register_goal("away")
         )
+        self.btn_away_goal.grid(row=1, column=1, sticky="ew", padx=5, pady=5)
 
-        ttk.Separator(self.frame, orient="horizontal").pack(fill="x", pady=10)
-
-        ttk.Button(self.frame, text="UNDO LAST GOAL", command=self._undo).pack(
-            fill="x", pady=5
-        )
-
-    # ---------------------------------------------------
-    # INTERNAL HELPERS
-    # ---------------------------------------------------
-    def _get_players(self, team: str):
+    # ------------------------------------------------------------------
+    def _register_goal(self, team: str):
         """
-        Take lineup from controller (already parsed from XML!)
-        Expect structure:
-        { "home": [ {"number": "30", "name": "Adam"}, ... ],
-          "away": [ {...} ]
-        }
+        When a goal button is pressed:
+        - ask for optional player
+        - update score
+        - show scoring graphic if player is known
         """
-        try:
-            return self.controller.lineup.get(team, [])
-        except:
-            return []
 
-    # ---------------------------------------------------
-    # BUTTON ACTIONS
-    # ---------------------------------------------------
-    def _goal_home(self):
-        self._handle_goal("home")
+        # Ask popup for player
+        player = PlayerSelectDialog(self.master, team=team).show()
 
-    def _goal_away(self):
-        self._handle_goal("away")
+        # CASE 1: NO PLAYER SELECTED (just goal)
+        if not player:
+            self.controller.add_goal(team=team)
+            return
 
-    def _handle_goal(self, team: str):
-        players = self._get_players(team)
-
-        number, name = pick_player(self.app.root, players, title="Välj målskytt")
-
-        # send None if unknown player
-        self.controller.goal_scored(team, number, name)
-
-        # log
-        if number:
-            self.app.log(f"Mål {team.upper()}: {number} {name}")
-        else:
-            self.app.log(f"Mål {team.upper()}: Okänd spelare (ingen grafik efter mål)")
-
-    def _undo(self):
-        self.controller.undo_goal()
-        self.app.log("Senaste mål ångrat.")
+        # CASE 2: PLAYER SELECTED
+        self.controller.add_goal(
+            team=team,
+            player_number=player.get("number"),
+            player_name=player.get("name"),
+            player_logo=player.get("logo", None)
+        )

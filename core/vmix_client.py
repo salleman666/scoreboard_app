@@ -30,7 +30,11 @@ class VMixClient:
     # Get full XML
     # ----------------------------------------------------------
     def get_status_xml(self):
-        return self._api()
+        url = f"http://{self.host}:{self.port}/API"
+        resp = requests.get(url)
+        resp.raise_for_status()
+        return resp.text
+
 
     # ----------------------------------------------------------
     # Parse XML & read a text field

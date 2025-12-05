@@ -1,148 +1,121 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-
-from scoreboard_app.controllers.penalty_controller import PenaltyController
+from tkinter import ttk
+from typing import Dict, Any
 
 
 class PenaltyPanel(tk.LabelFrame):
     """
-    GUI-panel för att kontrollera alla 4 penalty-fält:
-        Home P1, Home P2, Away P1, Away P2
-
-    - Live visar:
-        nummer
-        namn (om finns)
-        återstående tid
-    - Kan:
-        starta nedräkning
-        pausa nedräkning
-        rensa penalty
-        auto-refresh varje sekund
+    Auto-generated penalty GUI panel based on config mapping.
+    Supports:
+      - Unlimited penalty slots for home and away if config expands
+      - Automatic refresh of values
+      - Buttons for manual override
     """
 
-    REFRESH_MS = 1000
+    REFRESH_MS = 800
 
-    def __init__(self, parent, controller: PenaltyController):
-        super().__init__(parent, text="Utv PAC (Penalties)", padx=6, pady=6)
+    def __init__(self, master, controller, cfg: Dict[str, Any]):
+        super().__init__(master, text="PENALTIES", padx=10, pady=10, font=("Segoe UI", 12, "bold"))
 
         self.controller = controller
+        self.cfg = cfg
 
-        # -------------------------------
-        # UI LAYOUT
-        # -------------------------------
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
+        # penalty mapping reference
+        self.mapping = cfg["mapping"]["penalties"]
 
-        # HOME
-        ttk.Label(self, text="HEMMA").grid(row=0, column=0, sticky="w")
+        # storage of GUI widgets
+        self.rows: Dict[str, Dict[str, tk.Label]] = {}
 
-        self.h1_label = ttk.Label(self, text="H1 – tid: --:--  nr: --")
-        self.h1_label.grid(row=1, column=0, sticky="w")
+        # build dynamic UI
+        self._build_layout()
 
-        self.h2_label = ttk.Label(self, text="H2 – tid: --:--  nr: --")
-        self.h2_label.grid(row=2, column=0, sticky="w")
-
-        # AWAY
-        ttk.Label(self, text="BORTE").grid(row=0, column=1, sticky="w")
-
-        self.a1_label = ttk.Label(self, text="A1 – tid: --:--  nr: --")
-        self.a1_label.grid(row=1, column=1, sticky="w")
-
-        self.a2_label = ttk.Label(self, text="A2 – tid: --:--  nr: --")
-        self.a2_label.grid(row=2, column=1, sticky="w")
-
-        # -------------------------------
-        # KONTROLLKNAPPAR
-        # -------------------------------
-        btns = tk.Frame(self)
-        btns.grid(row=3, column=0, columnspan=2, pady=5)
-
-        ttk.Button(
-            btns, text="Start alla", command=self.start_all
-        ).grid(row=0, column=0, padx=4)
-
-        ttk.Button(
-            btns, text="Pausa alla", command=self.pause_all
-        ).grid(row=0, column=1, padx=4)
-
-        ttk.Button(
-            btns, text="Rensa alla", command=self.clear_all
-        ).grid(row=0, column=2, padx=4)
-
-        # -------------------------------
-        # AUTO REFRESH
-        # -------------------------------
+        # start auto refresh
         self.after(self.REFRESH_MS, self._refresh)
 
-    # ============================================================
-    # BUTTON ACTIONS
-    # ============================================================
+    # ----------------------------------------------------------------------
+    def _build_layout(self):
+        row = 0
 
-    def start_all(self):
+        ttk.Label(self, text="TEAM", width=10).grid(row=row, column=0, sticky="w")
+        ttk.Label(self, text="#", width=6).grid(row=row, column=1, sticky="w")
+        ttk.Label(self, text="TIME", width=8).grid(row=row, column=2, sticky="w")
+        ttk.Label(self, text="", width=10).grid(row=row, column=3)
+        row += 1
+
+        for side in ["home", "away"]:
+            slots = self.mapping[side]
+
+            for slot_key, slot_fields in slots.items():
+                row_id = f"{side}_{slot_key}"
+
+                team_lbl = ttk.Label(self, text=side.upper(), width=10)
+                team_lbl.grid(row=row, column=0, sticky="w")
+
+                num_lbl = ttk.Label(self, text="", width=6)
+                num_lbl.grid(row=row, column=1, sticky="w")
+
+                time_lbl = ttk.Label(self, text="", width=8)
+                time_lbl.grid(row=row, column=2, sticky="w")
+
+                btn = ttk.Button(
+                    self,
+                    text="✖ CLEAR",
+                    width=8,
+                    command=lambda s=side, k=slot_key: self._clear(s, k)
+                )
+                btn.grid(row=row, column=3, sticky="e")
+
+                self.rows[row_id] = {
+                    "number": num_lbl,
+                    "time": time_lbl,
+                }
+
+                row += 1
+
+        # bottom actions
+        ttk.Button(self, text="➕ ADD PENALTY", command=self._start_penalty)\
+            .grid(row=row, column=0, pady=10)
+
+        ttk.Button(self, text="✖ CLEAR ALL", command=self._clear_all)\
+            .grid(row=row, column=1, pady=10)
+
+    # ----------------------------------------------------------------------
+    def _refresh(self):
+        """ Read current penalty values from controller and update GUI """
         try:
-            self.controller.start_all_penalties()
+            status = self.controller.get_status()  # MUST RETURN mapping like {home:{p1:{time:"",number:""},...}}
         except Exception as e:
-            messagebox.showerror("Fel", str(e))
-
-    def pause_all(self):
-        try:
-            self.controller.pause_all_penalties()
-        except Exception as e:
-            messagebox.showerror("Fel", str(e))
-
-    def clear_all(self):
-        if not messagebox.askyesno("Bekräfta", "Rensa alla utvisningar?"):
+            print("[PenaltyPanel] refresh error:", e)
+            self.after(self.REFRESH_MS, self._refresh)
             return
 
+        for row_id, widgets in self.rows.items():
+            side, slot = row_id.split("_")
+            slot_data = status.get(side, {}).get(slot, {})
+
+            widgets["number"].config(text=slot_data.get("number", ""))
+            widgets["time"].config(text=slot_data.get("time", ""))
+
+        self.after(self.REFRESH_MS, self._refresh)
+
+    # ----------------------------------------------------------------------
+    def _start_penalty(self):
+        """ Open a dialog to select team, player and time """
         try:
-            self.controller.clear_home_penalties()
-            self.controller.clear_away_penalties()
+            self.controller.start_penalty_dialog(self.master)
         except Exception as e:
-            messagebox.showerror("Fel", str(e))
+            print("[PenaltyPanel] start_penalty error:", e)
 
-    # ============================================================
-    # REFRESH DISPLAY
-    # ============================================================
-
-    def _refresh(self):
-        """
-        Hämtar penalty status från controller och uppdaterar UI.
-        """
+    # ----------------------------------------------------------------------
+    def _clear(self, side: str, slot_key: str):
         try:
-            status = self.controller.get_all_penalty_status()
-            # status = {
-            #   "home": { "p1": {...}, "p2": {...} },
-            #   "away": { "p1": {...}, "p2": {...} }
-            # }
-
-            # HOME
-            h1 = status["home"]["p1"]
-            h2 = status["home"]["p2"]
-
-            self.h1_label.config(
-                text=f"H1 – tid: {h1['time']}  nr: {h1['number']}"
-            )
-
-            self.h2_label.config(
-                text=f"H2 – tid: {h2['time']}  nr: {h2['number']}"
-            )
-
-            # AWAY
-            a1 = status["away"]["p1"]
-            a2 = status["away"]["p2"]
-
-            self.a1_label.config(
-                text=f"A1 – tid: {a1['time']}  nr: {a1['number']}"
-            )
-
-            self.a2_label.config(
-                text=f"A2 – tid: {a2['time']}  nr: {a2['number']}"
-            )
-
+            self.controller.clear_penalty(side, slot_key)
         except Exception as e:
-            # visa, men krascha inte GUI
-            print("[PenaltyPanel] refresh error:", e)
+            print("[PenaltyPanel] clear_penalty error:", e)
 
-        finally:
-            # loop
-            self.after(self.REFRESH_MS, self._refresh)
+    # ----------------------------------------------------------------------
+    def _clear_all(self):
+        try:
+            self.controller.clear_all_penalties()
+        except Exception as e:
+            print("[PenaltyPanel] clear_all error:", e)

@@ -1,237 +1,183 @@
+import threading
 import time
-from typing import Dict, Optional
-
-from scoreboard_app.core.vmix_client import VMixClient
-from scoreboard_app.config.vmix_config import load_config
+from typing import Dict, Any
 
 
 class PenaltyController:
     """
-    Full automated penalty logic controller.
-
-    Supported:
-        - H1, H2, A1, A2 simultaneously
-        - Auto countdown monitoring
-        - Auto hide expired penalties
-        - Auto multiview overlay alerts
-        - State reading for GUI refresh
+    Handles penalty state for:
+      - home P1, P2
+      - away P1, P2
+    Reads/writes text fields in scoreboard input.
     """
 
-    def __init__(self, client: VMixClient, cfg: dict):
+    def __init__(self, client, cfg):
         self.client = client
         self.cfg = cfg
 
-        # Input name of scoreboard
-        self.scoreboard_input = cfg["inputs"]["scoreboard"]
+        mapping = cfg["mapping"]["penalties"]
 
-        # JSON field mapping
-        self.fields = cfg["mapping"]["penalties"]
-        # example:
-        # self.fields["home"]["p1"]["time"]  → "HomeP1time.Text"
+        # Field names — text timers
+        self.h1_time = mapping["home"]["p1"]["time"]
+        self.h2_time = mapping["home"]["p2"]["time"]
+        self.a1_time = mapping["away"]["p1"]["time"]
+        self.a2_time = mapping["away"]["p2"]["time"]
 
-        # GUI refresh wants cache
-        self._last_status = {}
+        # Player numbers
+        self.h1_nr = mapping["home"]["p1"]["number"]
+        self.h2_nr = mapping["home"]["p2"]["number"]
+        self.a1_nr = mapping["away"]["p1"]["number"]
+        self.a2_nr = mapping["away"]["p2"]["number"]
 
-        # Automation loop on/off
-        self._run_auto = True
+        # Background images — we use them to hide empty penalties
+        self.h1_bg = mapping["home"]["p1"]["bg"]
+        self.h2_bg = mapping["home"]["p2"]["bg"]
+        self.a1_bg = mapping["away"]["p1"]["bg"]
+        self.a2_bg = mapping["away"]["p2"]["bg"]
 
-        # Start worker thread style
-        self._start_background_poll()
+        # Number backgrounds
+        self.h1_nr_bg = mapping["home"]["p1"]["nrbg"]
+        self.h2_nr_bg = mapping["home"]["p2"]["nrbg"]
+        self.a1_nr_bg = mapping["away"]["p1"]["nrbg"]
+        self.a2_nr_bg = mapping["away"]["p2"]["nrbg"]
 
-    # -------------------------------------------------------------
-    # Private helper
-    # -------------------------------------------------------------
+        # scoreboard input name
+        self.input_name = cfg["inputs"]["scoreboard"]
 
-    def _start_background_poll(self):
+        # start thread loop
+        self._stop_loop = False
+        self._thread = threading.Thread(target=self._loop, daemon=True)
+        self._thread.start()
+
+    # -----------------------
+    # VMIX HELPER FUNCTIONS
+    # -----------------------
+
+    def _get_text(self, field: str) -> str:
+        """Return a text value from scoreboard input."""
+        return self.client.get_text(self.input_name, field)
+
+    def _set_text(self, field: str, value: str):
+        """Write a text value into scoreboard input."""
+        return self.client.set_text(self.input_name, field, value)
+
+    def _set_visible(self, name: str, visible: bool):
+        """Toggle visibility of a field or image."""
+        if visible:
+            self.client.set_visible_on(self.input_name, name)
+        else:
+            self.client.set_visible_off(self.input_name, name)
+
+    # -----------------------
+    # PENALTY API
+    # -----------------------
+
+    def add_time(self, slot: str, seconds: int):
         """
-        Runs in background: monitor penalties and clock.
+        slot: "H1", "H2", "A1", "A2"
+        seconds: positive or negative
         """
-        import threading
-        t = threading.Thread(target=self._loop, daemon=True)
-        t.start()
+        field = {
+            "H1": self.h1_time,
+            "H2": self.h2_time,
+            "A1": self.a1_time,
+            "A2": self.a2_time,
+        }.get(slot)
 
-    # -------------------------------------------------------------
+        if not field:
+            return
+
+        old = self._get_text(field)
+        new_seconds = self._parse_time(old) + seconds
+        if new_seconds < 0:
+            new_seconds = 0
+
+        self._set_text(field, self._format_time(new_seconds))
+
+    def clear(self, slot: str):
+        field = {
+            "H1": self.h1_time,
+            "H2": self.h2_time,
+            "A1": self.a1_time,
+            "A2": self.a2_time,
+        }.get(slot)
+
+        if not field:
+            return
+
+        self._set_text(field, "0:00")
+
+    # -----------------------
+    # DATA READOUT FOR GUI
+    # -----------------------
+
+    def get_penalties(self) -> Dict[str, Dict[str, Any]]:
+        """Return current penalty state for GUI refresh."""
+        def pack(name, nr_field, time_field):
+            return {
+                "number": self._get_text(nr_field),
+                "time": self._get_text(time_field),
+                "seconds": self._parse_time(self._get_text(time_field)),
+            }
+
+        return {
+            "home": {
+                "p1": pack("H1", self.h1_nr, self.h1_time),
+                "p2": pack("H2", self.h2_nr, self.h2_time),
+            },
+            "away": {
+                "p1": pack("A1", self.a1_nr, self.a1_time),
+                "p2": pack("A2", self.a2_nr, self.a2_time),
+            },
+        }
+
+    # -----------------------
+    # AUTO VISIBILITY + CAMERA ALERTS
+    # -----------------------
 
     def _loop(self):
-        while self._run_auto:
+        """Optional automatic hiding and overlay logic."""
+        while not self._stop_loop:
             try:
-                self._auto_monitor()
+                data = self.get_penalties()
+
+                # automatically hide empty penalties
+                for side in ["home", "away"]:
+                    for pid in ["p1", "p2"]:
+                        item = data[side][pid]
+                        bg = getattr(self, f"{side[0]}{pid[1]}_bg")
+                        nrbg = getattr(self, f"{side[0]}{pid[1]}_nr_bg")
+                        time_field = getattr(self, f"{side[0]}{pid[1]}_time")
+
+                        empty = (item["seconds"] == 0)
+                        self._set_visible(time_field, not empty)
+                        self._set_visible(bg, not empty)
+                        self._set_visible(nrbg, not empty)
+
             except Exception as e:
                 print("[PenaltyController] loop error:", e)
 
-            time.sleep(0.50)
+            time.sleep(0.5)
 
-    # -------------------------------------------------------------
-    # AUTO MONITOR
-    # -------------------------------------------------------------
-
-    def _auto_monitor(self):
-        """
-        Detect expiry and auto hide fields.
-        """
-        status = self.get_all_penalty_status()
-
-        for key, p in status.items():
-            if not p["time_sec"]:
-                continue
-
-            if p["time_sec"] == 0:  # hide expired
-                self._auto_hide_if_expired(key)
-
-        # Optional — multiview alert:
-        self._auto_multiview(status)
-
-        self._last_status = status
-
-    # -------------------------------------------------------------
-    # AUTO HIDE logic
-    # -------------------------------------------------------------
-
-    def _auto_hide_if_expired(self, slot: str):
-        """slot: 'H1', 'H2', 'A1', 'A2' """
-        team = "home" if slot.startswith("H") else "away"
-        p = "p1" if slot.endswith("1") else "p2"
-
-        time_field = self.fields[team][p]["time"]
-        nr_field = self.fields[team][p]["number"]
-        bg_field = self.fields[team][p]["bg"]
-        nr_bg_field = self.fields[team][p]["bg_number"]
-
-        # hide everything
-        self.client.set_text_visible(self.scoreboard_input, time_field, False)
-        self.client.set_text_visible(self.scoreboard_input, nr_field, False)
-        self.client.set_image_visible(self.scoreboard_input, bg_field, False)
-        self.client.set_image_visible(self.scoreboard_input, nr_bg_field, False)
-
-    # -------------------------------------------------------------
-    # MULTIVIEW (HARD RULE)
-    # -------------------------------------------------------------
-
-    def _auto_multiview(self, status: dict):
-        """
-        Home alert if any H1 or H2 <=5 sec
-        Away alert if any A1 or A2 <=5 sec
-        """
-        cfg = self.cfg["defaults"]
-        mv_home = cfg.get("mv_home", None)
-        mv_away = cfg.get("mv_away", None)
-
-        if not mv_home or not mv_away:
-            return  # optional feature
-
-        # home
-        if status["H1"]["time_sec"] and status["H1"]["time_sec"] <= 5:
-            self.client.overlay_on(self.scoreboard_input, mv_home)
-        elif status["H2"]["time_sec"] and status["H2"]["time_sec"] <= 5:
-            self.client.overlay_on(self.scoreboard_input, mv_home)
-        else:
-            self.client.overlay_off(self.scoreboard_input, mv_home)
-
-        # away
-        if status["A1"]["time_sec"] and status["A1"]["time_sec"] <= 5:
-            self.client.overlay_on(self.scoreboard_input, mv_away)
-        elif status["A2"]["time_sec"] and status["A2"]["time_sec"] <= 5:
-            self.client.overlay_on(self.scoreboard_input, mv_away)
-        else:
-            self.client.overlay_off(self.scoreboard_input, mv_away)
-
-    # -------------------------------------------------------------
-    # PENALTY READ
-    # -------------------------------------------------------------
-
-    def _read_slot(self, team: str, slot: str) -> dict:
-        """
-        Read GUI-friendly state for a single penalty.
-        """
-        fields = self.fields[team][slot]
-        t = self.client.get_text(self.scoreboard_input, fields["time"]) or ""
-        n = self.client.get_text(self.scoreboard_input, fields["number"]) or ""
-
-        sec = self._parse_time_to_sec(t)
-
-        return {
-            "time": t,
-            "time_sec": sec,
-            "number": n,
-        }
+    # -----------------------
+    # INTERNAL PARSERS
+    # -----------------------
 
     @staticmethod
-    def _parse_time_to_sec(txt: str) -> Optional[int]:
-        """
-        Convert MM:SS -> integer seconds
-        """
-        txt = txt.strip()
-        if not txt:
-            return None
-
-        if ":" in txt:
-            m, s = txt.split(":")
-            try:
-                return int(m) * 60 + int(s)
-            except:
-                return None
-
+    def _parse_time(text: str) -> int:
+        """Convert 'mm:ss' to seconds."""
+        if not text or text.strip() == "":
+            return 0
         try:
-            return int(txt)
+            if ":" in text:
+                m, s = text.split(":")
+                return int(m) * 60 + int(s)
+            return int(text)
         except:
-            return None
+            return 0
 
-    # -------------------------------------------------------------
-    # PUBLIC: GUI uses this
-    # -------------------------------------------------------------
-
-    def get_all_penalty_status(self) -> Dict[str, dict]:
-        """
-        Returns state object:
-            {
-                "H1": {"time","time_sec","number"},
-                "H2": ...
-                "A1": ...
-                "A2": ...
-            }
-        """
-        return {
-            "H1": self._read_slot("home", "p1"),
-            "H2": self._read_slot("home", "p2"),
-            "A1": self._read_slot("away", "p1"),
-            "A2": self._read_slot("away", "p2"),
-        }
-
-    # -------------------------------------------------------------
-    # PUBLIC: Set or clear penalties (GUI buttons)
-    # -------------------------------------------------------------
-
-    def set_penalty(self, slot: str, number: str, duration_sec: int):
-        """
-        slot: "H1","H2","A1","A2"
-        """
-        team = "home" if slot.startswith("H") else "away"
-        p = "p1" if slot.endswith("1") else "p2"
-
-        fields = self.fields[team][p]
-
-        mm = duration_sec // 60
-        ss = duration_sec % 60
-        txt = f"{mm:02d}:{ss:02d}"
-
-        # Set values visible
-        self.client.set_text(self.scoreboard_input, fields["time"], txt)
-        self.client.set_text(self.scoreboard_input, fields["number"], number)
-
-        self.client.set_text_visible(self.scoreboard_input, fields["time"], True)
-        self.client.set_text_visible(self.scoreboard_input, fields["number"], True)
-        self.client.set_image_visible(self.scoreboard_input, fields["bg"], True)
-        self.client.set_image_visible(self.scoreboard_input, fields["bg_number"], True)
-
-    def clear_penalty(self, slot: str):
-        team = "home" if slot.startswith("H") else "away"
-        p = "p1" if slot.endswith("1") else "p2"
-        fields = self.fields[team][p]
-
-        self.client.set_text(self.scoreboard_input, fields["time"], "")
-        self.client.set_text(self.scoreboard_input, fields["number"], "")
-
-        self.client.set_text_visible(self.scoreboard_input, fields["time"], False)
-        self.client.set_text_visible(self.scoreboard_input, fields["number"], False)
-        self.client.set_image_visible(self.scoreboard_input, fields["bg"], False)
-        self.client.set_image_visible(self.scoreboard_input, fields["bg_number"], False)
+    @staticmethod
+    def _format_time(seconds: int) -> str:
+        m = seconds // 60
+        s = seconds % 60
+        return f"{m}:{s:02d}"

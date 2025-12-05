@@ -6,7 +6,7 @@ using mappings defined in config/vmix_config.json.
 
 from __future__ import annotations
 from typing import Optional
-from ..core.vmix_client import VMixClient
+from scoreboard_app.core.vmix_client import VMixClient
 
 
 class ShotsController:
@@ -59,7 +59,7 @@ class ShotsController:
 
     def _sync_home(self):
         try:
-            self.client.set_text_field(
+            self.client.set_text(
                 self.scoreboard_input,
                 self.map_home,
                 str(self._shots_home)
@@ -69,7 +69,7 @@ class ShotsController:
 
     def _sync_away(self):
         try:
-            self.client.set_text_field(
+            self.client.set_text(
                 self.scoreboard_input,
                 self.map_away,
                 str(self._shots_away)

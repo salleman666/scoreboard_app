@@ -49,25 +49,31 @@
     },
 
     "penalties": {
-      "H1_number": "H1_Number.Text",
-      "H1_name": "H1_Name.Text",
-      "H1_time": "H1_Time.Text",
-      "H1_visible": "H1_IsVisible.Text",
-
-      "H2_number": "H2_Number.Text",
-      "H2_name": "H2_Name.Text",
-      "H2_time": "H2_Time.Text",
-      "H2_visible": "H2_IsVisible.Text",
-
-      "A1_number": "A1_Number.Text",
-      "A1_name": "A1_Name.Text",
-      "A1_time": "A1_Time.Text",
-      "A1_visible": "A1_IsVisible.Text",
-
-      "A2_number": "A2_Number.Text",
-      "A2_name": "A2_Name.Text",
-      "A2_time": "A2_Time.Text",
-      "A2_visible": "A2_IsVisible.Text"
+      "home": {
+        "p1": {
+          "number": "H_P1_number.Text",
+          "name":   "H_P1_name.Text",
+          "time":   "H_P1_time.Text"
+        },
+        "p2": {
+          "number": "H_P2_number.Text",
+          "name":   "H_P2_name.Text",
+          "time":   "H_P2_time.Text"
+        }
+      },
+      "away": {
+        "p1": {
+          "number": "A_P1_number.Text",
+          "name":   "A_P1_name.Text",
+          "time":   "A_P1_time.Text"
+        },
+        "p2": {
+          "number": "A_P2_number.Text",
+          "name":   "A_P2_name.Text",
+          "time":   "A_P2_time.Text"
+        }
+      }
     }
   }
 }
+

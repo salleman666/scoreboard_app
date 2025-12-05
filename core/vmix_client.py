@@ -1,195 +1,148 @@
-import socket
+import threading
 import xml.etree.ElementTree as ET
-from typing import Optional
+import requests
+from typing import Optional, Dict, Any
 
 
 class VMixClient:
     """
-    Client for communicating with vMix via TCP API.
-
-    Methods allow setting text/image fields on inputs, overlay control,
-    and retrieving the full vMix state as XML.
+    Unified API wrapper over vMix XML and function API.
+    Adds helper methods so GUI controllers don't need to perform XML parsing.
     """
 
-    def __init__(self, host: str = "127.0.0.1", port: int = 8099) -> None:
-        """
-        Initialize VMixClient.
+    def __init__(self, host: str, port: int):
+        self.host = host
+        self.port = port
+        self.base = f"http://{host}:{port}"
+        self._lock = threading.Lock()
+        self._tk_safe = True
 
-        Args:
-            host: vMix host IP or hostname.
-            port: vMix TCP API port.
-        """
-        self.host: str = host
-        self.port: int = port
-        self.sock: Optional[socket.socket] = None
-        self.connected: bool = False
+    # ----------------------------------------------------------------------
+    # SAFE-UPDATE TOGGLE (controllers can disable thread-unsafe GUI refresh)
+    # ----------------------------------------------------------------------
+    def set_tk_safe_update(self, enabled: bool):
+        self._tk_safe = enabled
 
-    def connect(self) -> bool:
-        """
-        Connect to vMix TCP API server.
+    # ----------------------------------------------------------------------
+    # BASIC API CALLS
+    # ----------------------------------------------------------------------
+    def _api(self, function: str, **params):
+        url = f"{self.base}/api"
+        q = {"function": function}
+        q.update(params)
 
-        Returns:
-            True if connection successful, False otherwise.
-        """
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((self.host, self.port))
-            self.connected = True
-            return True
-        except Exception as e:
-            print(f"[VMixClient] Could not connect: {e}")
-            self.connected = False
-            return False
+        with self._lock:
+            return requests.get(url, params=q, timeout=1)
 
-    def _send(self, command: str) -> bool:
-        """
-        Send a command to vMix via TCP.
+    def get_status_xml(self) -> ET.Element:
+        url = f"{self.base}/api"
+        with self._lock:
+            r = requests.get(url, timeout=1)
+        return ET.fromstring(r.text)
 
-        Args:
-            command: The command string to send (without CRLF).
+    # ----------------------------------------------------------------------
+    # INPUT LOOKUP
+    # ----------------------------------------------------------------------
+    def find_input(self, input_name: str) -> Optional[ET.Element]:
+        root = self.get_status_xml()
+        for inp in root.findall("inputs/input"):
+            if inp.get("title") == input_name:
+                return inp
+        return None
 
-        Returns:
-            True if the send succeeded, False otherwise.
-        """
-        if not self.connected or self.sock is None:
-            return False
-        try:
-            msg = (command + "\r\n").encode("utf-8")
-            self.sock.sendall(msg)
-            return True
-        except Exception as e:
-            print(f"[VMixClient] Send error: {e}")
-            return False
+    # ----------------------------------------------------------------------
+    # FIELD READERS
+    # ----------------------------------------------------------------------
+    def get_text(self, input_name: str, field_name: str) -> str:
+        inp = self.find_input(input_name)
+        if inp is None:
+            return ""
 
-    def set_text(self, input_name: str, field: str, value: str) -> bool:
-        """
-        Set a text field on a vMix input.
+        for t in inp.findall("text"):
+            if t.get("name") == field_name:
+                return t.text or ""
+        return ""
 
-        Args:
-            input_name: The name (or GUID) of the vMix input.
-            field: The name of the text field (SelectedName).
-            value: The text value to set.
+    def get_image(self, input_name: str, field_name: str) -> str:
+        inp = self.find_input(input_name)
+        if inp is None:
+            return ""
 
-        Returns:
-            True on success, False otherwise.
-        """
-        return self._send(
-            f'FUNCTION SetText Input="{input_name}" SelectedName="{field}" Value="{value}"'
+        for t in inp.findall("image"):
+            if t.get("name") == field_name:
+                return t.text or ""
+        return ""
+
+    # ----------------------------------------------------------------------
+    # FIELD WRITERS
+    # ----------------------------------------------------------------------
+    def set_text(self, input_name: str, field_name: str, value: str):
+        return self._api(
+            "SetText",
+            Input=input_name,
+            SelectedName=field_name,
+            Value=value,
         )
 
-    def set_image(self, input_name: str, field: str, value: str) -> bool:
-        """
-        Set an image (source) field on a vMix input.
-
-        Args:
-            input_name: The name (or GUID) of the vMix input.
-            field: The name of the image field (SelectedName).
-            value: The image source path or URL.
-
-        Returns:
-            True on success, False otherwise.
-        """
-        return self._send(
-            f'FUNCTION SetImage Input="{input_name}" SelectedName="{field}" Value="{value}"'
+    def set_image(self, input_name: str, field_name: str, path: str):
+        return self._api(
+            "SetImage",
+            Input=input_name,
+            SelectedName=field_name,
+            Value=path,
         )
 
-    def set_source(self, input_name: str, field: str, value: str) -> bool:
-        """
-        Alias for set_image. Many controllers call set_source().
-
-        Args same as set_image().
-        """
-        return self.set_image(input_name, field, value)
-
-    def set_overlay(self, channel: int, input_name: str) -> bool:
-        """
-        Enable overlay of an input on a given overlay channel.
-
-        Args:
-            channel: Overlay channel number (e.g. 0, 1, 2...).
-            input_name: The input you want to overlay.
-
-        Returns:
-            True on success, False otherwise.
-        """
-        return self._send(
-            f'FUNCTION OverlayInput{channel} Input="{input_name}"'
+    # ----------------------------------------------------------------------
+    # VISIBILITY FOR TITLES
+    # ----------------------------------------------------------------------
+    def set_text_visible_on(self, input_name: str, field_name: str):
+        return self._api(
+            "SetTextVisibleOn",
+            Input=input_name,
+            SelectedName=field_name,
         )
 
-    def clear_overlay(self, channel: int) -> bool:
-        """
-        Disable overlay on the given channel.
+    def set_text_visible_off(self, input_name: str, field_name: str):
+        return self._api(
+            "SetTextVisibleOff",
+            Input=input_name,
+            SelectedName=field_name,
+        )
 
-        Args:
-            channel: Overlay channel number to clear.
+    def set_image_visible_on(self, input_name: str, field_name: str):
+        return self._api(
+            "SetImageVisibleOn",
+            Input=input_name,
+            SelectedName=field_name,
+        )
 
-        Returns:
-            True on success, False otherwise.
-        """
-        return self._send(f'FUNCTION OverlayInput{channel}Off')
+    def set_image_visible_off(self, input_name: str, field_name: str):
+        return self._api(
+            "SetImageVisibleOff",
+            Input=input_name,
+            SelectedName=field_name,
+        )
 
-    def get_state_xml(self) -> Optional[ET.Element]:
-        """
-        Request vMix to send full state as XML, parse and return it.
+    # ----------------------------------------------------------------------
+    # CLOCK CONTROL (COUNTDOWNS)
+    # ----------------------------------------------------------------------
+    def countdown_start(self, input_name: str, field_name: str):
+        return self._api(
+            "StartCountdown",
+            Input=input_name,
+            SelectedName=field_name,
+        )
 
-        Ignores any leading non-XML response (e.g. 'VERSION OK').
+    def countdown_pause(self, input_name: str, field_name: str):
+        return self._api(
+            "PauseCountdown",
+            Input=input_name,
+            SelectedName=field_name,
+        )
 
-        Returns:
-            ElementTree root of XML response, or None if parse failed or no XML yet.
-        """
-        if not self._send("XML"):
-            return None
-        try:
-            raw = self.sock.recv(999999)
-            if not raw:
-                print("[VMixClient] Empty XML reply")
-                return None
-            text = raw.decode("utf-8", errors="ignore").strip()
-            if text.startswith("VERSION OK"):
-                return None
-            if "<" not in text:
-                print("[VMixClient] No XML yet")
-                return None
-            xml_start = text[text.index("<"):]
-            root = ET.fromstring(xml_start)
-            return root
-        except Exception as e:
-            print(f"[VMixClient] XML parse error: {e}")
-            return None
-
-    def get_status_xml(self) -> Optional[ET.Element]:
-        """
-        Alias for get_state_xml() to support older code calling get_status_xml().
-        """
-        return self.get_state_xml()
-    # ------------------------------------------------------------
-    # COUNTDOWN CONTROL FOR GT FIELDS (Clock, Penalties, etc.)
-    # ------------------------------------------------------------
-    def set_countdown_start(self, input_name: str, field: str):
-        """
-        Start a countdown for a specific GT text field.
-        Example field: "ClockTime.Text"
-        """
-        self._call_api("StartCountdown", {
-            "Input": input_name,
-            "SelectedName": field
-        })
-
-    def set_countdown_pause(self, input_name: str, field: str):
-        """
-        Pause countdown for a specific GT text field.
-        """
-        self._call_api("PauseCountdown", {
-            "Input": input_name,
-            "SelectedName": field
-        })
-
-    def set_countdown_reset(self, input_name: str, field: str):
-        """
-        Reset a countdown field to default text (usually period start)
-        """
-        self._call_api("ResetCountdown", {
-            "Input": input_name,
-            "SelectedName": field
-        })
-
+    def countdown_reset(self, input_name: str, field_name: str):
+        return self._api(
+            "ResetCountdown",
+            Input=input_name,
+            SelectedName=field_name,
+        )

@@ -1,145 +1,124 @@
-from typing import Optional, Dict, Any
+"""
+ScoreboardController
+- Central controller for scoreboard state (goals, period, shots, time)
+- Uses VMixClient for all vMix communication
+"""
+
+from __future__ import annotations
+
+from typing import Dict, Any, Optional
+
 from scoreboard_app.core.vmix_client import VMixClient
+from scoreboard_app.config.vmix_config import load_config
 
 
 class ScoreboardController:
     """
-    High-level API for updating scoreboard-related graphics on vMix.
+    The master state controller for:
+    - goals
+    - shots
+    - logos
+    - team names
+    - period
+    - scoreboard text fields
 
-    This controller is responsible for:
-    - Score updates
-    - Team names
-    - Logos
-    - Overlay control
-    - Empty goal graphics (home/away)
-
-    It uses VMixClient as backend for TCP control.
+    All writes go ONLY through vmix_client.set_text or set_image.
     """
 
-    def __init__(self, client: VMixClient, cfg: Dict[str, Any]) -> None:
-        """
-        Args:
-            client: Active VMixClient instance
-            cfg: Parsed config dict loaded from vmix_config.json
-        """
+    def __init__(self, client: VMixClient, cfg: Optional[Dict[str, Any]] = None):
         self.client = client
-        self.cfg = cfg
+        self.cfg = cfg if cfg else load_config()
+
+        # cached state (NOT required, but convenient)
+        self.home_score = 0
+        self.away_score = 0
+        self.shots_home = 0
+        self.shots_away = 0
+        self.period = 1
+
+        # mapping extracted for convenience
+        self.input_scoreboard = self.cfg["inputs"].get("scoreboard", "")
+        self.mapping = self.cfg["mapping"]["scoreboard"]
 
     # ------------------------------------------------------------
-    # SCORE UPDATES
+    # SCORE CONTROL
     # ------------------------------------------------------------
-    def set_score(self, home: int, away: int) -> bool:
-        """
-        Update scoreboard score values.
 
-        Args:
-            home: home team score
-            away: away team score
+    def set_home_score(self, value: int) -> None:
+        self.home_score = value
+        self._write(self.mapping["home_score"], str(value))
 
-        Returns:
-            True if both fields sent successfully
-        """
-        board = self.cfg["scoreboard"]
-        input_name = board["input"]
+    def set_away_score(self, value: int) -> None:
+        self.away_score = value
+        self._write(self.mapping["away_score"], str(value))
 
-        ok1 = self.client.set_text(input_name, board["home_score_field"], str(home))
-        ok2 = self.client.set_text(input_name, board["away_score_field"], str(away))
-        return ok1 and ok2
+    def add_goal_home(self) -> None:
+        self.home_score += 1
+        self.set_home_score(self.home_score)
 
-    # ------------------------------------------------------------
-    # TEAM NAMES
-    # ------------------------------------------------------------
-    def set_team_names(self, home_name: str, away_name: str) -> bool:
-        """
-        Set team names shown on scoreboard input.
-
-        Args:
-            home_name: name for home team
-            away_name: name for away team
-
-        Returns:
-            True on full success
-        """
-        board = self.cfg["scoreboard"]
-        input_name = board["input"]
-
-        ok1 = self.client.set_text(input_name, board["home_team_field"], home_name)
-        ok2 = self.client.set_text(input_name, board["away_team_field"], away_name)
-        return ok1 and ok2
+    def add_goal_away(self) -> None:
+        self.away_score += 1
+        self.set_away_score(self.away_score)
 
     # ------------------------------------------------------------
-    # TEAM LOGOS
+    # SHOTS
     # ------------------------------------------------------------
-    def set_team_logos(self, home_logo: str, away_logo: str) -> bool:
-        """
-        Set team logos for scoreboard.
 
-        Args:
-            home_logo: path or URL to home team logo
-            away_logo: path or URL to away team logo
+    def set_shots_home(self, value: int) -> None:
+        self.shots_home = value
+        self._write(self.mapping["shots_home"], str(value))
 
-        Returns:
-            True if both set successfully
-        """
-        board = self.cfg["scoreboard"]
-        input_name = board["input"]
+    def set_shots_away(self, value: int) -> None:
+        self.shots_away = value
+        self._write(self.mapping["shots_away"], str(value))
 
-        ok1 = self.client.set_source(input_name, board["home_logo_field"], home_logo)
-        ok2 = self.client.set_source(input_name, board["away_logo_field"], away_logo)
-        return ok1 and ok2
+    def add_shot_home(self) -> None:
+        self.shots_home += 1
+        self.set_shots_home(self.shots_home)
 
-    # ------------------------------------------------------------
-    # OVERLAY CONTROL
-    # ------------------------------------------------------------
-    def show_scoreboard(self) -> bool:
-        """
-        Show scoreboard input as overlay 1 (default)
-        """
-        overlay = self.cfg["scoreboard"]["overlay"]
-        return self.client.set_overlay(overlay, self.cfg["scoreboard"]["input"])
-
-    def hide_scoreboard(self) -> bool:
-        """
-        Hide scoreboard overlay channel
-        """
-        overlay = self.cfg["scoreboard"]["overlay"]
-        return self.client.clear_overlay(overlay)
+    def add_shot_away(self) -> None:
+        self.shots_away += 1
+        self.set_shots_away(self.shots_away)
 
     # ------------------------------------------------------------
-    # EMPTY GOAL GRAPHICS
+    # PERIOD
     # ------------------------------------------------------------
-    def set_empty_goal_home(self, enabled: bool) -> bool:
+
+    def set_period(self, value: int) -> None:
+        self.period = value
+        self._write(self.mapping["period"], str(value))
+
+    # ------------------------------------------------------------
+    # TEAM REFS
+    # ------------------------------------------------------------
+
+    def set_home_name(self, text: str) -> None:
+        self._write(self.mapping["home_name"], text)
+
+    def set_away_name(self, text: str) -> None:
+        self._write(self.mapping["away_name"], text)
+
+    def set_home_logo(self, path: str) -> None:
+        self._write(self.mapping["home_logo"], path, is_image=True)
+
+    def set_away_logo(self, path: str) -> None:
+        self._write(self.mapping["away_logo"], path, is_image=True)
+
+    # ------------------------------------------------------------
+    # INTERNAL — single field write
+    # ------------------------------------------------------------
+
+    def _write(self, field_name: str, value: str, is_image: bool = False) -> None:
         """
-        Display / clear empty goal indicator for home team.
-
-        Args:
-            enabled: True = show graphic, False = hide
-
-        Returns:
-            True on success
+        Generic value writer
         """
-        goal = self.cfg["emptygoal"]
-        field = goal["home_field"]
+        if not self.input_scoreboard or not field_name:
+            return
 
-        if enabled:
-            return self.client.set_text(goal["input"], field, goal["home_text"])
-        else:
-            return self.client.set_text(goal["input"], field, goal["blank_text"])
-
-    def set_empty_goal_away(self, enabled: bool) -> bool:
-        """
-        Display / clear empty goal indicator for away team.
-
-        Args:
-            enabled: True = show graphic, False = hide
-
-        Returns:
-            True on success
-        """
-        goal = self.cfg["emptygoal"]
-        field = goal["away_field"]
-
-        if enabled:
-            return self.client.set_text(goal["input"], field, goal["away_text"])
-        else:
-            return self.client.set_text(goal["input"], field, goal["blank_text"])
+        try:
+            if is_image:
+                self.client.set_image(self.input_scoreboard, field_name, value)
+            else:
+                self.client.set_text(self.input_scoreboard, field_name, value)
+        except Exception as e:
+            print(f"[ScoreboardController] WRITE ERROR: {field_name} -> {e}")

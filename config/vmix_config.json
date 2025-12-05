@@ -11,13 +11,13 @@
   },
 
   "inputs": {
-    "scoreboard": "",
-    "clock": "",
-    "goal_home": "",
-    "goal_away": "",
-    "lineup_home": "",
-    "lineup_away": "",
-    "penalty": ""
+    "scoreboard": "SCOREBOARD UPPE",
+    "clock": "SCOREBOARD UPPE",
+    "goal_home": "GOAL HOME",
+    "goal_away": "GOAL AWAY",
+    "lineup_home": "LINEUP HOME",
+    "lineup_away": "LINEUP AWAY",
+    "penalty": "SCOREBOARD UPPE"
   },
 
   "mapping": {
@@ -31,7 +31,43 @@
       "period": "Period.Text",
       "shots_home": "ShotsHome.Text",
       "shots_away": "ShotsAway.Text",
-      "clock": "ClockTime.Text"
+      "clock": "Time.Text"
+    },
+
+    "penalties": {
+      "home": {
+        "p1": {
+          "number": "HomeP1nr.Text",
+          "name": "HomeP1name.Text",
+          "time": "HomeP1time.Text",
+          "bg": "HomeP1bg.Source",
+          "nr_bg": "HomeP1bgnr.Source"
+        },
+        "p2": {
+          "number": "HomeP2nr.Text",
+          "name": "HomeP2name.Text",
+          "time": "HomeP2time.Text",
+          "bg": "HomeP2bg.Source",
+          "nr_bg": "HomeP2bgnr.Source"
+        }
+      },
+
+      "away": {
+        "p1": {
+          "number": "AwayP1nr.Text",
+          "name": "AwayP1name.Text",
+          "time": "AwayP1time.Text",
+          "bg": "AwayP1bg.Source",
+          "nr_bg": "AwayP1bgnr.Source"
+        },
+        "p2": {
+          "number": "AwayP2nr.Text",
+          "name": "AwayP2name.Text",
+          "time": "AwayP2time.Text",
+          "bg": "AwayP2bg.Source",
+          "nr_bg": "AwayP2bgnr.Source"
+        }
+      }
     },
 
     "goal": {
@@ -46,34 +82,6 @@
       "home_logo": "H_TeamLogo.Source",
       "away_teamname": "A_TeamName.Text",
       "away_logo": "A_TeamLogo.Source"
-    },
-
-    "penalties": {
-      "home": {
-        "p1": {
-          "number": "H_P1_number.Text",
-          "name":   "H_P1_name.Text",
-          "time":   "H_P1_time.Text"
-        },
-        "p2": {
-          "number": "H_P2_number.Text",
-          "name":   "H_P2_name.Text",
-          "time":   "H_P2_time.Text"
-        }
-      },
-      "away": {
-        "p1": {
-          "number": "A_P1_number.Text",
-          "name":   "A_P1_name.Text",
-          "time":   "A_P1_time.Text"
-        },
-        "p2": {
-          "number": "A_P2_number.Text",
-          "name":   "A_P2_name.Text",
-          "time":   "A_P2_time.Text"
-        }
-      }
     }
   }
 }
-

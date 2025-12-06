@@ -1,86 +1,87 @@
-# scoreboard_app/core/vmix_client.py
-
-import urllib.request
-import urllib.parse
+import requests
 import xml.etree.ElementTree as ET
-from typing import Optional, Dict, Any
 
 
 class VMixClient:
-    """
-    Minimal vMix API client
-    - Get status XML
-    - Get/set text fields
-    - Get/set image visibility
-    - Countdown control
-    """
-
-    def __init__(self, host: str, port: int = 8088):
+    def __init__(self, host="127.0.0.1", port=8088):
         self.host = host
         self.port = port
 
-    # ---------------------------------------------------------------------
-    def _api(self, function: str, **params) -> str:
-        """Send a vMix HTTP API request"""
-        query = urllib.parse.urlencode(
-            {"Function": function, **params}
-        )
-        url = f"http://{self.host}:{self.port}/api/?{query}"
-        with urllib.request.urlopen(url, timeout=1) as f:
-            return f.read().decode("utf-8")
+    def _api(self, function: str, **params):
+        url = f"http://{self.host}:{self.port}/api/"
+        payload = {"Function": function}
+        for k, v in params.items():
+            payload[k] = v
+        try:
+            requests.get(url, params=payload, timeout=1)
+        except:
+            pass
 
-    # ---------------------------------------------------------------------
-    def get_status_xml(self) -> str:
+    # ------------------------------
+    # GET STATUS XML
+    # ------------------------------
+    def get_status_xml(self):
         url = f"http://{self.host}:{self.port}/api"
-        with urllib.request.urlopen(url, timeout=1) as f:
-            return f.read().decode("utf-8")
+        r = requests.get(url, timeout=2)
+        return r.text
 
-    # ---------------------------------------------------------------------
-    def parse_xml(self) -> ET.Element:
+    # ------------------------------
+    # READ A TEXT FIELD
+    # ------------------------------
+    def get_text(self, input_name, field_name):
+        """
+        Reads a text field from vMix API XML
+        """
         xml = self.get_status_xml()
-        return ET.fromstring(xml)
+        try:
+            root = ET.fromstring(xml)
+        except:
+            return ""
 
-    # ---------------------------------------------------------------------
-    def find_input(self, name: str) -> Optional[ET.Element]:
-        """Return <input> XML node with the given title"""
-        root = self.parse_xml()
-        for inp in root.findall(".//input"):
-            if inp.get("title", "").strip().lower() == name.lower():
-                return inp
-        return None
+        for inp in root.findall("input"):
+            if inp.attrib.get("title") == input_name:
+                for t in inp.findall("text"):
+                    if t.attrib.get("name") == field_name:
+                        return t.text or ""
 
-    # ---------------------------------------------------------------------
-    def get_text(self, input_name: str, field: str) -> Optional[str]:
-        inp = self.find_input(input_name)
-        if inp is None:
-            return None
+        return ""
 
-        for node in inp.findall(".//text"):
-            if node.get("name") == field:
-                return (node.text or "").strip()
+    # ------------------------------
+    # WRITE TEXT FIELD
+    # ------------------------------
+    def set_text(self, input_name, field_name, value: str):
+        self._api(
+            "SetText",
+            Input=input_name,
+            SelectedName=field_name,
+            Value=value
+        )
 
-        return None
+    # ------------------------------
+    # VISIBILITY — ON
+    # ------------------------------
+    def set_visible_on(self, input_name, field_name):
+        self._api(
+            "SetTextVisibleOn",
+            Input=input_name,
+            SelectedName=field_name
+        )
 
-    # ---------------------------------------------------------------------
-    def set_text(self, input_name: str, field: str, value: str) -> None:
-        self._api("SetText", Input=input_name, SelectedName=field, Value=value)
+    # ------------------------------
+    # VISIBILITY — OFF
+    # ------------------------------
+    def set_visible_off(self, input_name, field_name):
+        self._api(
+            "SetTextVisibleOff",
+            Input=input_name,
+            SelectedName=field_name
+        )
 
-    # ---------------------------------------------------------------------
-    def set_visible(self, input_name: str, field: str, visible: bool) -> None:
-        func = "SetImageVisibleOn" if visible else "SetImageVisibleOff"
-        self._api(func, Input=input_name, SelectedName=field)
-
-    # ---------------------------------------------------------------------
-    def set_text_visible(self, input_name: str, field: str, visible: bool) -> None:
-        func = "SetTextVisibleOn" if visible else "SetTextVisibleOff"
-        self._api(func, Input=input_name, SelectedName=field)
-
-    # ---------------------------------------------------------------------
-    def start_countdown(self, input_name: str, field: str) -> None:
-        self._api("StartCountdown", Input=input_name, SelectedName=field)
-
-    def pause_countdown(self, input_name: str, field: str) -> None:
-        self._api("PauseCountdown", Input=input_name, SelectedName=field)
-
-    def reset_countdown(self, input_name: str, field: str) -> None:
-        self._api("ResetCountdown", Input=input_name, SelectedName=field)
+    # ------------------------------
+    # GROUPED — ON/OFF
+    # ------------------------------
+    def set_text_visible_on_or_off(self, input_name, field_name, visible: bool):
+        if visible:
+            self.set_visible_on(input_name, field_name)
+        else:
+            self.set_visible_off(input_name, field_name)

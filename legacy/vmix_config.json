@@ -1,0 +1,69 @@
+{
+  "vmix": {
+    "host": "127.0.0.1",
+    "port": 8088,
+    "password": null
+  },
+  "scoreboard": {
+    "input": "SCOREBOARD UPPE",
+    "clock_field": "Time.Text",
+    "home_score_field": "HomeScore.Text",
+    "away_score_field": "AwayScore.Text",
+    "period_field": "PeriodNr.Text",
+    "overlay_channel": 1,
+    "home_empty_field": "EmptyGoalH.Text",
+    "home_empty_bg_field": "EmptyGoalHbg.Source",
+    "away_empty_field": "EmptyGoalA.Text",
+    "away_empty_bg_field": "EmptyGoalAbg.Source",
+    "goal_graphic_input": "MÅÅL",
+    "goal_overlay_channel": 2,
+    "goal_duration_ms": 5000,
+    "after_goal_graphic_input": "NAMNSKYLT MED Nr",
+    "after_goal_duration_ms": 4000,
+    "default_period_time": "20:00",
+    "ot_time": "05:00",
+    "penalties": {
+      "H1": {
+        "time_field": "HomeP1time.Text",
+        "number_field": "HomeP1nr.Text",
+        "time_bg_field": "HomeP1bg.Source",
+        "number_bg_field": "HomeP1bgnr.Source",
+        "name_field": null
+      },
+      "H2": {
+        "time_field": "HomeP2time.Text",
+        "number_field": "HomeP2nr.Text",
+        "time_bg_field": "HomeP2bg.Source",
+        "number_bg_field": "HomeP2bgnr.Source",
+        "name_field": null
+      },
+      "A1": {
+        "time_field": "AwayP1time.Text",
+        "number_field": "AwayP1nr.Text",
+        "time_bg_field": "AwayP1bg.Source",
+        "number_bg_field": "AwayP1bgnr.Source",
+        "name_field": null
+      },
+      "A2": {
+        "time_field": "AwayP2time.Text",
+        "number_field": "AwayP2nr.Text",
+        "time_bg_field": "AwayP2bg.Source",
+        "number_bg_field": "AwayP2bgnr.Source",
+        "name_field": null
+      }
+    },
+    "overlay_follow_clock": false,
+    "mobile_permissions": {
+      "clock_control": true,
+      "adjust_time": true,
+      "goal_home": true,
+      "goal_away": true,
+      "set_penalty": true,
+      "clear_penalty": true,
+      "empty_goal": true,
+      "set_period": true,
+      "toggle_scoreboard": true
+    },
+    "after_goal_overlay_channel": 2
+  }
+}

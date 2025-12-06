@@ -1,87 +1,86 @@
 import requests
-import xml.etree.ElementTree as ET
+from lxml import etree
 
 
 class VMixClient:
-    def __init__(self, host="127.0.0.1", port=8088):
+    def __init__(self, host: str, port: int = 8088):
         self.host = host
         self.port = port
+        self.base = f"http://{host}:{port}"
 
-    def _api(self, function: str, **params):
-        url = f"http://{self.host}:{self.port}/api/"
-        payload = {"Function": function}
-        for k, v in params.items():
-            payload[k] = v
-        try:
-            requests.get(url, params=payload, timeout=1)
-        except:
-            pass
-
-    # ------------------------------
-    # GET STATUS XML
-    # ------------------------------
-    def get_status_xml(self):
-        url = f"http://{self.host}:{self.port}/api"
-        r = requests.get(url, timeout=2)
-        return r.text
-
-    # ------------------------------
-    # READ A TEXT FIELD
-    # ------------------------------
-    def get_text(self, input_name, field_name):
+    # ==========================================================
+    # RAW STATUS XML
+    # ==========================================================
+    def get_status_xml(self) -> etree._Element:
         """
-        Reads a text field from vMix API XML
+        Returns parsed XML from /api
+        """
+        url = f"{self.base}/api"
+        r = requests.get(url)
+        r.raise_for_status()
+        return etree.fromstring(r.content)
+
+    # ==========================================================
+    # GET TEXT FIELD FROM A TITLE
+    # ==========================================================
+    def get_text(self, input_name: str, field_name: str) -> str:
+        """
+        Reads text value from a vMix title input (Title/Text)
         """
         xml = self.get_status_xml()
-        try:
-            root = ET.fromstring(xml)
-        except:
+
+        # find input node
+        node = xml.xpath(f"//input[@title='{input_name}']")
+        if not node:
             return ""
 
-        for inp in root.findall("input"):
-            if inp.attrib.get("title") == input_name:
-                for t in inp.findall("text"):
-                    if t.attrib.get("name") == field_name:
-                        return t.text or ""
+        input_node = node[0]
 
+        txt = input_node.xpath(f".//text[@name='{field_name}']/text()")
+        if txt:
+            return txt[0]
         return ""
 
-    # ------------------------------
-    # WRITE TEXT FIELD
-    # ------------------------------
-    def set_text(self, input_name, field_name, value: str):
-        self._api(
-            "SetText",
-            Input=input_name,
-            SelectedName=field_name,
-            Value=value
-        )
+    # ==========================================================
+    # SET TEXT VISIBLE
+    # ==========================================================
+    def set_text_visible_on_or_off(self, input_name: str, field_name: str, visible: bool):
+        """
+        Uses vMix API function: SetTextVisibleOn/Off
+        Documentation:
+        https://www.vmix.com/help29/ShortcutFunctionReference.html
+        """
+        function = "SetTextVisibleOn" if visible else "SetTextVisibleOff"
+        url = f"{self.base}/api/?Function={function}&Input={input_name}&SelectedName={field_name}"
+        requests.get(url)
 
-    # ------------------------------
-    # VISIBILITY — ON
-    # ------------------------------
-    def set_visible_on(self, input_name, field_name):
-        self._api(
-            "SetTextVisibleOn",
-            Input=input_name,
-            SelectedName=field_name
-        )
+    # ==========================================================
+    # SET IMAGE (BG) VISIBLE
+    # ==========================================================
+    def set_bg_visible_on_or_off(self, input_name: str, field_name: str, visible: bool):
+        """
+        Uses vMix API function: SetImageVisibleOn/Off
+        """
+        function = "SetImageVisibleOn" if visible else "SetImageVisibleOff"
+        url = f"{self.base}/api/?Function={function}&Input={input_name}&SelectedName={field_name}"
+        requests.get(url)
 
-    # ------------------------------
-    # VISIBILITY — OFF
-    # ------------------------------
-    def set_visible_off(self, input_name, field_name):
-        self._api(
-            "SetTextVisibleOff",
-            Input=input_name,
-            SelectedName=field_name
-        )
+    # ==========================================================
+    # OPTIONAL – SET TEXT VALUE
+    # ==========================================================
+    def set_text(self, input_name: str, field_name: str, value: str):
+        """
+        Set a text value inside a title field
+        """
+        url = f"{self.base}/api/?Function=SetText&Input={input_name}&SelectedName={field_name}&Value={value}"
+        requests.get(url)
 
-    # ------------------------------
-    # GROUPED — ON/OFF
-    # ------------------------------
-    def set_text_visible_on_or_off(self, input_name, field_name, visible: bool):
-        if visible:
-            self.set_visible_on(input_name, field_name)
-        else:
-            self.set_visible_off(input_name, field_name)
+    # ==========================================================
+    # OPTIONAL – SET IMAGE VALUE
+    # ==========================================================
+    def set_image(self, input_name: str, field_name: str, path: str):
+        """
+        Change image source for a field
+        """
+        url = f"{self.base}/api/?Function=SetImage&Input={input_name}&SelectedName={field_name}&Value={path}"
+        requests.get(url)

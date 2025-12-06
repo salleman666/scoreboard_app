@@ -61,7 +61,7 @@ class MainWindow(tk.Tk):
         ttk.Button(
             top,
             text="⚙ INSTÄLLNINGAR",
-            command=lambda: open_settings_dialog(self, self.cfg),
+            command=lambda: open_settings_dialog(self, self.cfg, self.client),
         ).grid(row=0, column=0, padx=5)
 
         ttk.Button(

@@ -1,131 +1,148 @@
 import threading
 import time
 
+
 class PenaltyController:
+    """
+    Backend that manages all penalties using vMix text fields and countdowns.
+    Mapping info is loaded from JSON.
+    """
+
     def __init__(self, client, cfg):
         self.client = client
         self.cfg = cfg
-        self.mapping = cfg["mapping"]["penalties"]
 
-        # local runtime model — avoids GUI bugs
+        mapping = cfg["mapping"]["penalties"]
+
+        # HOME
+        self.h1 = mapping["home"]["p1"]
+        self.h2 = mapping["home"]["p2"]
+
+        # AWAY
+        self.a1 = mapping["away"]["p1"]
+        self.a2 = mapping["away"]["p2"]
+
+        # For internal time state
         self.state = {
             "home": {
-                "p1": {"seconds": 0, "active": False},
-                "p2": {"seconds": 0, "active": False},
+                "p1": {"time": 0, "active": False},
+                "p2": {"time": 0, "active": False},
             },
             "away": {
-                "p1": {"seconds": 0, "active": False},
-                "p2": {"seconds": 0, "active": False},
-            }
+                "p1": {"time": 0, "active": False},
+                "p2": {"time": 0, "active": False},
+            },
         }
 
-        self._running = True
-        self._loop_thread = threading.Thread(target=self._loop, daemon=True)
-        self._loop_thread.start()
+        # Background update loop
+        self.running = True
+        threading.Thread(target=self._loop, daemon=True).start()
 
-    # ============================================================
-    # INTERNAL LOOP — KEEP PENALTIES SYNCED WITH CLOCK STATE
-    # ============================================================
+    # ----------------------------------------------------------------------
+    # INTERNAL LOOP
+    # ----------------------------------------------------------------------
     def _loop(self):
-        while self._running:
+        while self.running:
             try:
-                # MAIN CLOCK TEXT
-                main_input = self.cfg["inputs"]["scoreboard"]
-                clock_field = self.cfg["mapping"]["scoreboard"]["clock"]
-                clock_text = self.client.get_text(main_input, clock_field)
-
-                main_running = (clock_text != "" and clock_text != "00:00")
-
-                # sync visibility and running for all 4 penalties
+                # decrease each active timer
                 for team in ["home", "away"]:
                     for slot in ["p1", "p2"]:
                         data = self.state[team][slot]
-                        if data["active"]:
-                            # make visible
-                            self._set_visible(team, slot, True)
-
-                            # if main clock running → penalties must count down
-                            if main_running:
-                                self._pause(team, slot, False)
-                            else:
-                                self._pause(team, slot, True)
-                        else:
-                            # hide completely
-                            self._set_visible(team, slot, False)
-                            self._pause(team, slot, True)
+                        if not data["active"]:
+                            continue
+                        if data["time"] > 0:
+                            data["time"] -= 1
+                            self._apply_time(team, slot, data["time"])
+                        if data["time"] <= 0:
+                            data["active"] = False
+                            self._hide(team, slot)
 
             except Exception as e:
                 print("[PenaltyController] loop error:", e)
 
-            time.sleep(0.3)
+            time.sleep(1)
 
-    # ============================================================
-    # SET PENALTY +10 / -10 / CLEAR
-    # ============================================================
-    def adjust_penalty(self, team, slot, delta_seconds):
+    # ----------------------------------------------------------------------
+    # UI HELPERS
+    # ----------------------------------------------------------------------
+    def _apply_time(self, team, slot, seconds):
+        m = seconds // 60
+        s = seconds % 60
+        text = f"{m:02d}:{s:02d}"
+
+        mp = self._map(team, slot)
+        self.client.set_text(
+            self.cfg["inputs"]["penalty"],
+            mp["time"],
+            text
+        )
+        self._show(team, slot)
+
+    def _map(self, team, slot):
+        if team == "home":
+            return self.h1 if slot == "p1" else self.h2
+        return self.a1 if slot == "p1" else self.a2
+
+    def _hide(self, team, slot):
+        mp = self._map(team, slot)
+        self.client.set_text_visible_on_or_off(
+            self.cfg["inputs"]["penalty"],
+            mp["time"],
+            False
+        )
+        self.client.set_text(
+            self.cfg["inputs"]["penalty"],
+            mp["number"],
+            ""
+        )
+        self.client.set_bg_visible_on_or_off(
+            self.cfg["inputs"]["penalty"],
+            mp["bg"],
+            False
+        )
+        self.client.set_bg_visible_on_or_off(
+            self.cfg["inputs"]["penalty"],
+            mp["nr_bg"],
+            False
+        )
+
+    def _show(self, team, slot):
+        mp = self._map(team, slot)
+        self.client.set_text_visible_on_or_off(
+            self.cfg["inputs"]["penalty"],
+            mp["time"],
+            True
+        )
+        self.client.set_bg_visible_on_or_off(
+            self.cfg["inputs"]["penalty"],
+            mp["bg"],
+            True
+        )
+        self.client.set_bg_visible_on_or_off(
+            self.cfg["inputs"]["penalty"],
+            mp["nr_bg"],
+            True
+        )
+
+    # ----------------------------------------------------------------------
+    # PUBLIC METHODS FOR PANEL
+    # ----------------------------------------------------------------------
+    def adjust_penalty(self, team, slot, delta):
         data = self.state[team][slot]
-        data["seconds"] = max(0, data["seconds"] + delta_seconds)
-
-        if data["seconds"] == 0:
-            data["active"] = False
-        else:
+        data["time"] = max(0, data["time"] + delta)
+        if data["time"] > 0:
             data["active"] = True
-
-        self._apply_time(team, slot)
+            self._apply_time(team, slot, data["time"])
+        else:
+            data["active"] = False
+            self._hide(team, slot)
 
     def clear_penalty(self, team, slot):
         data = self.state[team][slot]
-        data["seconds"] = 0
+        data["time"] = 0
         data["active"] = False
-        self._apply_time(team, slot)
+        self._hide(team, slot)
 
-    # ============================================================
-    # WRITE TIME TO VMIX FIELD AS MM:SS
-    # ============================================================
-    def _apply_time(self, team, slot):
-        seconds = self.state[team][slot]["seconds"]
-        mm = seconds // 60
-        ss = seconds % 60
-        txt = f"{mm:02}:{ss:02}"
-
-        input_name = self.cfg["inputs"]["penalty"]
-        field = self.mapping[team][slot]["time"]
-        self.client.set_text(input_name, field, txt)
-
-    # ============================================================
-    # VISIBLE HELPERS
-    # ============================================================
-    def _set_visible(self, team, slot, visible):
-        input_name = self.cfg["inputs"]["penalty"]
-
-        time_field = self.mapping[team][slot]["time"]
-        number_field = self.mapping[team][slot]["number"]
-        bg_field = self.mapping[team][slot]["bg"]
-        nrbg_field = self.mapping[team][slot]["nr_bg"]
-
-        self.client.set_bg_visible_on_or_off(input_name, bg_field, visible)
-        self.client.set_bg_visible_on_or_off(input_name, nrbg_field, visible)
-        self.client.set_text_visible_on_or_off(input_name, time_field, visible)
-        self.client.set_text_visible_on_or_off(input_name, number_field, visible)
-
-    # ============================================================
-    # PAUSE FUNCTION — IDENTICAL TO YOUR LEGACY SOLUTION
-    # ============================================================
-    def _pause(self, team, slot, pause):
-        input_name = self.cfg["inputs"]["penalty"]
-        time_field = self.mapping[team][slot]["time"]
-        # vMix PauseCountdown TOGGLES — does not need True/False
-        self.client.call_function("PauseCountdown", input=input_name, selected_name=time_field)
-
-
-    # ============================================================
-    # READABLE FOR GUI
-    # ============================================================
     def get_penalties(self):
+        # UI refresh structure
         return self.state
-
-    # ============================================================
-    # CLEANUP
-    # ============================================================
-    def stop(self):
-        self._running = False

@@ -1,90 +1,135 @@
-import logging
-from typing import Any, Dict
-
-from scoreboard_app.core.vmix_client import VMixClient
-
-logger = logging.getLogger(__name__)
-
+import threading
+import time
 
 class ClockController:
     """
-    Controls scoreboard match clock.
-
-    Reads mapping from config:
-        cfg["mapping"]["scoreboard"]["clock"]
-        cfg["mapping"]["scoreboard"]["period"]
+    Full clock backend with vMix sync, pause/start, period handling, adjust +/- seconds
+    Uses standard vMix API.Function("PauseCountdown", SelectedName="Time.Text")
     """
 
-    def __init__(self, client: VMixClient, cfg: Dict[str, Any]):
+    def __init__(self, client, cfg):
         self.client = client
         self.cfg = cfg
 
-        self.input_name = cfg["inputs"]["scoreboard"]
+        # mapping
         m = cfg["mapping"]["scoreboard"]
-
         self.clock_field = m["clock"]
         self.period_field = m["period"]
+        self.input_name = cfg["inputs"]["clock"]
 
-    # ---------------------------------------------------
-    # BASIC CLOCK FUNCTIONS
-    # ---------------------------------------------------
-    def start_clock(self) -> None:
-        try:
-            self.client.call_function(
-                "StartCountdown",
-                Input=self.input_name,
-                SelectedName=self.clock_field
-            )
-        except Exception as e:
-            logger.error("[ClockController] start_clock ERROR: %s", e)
+        # state
+        self.running = False
+        self.current_period = 1
+        self.refresh_ms = cfg["defaults"]["clock_refresh_ms"]
 
-    def stop_clock(self) -> None:
+        # background sync thread
+        self._stop = False
+        self.thread = threading.Thread(target=self._loop, daemon=True)
+        self.thread.start()
+
+    # ---------------------------------------------------------
+    # INTERNAL SYNC LOOP
+    # ---------------------------------------------------------
+    def _loop(self):
+        while not self._stop:
+            try:
+                if self.running:
+                    # read clock from vmix
+                    txt = self.client.get_text(self.input_name, self.clock_field)
+
+                    # if vmix lost formatting, ignore
+                    if txt and ":" in txt:
+                        pass  # we could parse MM:SS here if needed
+
+                # ignore else, GUI reads directly from vmix anyway
+
+            except Exception as e:
+                print("[ClockController] loop error:", e)
+
+            time.sleep(self.refresh_ms / 1000)
+
+    # ---------------------------------------------------------
+    # API CALLS
+    # ---------------------------------------------------------
+
+    def start_clock(self):
+        """Start the main scoreboard timer using PauseCountdown"""
         try:
             self.client.call_function(
                 "PauseCountdown",
                 Input=self.input_name,
                 SelectedName=self.clock_field
             )
+            self.running = True
         except Exception as e:
-            logger.error("[ClockController] stop_clock ERROR: %s", e)
+            print("[ClockController] start_clock ERROR:", e)
 
-    def reset_clock(self) -> None:
+    def stop_clock(self):
+        """Pause the main scoreboard timer using PauseCountdown"""
         try:
             self.client.call_function(
-                "ResetCountdown",
+                "PauseCountdown",
                 Input=self.input_name,
                 SelectedName=self.clock_field
             )
+            self.running = False
         except Exception as e:
-            logger.error("[ClockController] reset_clock ERROR: %s", e)
+            print("[ClockController] stop_clock ERROR:", e)
 
-    # ---------------------------------------------------
-    # PERIOD HANDLING
-    # ---------------------------------------------------
-    def set_period(self, period_index: int) -> None:
+    # ---------------------------------------------------------
+    # TIME ADJUSTMENT
+    # ---------------------------------------------------------
+
+    def adjust_time(self, seconds):
         """
-        Update TITLE field
+        Adjust time by +- seconds.
+
+        Reads current MM:SS from vMix, applies delta, rewrites formatted
         """
         try:
+            cur = self.client.get_text(self.input_name, self.clock_field)
+            if not cur or ":" not in cur:
+                return
+
+            mm, ss = cur.split(":")
+            total = int(mm) * 60 + int(ss)
+            total += seconds
+            if total < 0:
+                total = 0
+
+            mm2 = total // 60
+            ss2 = total % 60
+
+            newtxt = f"{mm2:02d}:{ss2:02d}"
+
+            self.client.set_text(
+                self.input_name,
+                self.clock_field,
+                newtxt
+            )
+
+        except Exception as e:
+            print("[ClockController] adjust_time ERROR:", e)
+
+    # ---------------------------------------------------------
+    # PERIOD HANDLING
+    # ---------------------------------------------------------
+
+    def set_period(self, p):
+        """Update period in vMix and internal state"""
+        try:
+            self.current_period = p
             self.client.set_text(
                 self.input_name,
                 self.period_field,
-                str(period_index)
+                str(p)
             )
         except Exception as e:
-            logger.error("[ClockController] set_period ERROR: %s", e)
+            print("[ClockController] set_period ERROR:", e)
 
-    # ---------------------------------------------------
-    # GETTERS
-    # ---------------------------------------------------
-    def get_time(self) -> str:
-        """
-        Reads current time text from scoreboard clock
-        """
-        try:
-            return self.client.get_text(
-                self.input_name,
-                self.clock_field
-            )
-        except Exception:
-            return ""
+    # ---------------------------------------------------------
+    # CLEANUP
+    # ---------------------------------------------------------
+
+    def shutdown(self):
+        self._stop = True

@@ -1,82 +1,187 @@
 {
-  "vmix": {
-    "host": "127.0.0.1",
-    "port": 8088
-  },
+    "connection": {
+        "host": "127.0.0.1",
+        "port": 8088,
+        "password": ""
+    },
 
-  "defaults": {
-    "period_minutes": 20,
-    "clock_refresh_ms": 500,
-    "hide_graphics_delay_ms": 4500
-  },
-
-  "inputs": {
-    "scoreboard": "SCOREBOARD UPPE",
-    "clock": "SCOREBOARD UPPE",
-    "goal_home": "GOAL HOME",
-    "goal_away": "GOAL AWAY",
-    "lineup_home": "LINEUP HOME",
-    "lineup_away": "LINEUP AWAY",
-    "penalty": "SCOREBOARD UPPE"
-  },
-
-  "mapping": {
     "scoreboard": {
-      "home_score": "HomeScore.Text",
-      "away_score": "AwayScore.Text",
-      "home_name": "HomeName.Text",
-      "away_name": "AwayName.Text",
-      "home_logo": "HomeLogo.Source",
-      "away_logo": "AwayLogo.Source",
-      "period": "Period.Text",
-      "shots_home": "ShotsHome.Text",
-      "shots_away": "ShotsAway.Text",
-      "clock": "Time.Text"
+        "input": "SCOREBOARD UPPE",
+        "home_score_field": "HomeScore.Text",
+        "away_score_field": "AwayScore.Text",
+        "period_field": "Period.Text",
+        "clock_field": "Time.Text",
+        "overlay_channel": 1,
+        "shots_home_field": "HomeShotNr.Text",
+        "shots_away_field": "AwayShotNr.Text",
+        "team_home_name_field": "NameHome.Text",
+        "team_away_name_field": "NameAway.Text",
+        "team_home_logo_field": "HomeLogo.Source",
+        "team_away_logo_field": "AwayLogo.Source",
+        "team_home_name_override": "",
+        "team_away_name_override": ""
     },
 
-   "penalties": {
-     "home": {
-       "p1": {
-         "time":  "HomeP1time.Text",
-         "number": "HomeP1nr.Text",
-         "bg": "HomeP1bg.Source",
-         "nr_bg": "HomeP1bgnr.Source"
-       },
-       "p2": {
-         "time":  "HomeP2time.Text",
-         "number": "HomeP2nr.Text",
-         "bg": "HomeP2bg.Source",
-         "nr_bg": "HomeP2bgnr.Source"
-       }
-     },
-     "away": {
-       "p1": {
-         "time":  "AwayP1time.Text",
-         "number": "AwayP1nr.Text",
-         "bg": "AwayP1bg.Source",
-         "nr_bg": "AwayP1bgnr.Source"
-       },
-       "p2": {
-         "time":  "AwayP2time.Text",
-         "number": "AwayP2nr.Text",
-         "bg": "AwayP2bg.Source",
-         "nr_bg": "AwayP2bgnr.Source"
-       }
-     }
-   },
-
-    "goal": {
-      "popup_player_name": "GoalPlayer.Text",
-      "popup_player_number": "GoalNumber.Text",
-      "popup_team_logo": "GoalTeamLogo.Source",
-      "popup_team_name": "GoalTeamName.Text"
+    "goal_graphics": {
+        "goal_input": "MÅÅL",
+        "goal_overlay_channel": 2,
+        "goal_duration_ms": 2000,
+        "after_goal_input": "NAMNSKYLT MED Nr",
+        "after_goal_overlay_channel": 3,
+        "after_goal_duration_ms": 3000,
+        "after_goal_pause_ms": 0,
+        "after_goal_number_field": "Nr.Text",
+        "after_goal_name_field": "Name.Text",
+        "after_goal_team_field": "Team.Text",
+        "after_goal_logo_field": "Logo.Source",
+        "goal_number_field": null,
+        "goal_name_field": null,
+        "goal_team_field": null,
+        "goal_logo_field": null
     },
 
-    "lineup": {
-      "home_teamname": "H_TeamName.Text",
-      "home_logo": "H_TeamLogo.Source",
-      "away_teamname": "A_TeamName.Text",
-      "away_logo": "A_TeamLogo.Source"
+    "empty_goal": {
+        "input": "SCOREBOARD UPPE",
+        "home_text_field": "HomeEmpty.Text",
+        "away_text_field": "AwayEmpty.Text",
+        "home_bg_field": "HomeEmptyBg.Source",
+        "away_bg_field": "AwayEmptyBg.Source",
+        "text": "EMPTY GOAL",
+        "home": {
+            "field_text": "EmptyGoalH.Text",
+            "field_bg": "EmptyGoalHbg.Source"
+        },
+        "away": {
+            "field_text": "EmptyGoalA.Text",
+            "field_bg": "EmptyGoalAbg.Source"
+        },
+        "override_text": "EMPTY GOAL"
+    },
+
+    "shots": {
+        "source_input": "MATCHSTATS",
+        "source_home_field": "HomeShots.Text",
+        "source_away_field": "AwayShots.Text",
+        "scoreboard_home_field": "HomeShotNr.Text",
+        "scoreboard_away_field": "AwayShotNr.Text",
+        "poll_interval_ms": 1000,
+        "input": "SCOREBOARD UPPE",
+        "home": {
+            "field": "HomeShotNr.Text",
+            "field_bg": ""
+        },
+        "away": {
+            "field": "AwayShotNr.Text",
+            "field_bg": ""
+        },
+        "background": {
+            "field": "Shotbg.Source"
+        }
+    },
+
+    "time": {
+        "period_1": "20:00",
+        "period_2": "20:00",
+        "period_3": "20:00",
+        "overtime": "05:00"
+    },
+
+    "teams": {
+        "lineup_home_input": "LINEUP HOME",
+        "lineup_away_input": "LINEUP AWAY",
+        "home_number_pattern": null,
+        "home_name_pattern": null,
+        "away_number_pattern": null,
+        "away_name_pattern": null,
+        "home_player_count": 20,
+        "away_player_count": 20
+    },
+
+    "vmix": {
+        "host": "127.0.0.1",
+        "port": 8088
+    },
+
+    "defaults": {
+        "period_minutes": 20,
+        "clock_refresh_ms": 500,
+        "hide_graphics_delay_ms": 4500
+    },
+
+    "inputs": {
+        "scoreboard": "SCOREBOARD UPPE",
+        "clock": "SCOREBOARD UPPE",
+        "goal_home": "GOAL HOME",
+        "goal_away": "GOAL AWAY",
+        "lineup_home": "LINEUP HOME",
+        "lineup_away": "LINEUP AWAY",
+        "penalty": "SCOREBOARD UPPE"
+    },
+
+    "mapping": {
+        "scoreboard": {
+            "home_score": "HomeScore.Text",
+            "away_score": "AwayScore.Text",
+            "home_name": "HomeName.Text",
+            "away_name": "AwayName.Text",
+            "home_logo": "HomeLogo.Source",
+            "away_logo": "AwayLogo.Source",
+            "period": "Period.Text",
+            "shots_home": "ShotsHome.Text",
+            "shots_away": "ShotsAway.Text",
+            "clock": "Time.Text"
+        },
+
+        "goal": {
+            "popup_player_name": "GoalPlayer.Text",
+            "popup_player_number": "GoalNumber.Text",
+            "popup_team_logo": "GoalTeamLogo.Source",
+            "popup_team_name": "GoalTeamName.Text"
+        },
+
+        "lineup": {
+            "home_teamname": "H_TeamName.Text",
+            "home_logo": "H_TeamLogo.Source",
+            "away_teamname": "A_TeamName.Text",
+            "away_logo": "A_TeamLogo.Source"
+        }
+    },
+
+    "penalties": {
+        "input": "SCOREBOARD UPPE",
+
+        "home": [
+            {
+                "field_time": "HomeP1time.Text",
+                "field_time_bg": "HomeP1bg.Source",
+                "field_number": "HomeP1nr.Text",
+                "field_number_bg": "HomeP1bgnr.Source",
+                "field_name": ""
+            },
+            {
+                "field_time": "HomeP2time.Text",
+                "field_time_bg": "HomeP2bg.Source",
+                "field_number": "HomeP2nr.Text",
+                "field_number_bg": "HomeP2bgnr.Source",
+                "field_name": ""
+            }
+        ],
+
+        "away": [
+            {
+                "field_time": "AwayP1time.Text",
+                "field_time_bg": "AwayP1bg.Source",
+                "field_number": "AwayP1nr.Text",
+                "field_number_bg": "AwayP1bgnr.Source",
+                "field_name": ""
+            },
+            {
+                "field_time": "AwayP2time.Text",
+                "field_time_bg": "AwayP2bg.Source",
+                "field_number": "AwayP2nr.Text",
+                "field_number_bg": "AwayP2bgnr.Source",
+                "field_name": ""
+            }
+        ]
     }
-  }
 }

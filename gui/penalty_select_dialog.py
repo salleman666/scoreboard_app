@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from scoreboard_app.core.vmix_client import VMixClient
 
 
-class PlayerSelectDialog(tk.Toplevel):
+class PenaltySelectDialog(tk.Toplevel):
     """
     Shows roster list + duration options.
     Returns dict:
@@ -14,10 +14,9 @@ class PlayerSelectDialog(tk.Toplevel):
             "duration": minutes (int)
         }
     """
-
     def __init__(self, parent, input_title):
         super().__init__(parent)
-        self.title("Player Selection")
+        self.title("Penalty Selection")
         self.geometry("600x800")
 
         self.client = VMixClient()

@@ -1,98 +1,106 @@
 import tkinter as tk
 from tkinter import ttk
+import logging
+
 
 class PenaltyPanel(tk.Frame):
     """
-    Automatically builds a penalty status GUI based on vmix_config.json mapping.
-    Supports home/away, 2 slots each.
+    Displays 2 HOME penalty slots and 2 AWAY penalty slots.
+
+    Reads configuration as:
+        cfg["penalties"]["home"] = [slot0, slot1]
+        cfg["penalties"]["away"] = [slot0, slot1]
+
+    Controller interface:
+        controller.get_penalties() -> {
+            "home": [slot0, slot1],
+            "away": [slot0, slot1]
+        }
     """
 
-    REFRESH_MS = 500
-
-    def __init__(self, master, controller):
-        super().__init__(master)
+    def __init__(self, parent, controller):
+        super().__init__(parent)
         self.controller = controller
         self.cfg = controller.cfg
-        self.mapping = self.cfg["mapping"]["penalties"]
 
-        self.rows = {}  # track widgets for live updates
+        # CONFIG IS HERE NOW
+        self.mapping = self.cfg["penalties"]
 
-        self._build_layout()
-        self.after(self.REFRESH_MS, self._refresh_loop)
+        self._build_gui()
 
-    # --------------------------------------------------------------------
+        # refresh loop
+        self.after(1000, self._refresh)
 
-    def _build_layout(self):
+    def _build_gui(self):
         """
-        Build UI dynamically using JSON mapping.
+        Build static layout: 4 rows (H1,H2,A1,A2)
         """
+        title = tk.Label(self, text="PENALTIES", font=("Arial", 14, "bold"))
+        title.pack(pady=4)
 
-        ttk.Label(self, text="🏒 PENALTIES", font=("Segoe UI", 14, "bold"))\
-            .grid(row=0, column=0, columnspan=4, pady=5)
+        table = tk.Frame(self)
+        table.pack(fill="x", padx=4, pady=4)
 
-        row_index = 1
+        headers = ["TEAM", "TIME", "NUMBER", "NAME"]
+        for c, h in enumerate(headers):
+            tk.Label(table, text=h, font=("Arial", 10, "bold")).grid(row=0, column=c, padx=6)
 
-        for team in ["home", "away"]:
-            for slot in ["p1", "p2"]:
+        # HOME rows
+        self.home_rows = []
+        for i in range(2):
+            row_widgets = self._make_row(table, 1 + i, is_home=True, index=i)
+            self.home_rows.append(row_widgets)
 
-                # Extract GUI fields
-                name = f"{team.upper()} {slot.upper()}"
-                data = self.mapping[team][slot]
+        # AWAY rows
+        self.away_rows = []
+        for i in range(2):
+            row_widgets = self._make_row(table, 3 + i, is_home=False, index=i)
+            self.away_rows.append(row_widgets)
 
-                row_widgets = {}
-
-                ttk.Label(self, text=name, width=12)\
-                    .grid(row=row_index, column=0, padx=3)
-
-                # Time label
-                time_var = tk.StringVar()
-                ttk.Label(self, textvariable=time_var, width=10)\
-                    .grid(row=row_index, column=1, padx=3)
-                row_widgets["time"] = time_var
-
-                # Number label
-                num_var = tk.StringVar()
-                ttk.Label(self, textvariable=num_var, width=5)\
-                    .grid(row=row_index, column=2, padx=3)
-                row_widgets["number"] = num_var
-
-                # Adjust buttons
-                ttk.Button(self, text="+10",
-                           command=lambda t=team, s=slot: self.controller.adjust_penalty(t, s, +10)
-                           ).grid(row=row_index, column=3)
-
-                ttk.Button(self, text="-10",
-                           command=lambda t=team, s=slot: self.controller.adjust_penalty(t, s, -10)
-                           ).grid(row=row_index, column=4)
-
-                ttk.Button(self, text="CLEAR",
-                           command=lambda t=team, s=slot: self.controller.clear_penalty(t, s)
-                           ).grid(row=row_index, column=5)
-
-                # Store update targets
-                self.rows[(team, slot)] = row_widgets
-
-                row_index += 1
-
-    # --------------------------------------------------------------------
-
-    def _refresh_loop(self):
+    def _make_row(self, parent, r, is_home, index):
         """
-        Poll controller and update values.
+        Create a GUI row:
+           TEAM LABEL | TIME | NUMBER | NAME
         """
+        team_txt = "HOME" if is_home else "AWAY"
+        team_label = tk.Label(parent, text=f"{team_txt} {index+1}")
+        team_label.grid(row=r, column=0, padx=6, pady=2)
 
+        time_var = tk.StringVar(value="")
+        nr_var = tk.StringVar(value="")
+        nm_var = tk.StringVar(value="")
+
+        tk.Label(parent, textvariable=time_var).grid(row=r, column=1, padx=6)
+        tk.Label(parent, textvariable=nr_var).grid(row=r, column=2, padx=6)
+        tk.Label(parent, textvariable=nm_var).grid(row=r, column=3, padx=6)
+
+        return {
+            "time": time_var,
+            "nr": nr_var,
+            "name": nm_var
+        }
+
+    def _refresh(self):
+        """
+        Pull latest penalty info from controller and display it.
+        """
         try:
-            status = self.controller.get_penalties()
-            # Expected:
-            # {
-            #   "home": {"p1":{"number":..., "time":...}, "p2"...},
-            #   "away": {...}
-            # }
-            for (team, slot), widgets in self.rows.items():
-                pdata = status[team][slot]
-                widgets["time"].set(pdata.get("time", ""))
-                widgets["number"].set(pdata.get("number", ""))
-        except Exception as e:
-            print("[PenaltyPanel] refresh error:", e)
+            data = self.controller.get_penalties()
 
-        self.after(self.REFRESH_MS, self._refresh_loop)
+            # HOME
+            for i, slot in enumerate(data["home"]):
+                self.home_rows[i]["time"].set(slot["time"])
+                self.home_rows[i]["nr"].set(slot["number"])
+                self.home_rows[i]["name"].set(slot["name"])
+
+            # AWAY
+            for i, slot in enumerate(data["away"]):
+                self.away_rows[i]["time"].set(slot["time"])
+                self.away_rows[i]["nr"].set(slot["number"])
+                self.away_rows[i]["name"].set(slot["name"])
+
+        except Exception as e:
+            logging.error(f"[PenaltyPanel] refresh error: {e}")
+
+        finally:
+            self.after(1000, self._refresh)

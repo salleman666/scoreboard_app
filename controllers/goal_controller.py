@@ -1,154 +1,122 @@
-"""
-GoalController module
----------------------
+from scoreboard_app.controllers.base_controller import BaseController
+import time
 
-Ansvar:
-- Hantera mål-logik (home / away)
-- Uppdatera scoreboard-fält i vMix
-- Trigga after-goal grafik (om aktiverat)
-- Hantera empty-goal states
-
-Denna controller:
-- håller ingen GUI logik
-- kastar tydliga fel när vMix saknar fält
-- läser fältnamn från config
-"""
-
-from __future__ import annotations
-from typing import Optional, Dict, Any
-from scoreboard_app.core.vmix_client import VMixClient
-
-
-class GoalController:
+class GoalController(BaseController):
     """
-    Controller för mål-logik
+    Handles goal registration:
+    - sets scoreboard numbers
+    - triggers goal popup
+    - triggers after-goal graphics
     """
+    def __init__(self, client, cfg):
+        super().__init__(client, cfg)
 
-    def __init__(self, client: VMixClient, cfg: Dict[str, Any]):
-        """
-        :param client: VMixClient som hanterar vMix API-kommunikation
-        :param cfg: konfigurationsobjekt enligt vmix_config.json
-        """
-        self.client = client
         self.cfg = cfg
-
-        # score state
-        self.home_goals = 0
-        self.away_goals = 0
-
-        # empty-goal flaggar
-        self.home_empty = False
-        self.away_empty = False
+        self.client = client
 
     # ----------------------------------------------------------------------
-    # INTERNAL HELPERS
-    # ----------------------------------------------------------------------
-
-    def _get_field(self, side: str, field: str) -> str:
+    def add_goal(self, team, number, name):
         """
-        Returnerar fältnamn från konfigurering
-        :param side: "home" eller "away"
-        :param field: t.ex. "score_field"
-        """
-        try:
-            return self.cfg["goal"][side][field]
-        except Exception as e:
-            raise ValueError(
-                f"GoalController missing config field for {side}.{field}: {e}"
-            )
-
-    def _update_scoreboard_field(self, side: str, value: str) -> None:
-        """
-        Sätter score-fält i scoreboard graphic
-        """
-        field_name = self._get_field(side, "score_field")
-        input_key = self.cfg["goal"]["scoreboard_input"]
-
-        try:
-            self.client.set_text(input_key, field_name, value)
-        except Exception as e:
-            raise RuntimeError(
-                f"Failed to set {side} scoreboard field '{field_name}' "
-                f"to '{value}': {e}"
-            )
-
-    # ----------------------------------------------------------------------
-    # PUBLIC API — USED BY GUI
-    # ----------------------------------------------------------------------
-
-    def goal_home(self, after_graphic: bool = True) -> None:
-        """
-        Registrerar hemmamål, uppdaterar scoreboard
-        """
-        self.home_goals += 1
-        self._update_scoreboard_field("home", str(self.home_goals))
-
-        if after_graphic:
-            self._show_after_goal_graphic("home")
-
-    def goal_away(self, after_graphic: bool = True) -> None:
-        """
-        Registrerar bortamål, uppdaterar scoreboard
-        """
-        self.away_goals += 1
-        self._update_scoreboard_field("away", str(self.away_goals))
-
-        if after_graphic:
-            self._show_after_goal_graphic("away")
-
-    # ----------------------------------------------------------------------
-
-    def toggle_empty_goal(self, side: str) -> None:
-        """
-        Växlar empty-goal state och sätter rätt grafik
-        :param side: "home" eller "away"
+        Called from PlayerSelectDialog via goal_panel.py
+        team = "home" | "away"
+        number = jersey number as string
+        name = scorer name as string
         """
 
-        if side == "home":
-            self.home_empty = not self.home_empty
-            self._update_empty_goal("home", self.home_empty)
-
-        elif side == "away":
-            self.away_empty = not self.away_empty
-            self._update_empty_goal("away", self.away_empty)
-
-        else:
-            raise ValueError("toggle_empty_goal: side must be 'home' or 'away'")
-
-    # ----------------------------------------------------------------------
-
-    def _update_empty_goal(self, side: str, state: bool) -> None:
-        """
-        Sätter empty-goal grafik ON/OFF för rätt lag
-        """
-
-        field_name = self._get_field(side, "empty_goal_field")
-        input_key = self.cfg["goal"]["scoreboard_input"]
-
-        value = "ON" if state else "OFF"
-
-        try:
-            self.client.set_text(input_key, field_name, value)
-        except Exception as e:
-            raise RuntimeError(
-                f"Failed to set empty-goal for {side}: {e}"
-            )
-
-    # ----------------------------------------------------------------------
-
-    def _show_after_goal_graphic(self, side: str) -> None:
-        """
-        Triggar after-goal graphic om aktiverat i config
-        """
-
-        if not self.cfg["goal"].get("after_goal_enabled", False):
+        if not team:
             return
 
-        graphic_key = self.cfg["goal"]["after_goal_input"]
+        # READ SCORE
+        if team == "home":
+            hs = int(self.get("score.home") or 0) + 1
+            self.set("score.home", hs)
+        else:
+            as_ = int(self.get("score.away") or 0) + 1
+            self.set("score.away", as_)
 
-        try:
-            self.client.overlay_show(graphic_key)
-        except Exception as e:
-            raise RuntimeError(
-                f"After-goal graphic failed for {side}: {e}"
+        # UPDATE SCOREBOARD TITLE
+        self._push_score()
+
+        # SHOW GOAL POPUP (if configured)
+        self._show_goal_popup(team)
+
+        # SHOW SCORER GRAPHICS (if configured)
+        self._show_after_goal(team, number, name)
+
+    # ----------------------------------------------------------------------
+    def _push_score(self):
+        """
+        Update scoreboard GT fields via vmix_client
+        """
+        m = self.cfg
+
+        if not m.get("score.input"):
+            return
+
+        inp = m["score.input"]
+
+        # home
+        if m.get("score.home_field") and self.get("score.home") is not None:
+            self.client.set_text(
+                inp,
+                m["score.home_field"],
+                str(self.get("score.home"))
             )
+
+        # away
+        if m.get("score.away_field") and self.get("score.away") is not None:
+            self.client.set_text(
+                inp,
+                m["score.away_field"],
+                str(self.get("score.away"))
+            )
+
+    # ----------------------------------------------------------------------
+    def _show_goal_popup(self, team):
+        """
+        Use GOAL pop-up overlay settings
+        """
+        m = self.cfg
+        if not m.get("goal.popup_input"):
+            return
+
+        inp = m["goal.popup_input"]
+        ov = int(m.get("goal.popup_overlay") or 1)
+        dur = int(m.get("goal.popup_duration") or 3000)
+
+        # show popup
+        self.client.overlay_on(inp, ov)
+        time.sleep(dur / 1000.0)
+        self.client.overlay_off(inp, ov)
+
+    # ----------------------------------------------------------------------
+    def _show_after_goal(self, team, number, name):
+        """
+        Display scorer graphics after goal
+        """
+        m = self.cfg
+
+        if not m.get("goal.after_input"):
+            return
+
+        inp = m["goal.after_input"]
+        ov = int(m.get("goal.after_overlay") or 1)
+        dur = int(m.get("goal.after_duration") or 3000)
+        pause = int(m.get("goal.after_pause") or 1000)
+
+        # UPDATE TITLE FIELDS
+        # only update those configured in MappingDialog
+        if number and m.get("goal.after_number_field"):
+            self.client.set_text(inp, m["goal.after_number_field"], number)
+
+        if name and m.get("goal.after_name_field"):
+            self.client.set_text(inp, m["goal.after_name_field"], name)
+
+        if team and m.get("goal.after_team_field"):
+            self.client.set_text(inp, m["goal.after_team_field"], team.upper())
+
+        # show overlay
+        self.client.overlay_on(inp, ov)
+        time.sleep(dur / 1000.0)
+        self.client.overlay_off(inp, ov)
+        time.sleep(pause / 1000.0)

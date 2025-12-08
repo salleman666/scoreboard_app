@@ -1,145 +1,73 @@
 import tkinter as tk
 from tkinter import ttk
-import xml.etree.ElementTree as ET
-from scoreboard_app.core.vmix_client import VMixClient
-
 
 class PlayerSelectDialog(tk.Toplevel):
     """
-    Shows roster list + duration options.
-    Returns dict:
-        {
-            "number": str or "",
-            "name": str or "",
-            "duration": minutes (int)
-        }
+    Dialog for selecting player number + player name.
+    Supports HOME or AWAY side via team parameter.
     """
-
-    def __init__(self, parent, input_title):
+    def __init__(self, parent, team="home"):
         super().__init__(parent)
-        self.title("Player Selection")
-        self.geometry("600x800")
+        self.parent = parent
+        self.team = team  # <-- IMPORTANT
+        self.title(f"Select Player ({team.upper()})")
 
-        self.client = VMixClient()
-        self.input_title = input_title
-
+        # store result here
         self.result = None
 
-        # parsed roster = list of (number,name)
-        self.players = self._load_players()
-        self.selected_player = None
-        self.selected_duration = None
-
-        self._build_gui()
-
-    def _load_players(self):
-        """Parse lineup XML and extract (number,name) pairs sorted"""
-        xml = self.client.get_status_xml()
-        if xml is None:
-            return []
-
-        # find input
-        for inp in xml.findall(".//input"):
-            if inp.get("title") == self.input_title:
-                # scan text fields
-                texts = inp.findall(".//text")
-                numbers = {}
-                names = {}
-                for t in texts:
-                    nm = t.get("name")
-                    val = (t.text or "").strip()
-                    if nm.endswith("_number.Text"):
-                        key = nm.replace("_number.Text", "")
-                        numbers[key] = val
-                    elif nm.endswith("_name.Text"):
-                        key = nm.replace("_name.Text", "")
-                        names[key] = val
-
-                roster = []
-                for k, nr in numbers.items():
-                    nm = names.get(k, "")
-                    if nr:
-                        roster.append((nr, nm))
-
-                # sort numeric
-                roster.sort(key=lambda x: int(x[0]))
-                return roster
-
-        return []
-
-    def _build_gui(self):
-        list_frame = tk.Frame(self)
-        list_frame.pack(fill="both", expand=True, padx=10, pady=10)
-
-        self.listbox = tk.Listbox(list_frame, font=("Arial", 14))
-        self.listbox.pack(fill="both", expand=True)
-
-        for nr, nm in self.players:
-            self.listbox.insert("end", f"{nr}  {nm}")
-
-        self.listbox.bind("<<ListboxSelect>>", self._on_select_player)
-
-        # Duration buttons
-        dur_frame = tk.Frame(self)
-        dur_frame.pack(pady=10)
-        for mins in [2, 4, 5, 10]:
-            btn = tk.Button(dur_frame, text=f"{mins} MIN",
-                            command=lambda m=mins: self._on_select_duration(m))
-            btn.pack(side="left", padx=10)
-
-        # Bottom buttons
-        btn_frame = tk.Frame(self)
-        btn_frame.pack(pady=20)
-        tk.Button(btn_frame, text="OK (Player + Time)",
-                  command=self._ok_player_and_time).pack(side="left", padx=10)
-
-        tk.Button(btn_frame, text="OK (Time Only)",
-                  command=self._ok_time_only).pack(side="left", padx=10)
-
-        tk.Button(btn_frame, text="Cancel",
-                  command=self._cancel).pack(side="left", padx=10)
-
-    def _on_select_player(self, _):
-        sel = self.listbox.curselection()
-        if not sel:
-            self.selected_player = None
-            return
-        idx = sel[0]
-        nr, nm = self.players[idx]
-        self.selected_player = (nr, nm)
-
-    def _on_select_duration(self, mins):
-        self.selected_duration = mins
-
-    def _ok_player_and_time(self):
-        if not self.selected_duration:
-            return
-        nr = ""
-        nm = ""
-        if self.selected_player:
-            nr, nm = self.selected_player
-        self.result = {
-            "number": nr,
-            "name": nm,
-            "duration": self.selected_duration,
-        }
-        self.destroy()
-
-    def _ok_time_only(self):
-        if not self.selected_duration:
-            return
-        self.result = {
-            "number": "",
-            "name": "",
-            "duration": self.selected_duration,
-        }
-        self.destroy()
-
-    def _cancel(self):
-        self.result = None
-        self.destroy()
-
-    def run(self):
+        # modal dialog behavior
         self.grab_set()
+        self.focus_force()
+
+        # layout
+        frm = ttk.Frame(self, padding=10)
+        frm.pack(fill="both", expand=True)
+
+        ttk.Label(frm, text="Player Number:").grid(row=0, column=0, sticky="w")
+        self.num_var = tk.StringVar()
+        ttk.Entry(frm, textvariable=self.num_var, width=10).grid(row=0, column=1, sticky="w")
+
+        ttk.Label(frm, text="Player Name:").grid(row=1, column=0, sticky="w")
+        self.name_var = tk.StringVar()
+        ttk.Entry(frm, textvariable=self.name_var, width=25).grid(row=1, column=1, sticky="w")
+
+        btn = ttk.Frame(frm)
+        btn.grid(row=2, column=0, columnspan=2, pady=10)
+
+        ttk.Button(btn, text="OK", command=self._on_ok).pack(side="left", padx=5)
+        ttk.Button(btn, text="Cancel", command=self._on_cancel).pack(side="left", padx=5)
+
+        self.protocol("WM_DELETE_WINDOW", self._on_cancel)
+
+    def _on_ok(self):
+        """
+        Returns a dict with player data:
+
+        {
+            "team": "home" | "away",
+            "number": "12",
+            "name": "John Doe"
+        }
+        """
+        number = self.num_var.get().strip()
+        name = self.name_var.get().strip()
+
+        if number or name:
+            self.result = {
+                "team": self.team,
+                "number": number,
+                "name": name
+            }
+
+        self.destroy()
+
+    def _on_cancel(self):
+        self.result = None
+        self.destroy()
+
+    def show(self):
+        """
+        Make dialog blocking and return result
+        """
         self.wait_window()
         return self.result

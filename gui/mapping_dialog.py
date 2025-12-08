@@ -1,305 +1,415 @@
 import tkinter as tk
-from tkinter import ttk
-import xml.etree.ElementTree as ET
+from tkinter import ttk, Toplevel
+from tkinter import messagebox
 
+from scoreboard_app.core.vmix_client import VMixClient
 from scoreboard_app.core.config_loader import save_config
 
 
-class MappingDialog(tk.Toplevel):
-    def __init__(self, parent, cfg, client):
+class MappingDialog(Toplevel):
+    """
+    FULL REBUILD OF MAPPING DIALOG
+    - Penalty mappings: 4 slots (Home1, Home2, Away1, Away2)
+    - Each slot has 4 filtered dropdowns:
+        time.Text, bg.Source, nr.Text, bgnr.Source
+    - Empty Goal block (text + bg)
+    - Shots block (home nr, away nr, bg)
+    - Lineup block (home input, away input only)
+    - Goal Popup & After Goal block (inputs, overlay, duration)
+    - save + load supported
+    """
+
+    def __init__(self, parent, cfg, client: VMixClient):
         super().__init__(parent)
         self.title("Mapping Configuration")
+        self.geometry("1000x700")
 
         self.parent = parent
-        self.client = client
         self.cfg = cfg
+        self.client = client
 
-        self.inputs = []
-        self._load_inputs()
+        self.nb = ttk.Notebook(self)
+        self.nb.pack(fill="both", expand=True, padx=10, pady=10)
 
-        nb = ttk.Notebook(self)
-        nb.pack(fill="both", expand=True, padx=8, pady=8)
+        # Create tabs
+        self._build_penalties_tab()
+        self._build_emptygoal_tab()
+        self._build_shots_tab()
+        self._build_lineup_tab()
+        self._build_goal_tab()
 
-        # tabs
-        self._build_clock_tab(nb)
-        self._build_penalty_tab(nb)
-        self._build_empty_goal_tab(nb)
+        # Save button
+        btn_frame = tk.Frame(self)
+        btn_frame.pack(fill="x", pady=10)
+        ttk.Button(btn_frame, text="SAVE", command=self._save).pack(side="right")
 
-        # SAVE + CLOSE
-        bframe = tk.Frame(self)
-        bframe.pack(pady=6)
+    # ------------- SHARED HELPERS -----------------
 
-        tk.Button(bframe, text="Save", command=self._save).pack(side="left", padx=4)
-        tk.Button(bframe, text="Close", command=self.destroy).pack(side="left", padx=4)
+    def _safe_get_mapping(self, section):
+        """
+        Ensure mapping structure exists
+        """
+        if "mapping" not in self.cfg:
+            self.cfg["mapping"] = {}
+        if section not in self.cfg["mapping"]:
+            self.cfg["mapping"][section] = {}
+        return self.cfg["mapping"][section]
 
-    # ---------------------------------------------------
-    # INPUT LIST LOADER
-    # ---------------------------------------------------
     def _load_inputs(self):
-        """
-        Load all vMix input titles using get_status()
-        """
         try:
-            raw = self.client.get_status()
-            xml = ET.fromstring(raw)
-            titles = []
-
-            for inp in xml.findall(".//inputs/input"):
-                title = inp.get("title")
-                if title:
-                    titles.append(title)
-
-            self.inputs = sorted(titles)
-
-        except Exception as e:
-            print("ERROR reading inputs:", e)
-            self.inputs = []
-
-    # ---------------------------------------------------
-    # LOAD FIELDS FOR SELECTED INPUT
-    # ---------------------------------------------------
-    def _load_fields_for_input(self, input_name):
-        """
-        Returns a list of field names inside one vMix GT input
-        """
-        if not input_name:
+            return self.client.list_inputs()
+        except:
             return []
 
+    def _load_fields(self, input_name):
+        """
+        Return all title fields from vMix for given input
+        """
         try:
-            raw = self.client.get_status()
-            xml = ET.fromstring(raw)
+            return self.client.list_title_fields(input_name)
+        except:
+            return []
 
-            for inp in xml.findall(".//inputs/input"):
-                if inp.get("title") == input_name:
-                    fields = []
-                    for t in inp.findall(".//text"):
-                        nm = t.get("name")
-                        if nm:
-                            fields.append(nm)
-                    for i in inp.findall(".//image"):
-                        nm = i.get("name")
-                        if nm:
-                            fields.append(nm)
-                    return sorted(fields)
+    # ----------------- PENALTIES TAB --------------------
 
-        except Exception as e:
-            print("ERROR reading fields:", e)
+    def _build_penalties_tab(self):
+        tab = ttk.Frame(self.nb)
+        self.nb.add(tab, text="Penalties")
 
-        return []
+        m = self._safe_get_mapping("penalties")
 
-    # ---------------------------------------------------
-    # CLOCK TAB
-    # ---------------------------------------------------
-    def _build_clock_tab(self, nb):
-        f = tk.Frame(nb)
-        nb.add(f, text="Clock")
-
-        # ensure structure
-        if "mapping" not in self.cfg:
-            self.cfg["mapping"] = {}
-        if "clock" not in self.cfg["mapping"]:
-            self.cfg["mapping"]["clock"] = {
-                "input": "",
-                "field": ""
-            }
-
-        m = self.cfg["mapping"]["clock"]
-
-        tk.Label(f, text="Clock Input:").grid(row=0, column=0, sticky="w", pady=4)
-        self.clock_input = tk.StringVar(value=m.get("input", ""))
-        cb = ttk.Combobox(f, textvariable=self.clock_input, values=self.inputs, width=35)
-        cb.grid(row=0, column=1, sticky="w")
-        cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_clock_field())
-
-        tk.Label(f, text="Clock Field:").grid(row=1, column=0, sticky="w", pady=4)
-        self.clock_field = ttk.Combobox(f, width=35)
-        self.clock_field.grid(row=1, column=1, sticky="w")
-
-        # initial refresh
-        self._refresh_clock_field()
-
-    def _refresh_clock_field(self):
-        input_name = self.clock_input.get()
-        fields = self._load_fields_for_input(input_name)
-        self.clock_field["values"] = fields
-
-        # restore config if possible
-        m = self.cfg["mapping"]["clock"]
-        if m.get("field") in fields:
-            self.clock_field.set(m["field"])
-        else:
-            self.clock_field.set("")
-
-    # ---------------------------------------------------
-    # PENALTIES TAB
-    # ---------------------------------------------------
-    def _build_penalty_tab(self, nb):
-        f = tk.Frame(nb)
-        nb.add(f, text="Penalties")
-
-        if "mapping" not in self.cfg:
-            self.cfg["mapping"] = {}
-        if "penalties" not in self.cfg["mapping"]:
-            self.cfg["mapping"]["penalties"] = {
-                "input": "",
-                "rows": {
-                    "HOME1": {"time": "", "num": ""},
-                    "HOME2": {"time": "", "num": ""},
-                    "AWAY1": {"time": "", "num": ""},
-                    "AWAY2": {"time": "", "num": ""}
+        # If structure missing, initialize
+        default_slots = ["home1", "home2", "away1", "away2"]
+        for k in default_slots:
+            if k not in m:
+                m[k] = {
+                    "time": "",
+                    "time_bg": "",
+                    "nr": "",
+                    "nr_bg": ""
                 }
+
+        # UI
+        top_row = tk.Frame(tab)
+        top_row.pack(fill="x", pady=5)
+
+        tk.Label(top_row, text="Penalty Input:").pack(side="left")
+
+        inputs = self._load_inputs()
+        self.pen_input_var = tk.StringVar(value=m.get("input", ""))
+        self.pen_input_cb = ttk.Combobox(top_row, textvariable=self.pen_input_var, values=inputs, width=40)
+        self.pen_input_cb.pack(side="left", padx=8)
+        self.pen_input_cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_penalty_rows())
+
+        # Table headers
+        hdr = tk.Frame(tab)
+        hdr.pack(fill="x", pady=4)
+        labels = ["SLOT", "Time.Text", "Time BG", "Nr.Text", "Nr BG"]
+        for idx, t in enumerate(labels):
+            tk.Label(hdr, text=t, width=20, anchor="w").grid(row=0, column=idx, padx=4)
+
+        # Build rows
+        self.penalty_rows = {}  # store references
+
+        def make_row(row_index, slotname, initial):
+            container = tk.Frame(tab)
+            container.pack(fill="x", pady=2)
+
+            tk.Label(container, text=slotname.upper(), width=20, anchor="w").grid(row=0, column=0, padx=4)
+
+            # 4 columns
+            v_time = tk.StringVar(value=initial["time"])
+            v_timebg = tk.StringVar(value=initial["time_bg"])
+            v_nr = tk.StringVar(value=initial["nr"])
+            v_nrbg = tk.StringVar(value=initial["nr_bg"])
+
+            cb1 = ttk.Combobox(container, textvariable=v_time, width=20)
+            cb2 = ttk.Combobox(container, textvariable=v_timebg, width=20)
+            cb3 = ttk.Combobox(container, textvariable=v_nr, width=20)
+            cb4 = ttk.Combobox(container, textvariable=v_nrbg, width=20)
+
+            cb1.grid(row=0, column=1, padx=4)
+            cb2.grid(row=0, column=2, padx=4)
+            cb3.grid(row=0, column=3, padx=4)
+            cb4.grid(row=0, column=4, padx=4)
+
+            # store
+            self.penalty_rows[slotname] = {
+                "v_time": v_time,
+                "v_timebg": v_timebg,
+                "v_nr": v_nr,
+                "v_nrbg": v_nrbg,
+                "cb_time": cb1,
+                "cb_timebg": cb2,
+                "cb_nr": cb3,
+                "cb_nrbg": cb4
             }
 
-        m = self.cfg["mapping"]["penalties"]
+        make_row(1, "home1", m["home1"])
+        make_row(2, "home2", m["home2"])
+        make_row(3, "away1", m["away1"])
+        make_row(4, "away2", m["away2"])
 
-        tk.Label(f, text="Penalty Input:").grid(row=0, column=0, sticky="w", pady=4)
-        self.pen_input = tk.StringVar(value=m.get("input", ""))
-        cb = ttk.Combobox(f, textvariable=self.pen_input, values=self.inputs, width=35)
-        cb.grid(row=0, column=1, sticky="w")
-        cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_penalty_fields())
+        # initial fill
+        self._refresh_penalty_rows()
 
-        # HEADER
-        tk.Label(f, text="Team").grid(row=2, column=0)
-        tk.Label(f, text="Time Field").grid(row=2, column=1)
-        tk.Label(f, text="Nr Field").grid(row=2, column=2)
+    def _refresh_penalty_rows(self):
+        name = self.pen_input_var.get().strip()
+        if not name:
+            return
+        fields = self._load_fields(name)
 
-        self.pen_rows = {}
+        # Filter
+        time_list = [f for f in fields if f.lower().endswith("time.text")]
+        timebg_list = [f for f in fields if f.lower().endswith("bg.source")]
+        nr_list = [f for f in fields if f.lower().endswith("nr.text")]
+        nrbg_list = [f for f in fields if f.lower().endswith("bgnr.source")]
 
-        rownames = ["HOME1", "HOME2", "AWAY1", "AWAY2"]
-        for idx, name in enumerate(rownames):
-            r = 3 + idx
-            tk.Label(f, text=name).grid(row=r, column=0)
+        for slot, row in self.penalty_rows.items():
+            row["cb_time"]["values"] = time_list
+            row["cb_timebg"]["values"] = timebg_list
+            row["cb_nr"]["values"] = nr_list
+            row["cb_nrbg"]["values"] = nrbg_list
 
-            tcb = ttk.Combobox(f, width=30)
-            ncb = ttk.Combobox(f, width=30)
+    # ---------------- EMPTY GOAL TAB --------------------
 
-            tcb.grid(row=r, column=1)
-            ncb.grid(row=r, column=2)
+    def _build_emptygoal_tab(self):
+        tab = ttk.Frame(self.nb)
+        self.nb.add(tab, text="Empty Goal")
 
-            self.pen_rows[name] = {
-                "time": tcb,
-                "num": ncb
-            }
+        m = self._safe_get_mapping("emptygoal")
+        if "input" not in m:
+            m["input"] = ""
+        if "text_field" not in m:
+            m["text_field"] = ""
+        if "bg_field" not in m:
+            m["bg_field"] = ""
 
-        self._refresh_penalty_fields()
+        inputs = self._load_inputs()
 
-    def _refresh_penalty_fields(self):
-        input_name = self.pen_input.get()
-        fields = self._load_fields_for_input(input_name)
+        row = tk.Frame(tab)
+        row.pack(fill="x", pady=8)
+        tk.Label(row, text="Input:").pack(side="left")
+        self.eg_input_var = tk.StringVar(value=m["input"])
+        self.eg_input_cb = ttk.Combobox(row, textvariable=self.eg_input_var, values=inputs, width=40)
+        self.eg_input_cb.pack(side="left", padx=6)
+        self.eg_input_cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_emptygoal_fields())
 
-        for name, row in self.pen_rows.items():
-            row["time"]["values"] = fields
-            row["num"]["values"] = fields
+        hdr = tk.Frame(tab)
+        hdr.pack(fill="x", pady=4)
+        tk.Label(hdr, text="Text Field", width=30).grid(row=0, column=0)
+        tk.Label(hdr, text="BG Field", width=30).grid(row=0, column=1)
 
-            m = self.cfg["mapping"]["penalties"]["rows"].get(name, {})
-            if m.get("time") in fields:
-                row["time"].set(m["time"])
-            else:
-                row["time"].set("")
+        row2 = tk.Frame(tab)
+        row2.pack(fill="x", pady=4)
 
-            if m.get("num") in fields:
-                row["num"].set(m["num"])
-            else:
-                row["num"].set("")
+        self.eg_text_var = tk.StringVar(value=m["text_field"])
+        self.eg_bg_var = tk.StringVar(value=m["bg_field"])
 
-    # ---------------------------------------------------
-    # EMPTY GOAL TAB
-    # ---------------------------------------------------
-    def _build_empty_goal_tab(self, nb):
-        f = tk.Frame(nb)
-        nb.add(f, text="Empty Goal")
+        self.eg_text_cb = ttk.Combobox(row2, textvariable=self.eg_text_var, width=30)
+        self.eg_bg_cb = ttk.Combobox(row2, textvariable=self.eg_bg_var, width=30)
 
-        if "empty_goal" not in self.cfg["mapping"]:
-            self.cfg["mapping"]["empty_goal"] = {
-                "input": "",
-                "home_text": "",
-                "home_bg": "",
-                "away_text": "",
-                "away_bg": ""
-            }
+        self.eg_text_cb.grid(row=0, column=0, padx=4)
+        self.eg_bg_cb.grid(row=0, column=1, padx=4)
 
-        m = self.cfg["mapping"]["empty_goal"]
+        self._refresh_emptygoal_fields()
 
-        # INPUT
-        tk.Label(f, text="Empty Goal Input:").grid(row=0, column=0, sticky="w", pady=4)
-        self.eg_input = tk.StringVar(value=m.get("input", ""))
-        cb = ttk.Combobox(f, textvariable=self.eg_input, values=self.inputs, width=35)
-        cb.grid(row=0, column=1, sticky="w")
-        cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_empty_goal_fields())
+    def _refresh_emptygoal_fields(self):
+        name = self.eg_input_var.get().strip()
+        if not name:
+            return
+        f = self._load_fields(name)
+        txt = [x for x in f if x.lower().endswith("text")]
+        bg = [x for x in f if x.lower().endswith("bg.source")]
 
-        # FIELDS
-        tk.Label(f, text="Team").grid(row=2, column=0)
-        tk.Label(f, text="Text Field").grid(row=2, column=1)
-        tk.Label(f, text="BG Field").grid(row=2, column=2)
+        self.eg_text_cb["values"] = txt
+        self.eg_bg_cb["values"] = bg
 
-        self.eg_home_text = ttk.Combobox(f, width=30)
-        self.eg_home_bg = ttk.Combobox(f, width=30)
-        self.eg_away_text = ttk.Combobox(f, width=30)
-        self.eg_away_bg = ttk.Combobox(f, width=30)
+    # ----------------- SHOTS TAB --------------------
 
-        tk.Label(f, text="HOME").grid(row=3, column=0)
-        self.eg_home_text.grid(row=3, column=1)
-        self.eg_home_bg.grid(row=3, column=2)
+    def _build_shots_tab(self):
+        tab = ttk.Frame(self.nb)
+        self.nb.add(tab, text="Shots")
 
-        tk.Label(f, text="AWAY").grid(row=4, column=0)
-        self.eg_away_text.grid(row=4, column=1)
-        self.eg_away_bg.grid(row=4, column=2)
+        m = self._safe_get_mapping("shots")
+        if "input" not in m:
+            m["input"] = ""
+        if "home_nr" not in m:
+            m["home_nr"] = ""
+        if "away_nr" not in m:
+            m["away_nr"] = ""
+        if "bg_field" not in m:
+            m["bg_field"] = ""
 
-        self._refresh_empty_goal_fields()
+        inputs = self._load_inputs()
 
-    def _refresh_empty_goal_fields(self):
-        input_name = self.eg_input.get()
-        fields = self._load_fields_for_input(input_name)
+        row = tk.Frame(tab)
+        row.pack(fill="x", pady=8)
+        tk.Label(row, text="Input:").pack(side="left")
+        self.sh_input_var = tk.StringVar(value=m["input"])
+        self.sh_input_cb = ttk.Combobox(row, textvariable=self.sh_input_var, values=inputs, width=40)
+        self.sh_input_cb.pack(side="left", padx=6)
+        self.sh_input_cb.bind("<<ComboboxSelected>>", lambda e: self._refresh_shots_fields())
 
-        self.eg_home_text["values"] = fields
-        self.eg_home_bg["values"] = fields
-        self.eg_away_text["values"] = fields
-        self.eg_away_bg["values"] = fields
+        hdr = tk.Frame(tab)
+        hdr.pack(fill="x", pady=4)
+        for i, t in enumerate(["HOME Nr", "AWAY Nr", "BG"]):
+            tk.Label(hdr, text=t, width=25).grid(row=0, column=i)
 
-        m = self.cfg["mapping"]["empty_goal"]
+        row2 = tk.Frame(tab)
+        row2.pack(fill="x", pady=4)
 
-        if m.get("home_text") in fields:
-            self.eg_home_text.set(m["home_text"])
-        else:
-            self.eg_home_text.set("")
+        self.sh_home_var = tk.StringVar(value=m["home_nr"])
+        self.sh_away_var = tk.StringVar(value=m["away_nr"])
+        self.sh_bg_var = tk.StringVar(value=m["bg_field"])
 
-        if m.get("home_bg") in fields:
-            self.eg_home_bg.set(m["home_bg"])
-        else:
-            self.eg_home_bg.set("")
+        self.sh_home_cb = ttk.Combobox(row2, textvariable=self.sh_home_var, width=25)
+        self.sh_away_cb = ttk.Combobox(row2, textvariable=self.sh_away_var, width=25)
+        self.sh_bg_cb = ttk.Combobox(row2, textvariable=self.sh_bg_var, width=25)
 
-        if m.get("away_text") in fields:
-            self.eg_away_text.set(m["away_text"])
-        else:
-            self.eg_away_text.set("")
+        self.sh_home_cb.grid(row=0, column=0, padx=4)
+        self.sh_away_cb.grid(row=0, column=1, padx=4)
+        self.sh_bg_cb.grid(row=0, column=2, padx=4)
 
-        if m.get("away_bg") in fields:
-            self.eg_away_bg.set(m["away_bg"])
-        else:
-            self.eg_away_bg.set("")
+        self._refresh_shots_fields()
 
-    # ---------------------------------------------------
-    # SAVE
-    # ---------------------------------------------------
+    def _refresh_shots_fields(self):
+        name = self.sh_input_var.get().strip()
+        if not name:
+            return
+        f = self._load_fields(name)
+
+        nr_fields = [x for x in f if x.lower().endswith("nr.text")]
+        bg_fields = [x for x in f if x.lower().endswith("bg.source")]
+
+        self.sh_home_cb["values"] = nr_fields
+        self.sh_away_cb["values"] = nr_fields
+        self.sh_bg_cb["values"] = bg_fields
+
+    # ----------------- LINEUP TAB --------------------
+
+    def _build_lineup_tab(self):
+        tab = ttk.Frame(self.nb)
+        self.nb.add(tab, text="Lineup")
+
+        m = self._safe_get_mapping("lineup")
+
+        if "home_input" not in m:
+            m["home_input"] = ""
+        if "away_input" not in m:
+            m["away_input"] = ""
+
+        inputs = self._load_inputs()
+
+        tk.Label(tab, text="HOME Input:").pack(anchor="w", pady=4)
+        self.lu_home_var = tk.StringVar(value=m["home_input"])
+        self.lu_home_cb = ttk.Combobox(tab, textvariable=self.lu_home_var, values=inputs, width=60)
+        self.lu_home_cb.pack(anchor="w")
+
+        tk.Label(tab, text="AWAY Input:").pack(anchor="w", pady=10)
+        self.lu_away_var = tk.StringVar(value=m["away_input"])
+        self.lu_away_cb = ttk.Combobox(tab, textvariable=self.lu_away_var, values=inputs, width=60)
+        self.lu_away_cb.pack(anchor="w")
+
+    # ----------------- GOAL TAB --------------------
+
+    def _build_goal_tab(self):
+        tab = ttk.Frame(self.nb)
+        self.nb.add(tab, text="Goals")
+
+        m = self._safe_get_mapping("goal")
+
+        for key in ["popup_input", "popup_overlay", "popup_duration",
+                    "after_input", "after_overlay", "after_duration",
+                    "pause_between"]:
+            if key not in m:
+                m[key] = ""
+
+        inputs = self._load_inputs()
+
+        # POPUP
+        tk.Label(tab, text="GOAL POPUP Input:").pack(anchor="w", pady=4)
+        self.gp_input_var = tk.StringVar(value=m["popup_input"])
+        self.gp_input_cb = ttk.Combobox(tab, textvariable=self.gp_input_var, values=inputs, width=60)
+        self.gp_input_cb.pack(anchor="w")
+
+        tk.Label(tab, text="Overlay (1-8):").pack(anchor="w")
+        self.gp_ov_var = tk.StringVar(value=m["popup_overlay"])
+        self.gp_ov_entry = tk.Entry(tab, textvariable=self.gp_ov_var, width=10)
+        self.gp_ov_entry.pack(anchor="w")
+
+        tk.Label(tab, text="Duration ms:").pack(anchor="w")
+        self.gp_dur_var = tk.StringVar(value=m["popup_duration"])
+        self.gp_dur_entry = tk.Entry(tab, textvariable=self.gp_dur_var, width=10)
+        self.gp_dur_entry.pack(anchor="w")
+
+        # AFTER GOAL
+        tk.Label(tab, text="AFTER GOAL Input:").pack(anchor="w", pady=18)
+        self.ga_input_var = tk.StringVar(value=m["after_input"])
+        self.ga_input_cb = ttk.Combobox(tab, textvariable=self.ga_input_var, values=inputs, width=60)
+        self.ga_input_cb.pack(anchor="w")
+
+        tk.Label(tab, text="Overlay (1-8):").pack(anchor="w")
+        self.ga_ov_var = tk.StringVar(value=m["after_overlay"])
+        self.ga_ov_entry = tk.Entry(tab, textvariable=self.ga_ov_var, width=10)
+        self.ga_ov_entry.pack(anchor="w")
+
+        tk.Label(tab, text="Duration ms:").pack(anchor="w")
+        self.ga_dur_var = tk.StringVar(value=m["after_duration"])
+        self.ga_dur_entry = tk.Entry(tab, textvariable=self.ga_dur_var, width=10)
+        self.ga_dur_entry.pack(anchor="w")
+
+        # PAUSE
+        tk.Label(tab, text="Pause Between Popup/After ms:").pack(anchor="w", pady=18)
+        self.ga_pause_var = tk.StringVar(value=m["pause_between"])
+        self.ga_pause_entry = tk.Entry(tab, textvariable=self.ga_pause_var, width=10)
+        self.ga_pause_entry.pack(anchor="w")
+
+    # ---------------- SAVE --------------------
+
     def _save(self):
-        # CLOCK
-        self.cfg["mapping"]["clock"]["input"] = self.clock_input.get()
-        self.cfg["mapping"]["clock"]["field"] = self.clock_field.get()
+        # Penalties
+        mp = self._safe_get_mapping("penalties")
+        mp["input"] = self.pen_input_var.get().strip()
 
-        # PENALTIES
-        pen = self.cfg["mapping"]["penalties"]
-        pen["input"] = self.pen_input.get()
-        for name, row in self.pen_rows.items():
-            pen["rows"][name]["time"] = row["time"].get()
-            pen["rows"][name]["num"] = row["num"].get()
+        for slot, row in self.penalty_rows.items():
+            mp[slot]["time"] = row["v_time"].get().strip()
+            mp[slot]["time_bg"] = row["v_timebg"].get().strip()
+            mp[slot]["nr"] = row["v_nr"].get().strip()
+            mp[slot]["nr_bg"] = row["v_nrbg"].get().strip()
 
-        # EMPTY GOAL
-        eg = self.cfg["mapping"]["empty_goal"]
-        eg["input"] = self.eg_input.get()
-        eg["home_text"] = self.eg_home_text.get()
-        eg["home_bg"] = self.eg_home_bg.get()
-        eg["away_text"] = self.eg_away_text.get()
-        eg["away_bg"] = self.eg_away_bg.get()
+        # Empty goal
+        mg = self._safe_get_mapping("emptygoal")
+        mg["input"] = self.eg_input_var.get().strip()
+        mg["text_field"] = self.eg_text_var.get().strip()
+        mg["bg_field"] = self.eg_bg_var.get().strip()
 
+        # Shots
+        ms = self._safe_get_mapping("shots")
+        ms["input"] = self.sh_input_var.get().strip()
+        ms["home_nr"] = self.sh_home_var.get().strip()
+        ms["away_nr"] = self.sh_away_var.get().strip()
+        ms["bg_field"] = self.sh_bg_var.get().strip()
+
+        # Lineup
+        ml = self._safe_get_mapping("lineup")
+        ml["home_input"] = self.lu_home_var.get().strip()
+        ml["away_input"] = self.lu_away_var.get().strip()
+
+        # Goals
+        mg2 = self._safe_get_mapping("goal")
+        mg2["popup_input"] = self.gp_input_var.get().strip()
+        mg2["popup_overlay"] = self.gp_ov_var.get().strip()
+        mg2["popup_duration"] = self.gp_dur_var.get().strip()
+
+        mg2["after_input"] = self.ga_input_var.get().strip()
+        mg2["after_overlay"] = self.ga_ov_var.get().strip()
+        mg2["after_duration"] = self.ga_dur_var.get().strip()
+
+        mg2["pause_between"] = self.ga_pause_var.get().strip()
+
+        # write to disk
         save_config(self.cfg)
+
+        messagebox.showinfo("OK", "Mapping saved.")
         self.destroy()

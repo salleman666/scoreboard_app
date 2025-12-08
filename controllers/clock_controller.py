@@ -1,190 +1,163 @@
 import logging
+from scoreboard_app.config_loader import save_config, load_config
 from scoreboard_app.core.vmix_client import VMixClient
-from scoreboard_app.core.config_loader import load_config, save_config
 
 log = logging.getLogger(__name__)
 
 
 class ClockController:
     """
-    Central logic for main game clock.
+    CONTROL FLOW LOGIC:
 
-    RULES:
-    - start_countdown  = first start (from initial value)
-    - pause_countdown  = toggle play/pause without resetting
-    - stop_countdown   = reset to initial value (only used at period end)
-    - adjust           = Add/Sub seconds during live play
+    clock mappings stored in vmix_config.json:
+    {
+      "mapping": {
+        "clock": {
+          "input": "<vmix title name>",
+          "field": "<vmix text field name>",   e.g. "Time.Text"
+          "start_time": "20:00"
+        }
+      }
+    }
+
+    ALL VMIX CLOCK ACTIONS USE:
+      - StartCountdown
+      - StopCountdown
+      - PauseCountdown
+      - AdjustCountdown
+      - SetCountdown
     """
 
-    def __init__(self, client: VMixClient, cfg=None):
-        self.client = client
-        self.cfg = cfg if cfg else load_config()
+    def __init__(self, vmix_client: VMixClient, cfg: dict):
+        self.client = vmix_client
+        self.cfg = cfg
 
-        # -----------------------
-        # ENSURE CONFIG STRUCTURE
-        # -----------------------
+        # REQUIRED PATH
         if "mapping" not in self.cfg:
             self.cfg["mapping"] = {}
 
         if "clock" not in self.cfg["mapping"]:
-            self.cfg["mapping"]["clock"] = {}
+            self.cfg["mapping"]["clock"] = {
+                "input": "",
+                "field": "",
+                "start_time": "20:00"
+            }
+            save_config(self.cfg)
 
-        clock_map = self.cfg["mapping"]["clock"]
+        self.clock_map = self.cfg["mapping"]["clock"]
+        self.clock_input = self.clock_map.get("input")
+        self.clock_field = self.clock_map.get("field")
+        self.default_time = self.clock_map.get("start_time", "20:00")
 
-        # guarantee mapping fields exist
-        clock_map.setdefault("input", "")
-        clock_map.setdefault("field", "")
-        clock_map.setdefault("initial_time", "20:00")      # default
-        clock_map.setdefault("period_1", "20:00")
-        clock_map.setdefault("period_2", "20:00")
-        clock_map.setdefault("period_3", "20:00")
-        clock_map.setdefault("overtime", "05:00")
-
-        save_config(self.cfg)
-
-        # local state
-        self.clock_input = clock_map["input"]          # SCOREBOARD UPPE
-        self.clock_field = clock_map["field"]          # Time.Text
-        self.initial_time = clock_map["initial_time"]
-        self.running = False
-
-    # -------------------------------------------------------------
-    # INTERNAL UTILITY
-    # -------------------------------------------------------------
-    def _has_mapping(self):
+    # ---------------------------------------
+    # VALIDATION
+    # ---------------------------------------
+    def _is_ready(self):
         if not self.clock_input or not self.clock_field:
             log.error("[CLOCK] Missing mapping: cannot run")
             return False
         return True
 
-    # -------------------------------------------------------------
+    # ---------------------------------------
+    # READ CLOCK VALUE (OPTIONAL)
+    # ---------------------------------------
+    def get_time(self):
+        """
+        Reads current time from vMix text field
+        """
+        if not self._is_ready():
+            return None
+
+        txt = self.client.read_text(self.clock_input, self.clock_field)
+        return txt
+
+    # ---------------------------------------
     # CLOCK ACTIONS
-    # -------------------------------------------------------------
-    def start(self):
+    # ---------------------------------------
+    def set_time(self, mmss: str):
         """
-        First launch of a period — ALWAYS set the time before start.
+        Manually set a time, before first start OR to reset after StopCountdown
         """
-        if not self._has_mapping():
+        if not self._is_ready():
             return
 
-        if not self.running:
-            # first start = load initial time
-            self.client.set_countdown(
-                self.clock_input,
-                self.clock_field,
-                self.initial_time
-            )
-            self.client.start_countdown(
-                self.clock_input,
-                self.clock_field
-            )
-            self.running = True
-            log.info("[CLOCK] started")
-        else:
-            # already running => ignore
-            log.info("[CLOCK] already running")
+        log.info(f"[CLOCK] Set time => {mmss}")
+        self.client.set_countdown(self.clock_input, self.clock_field, mmss)
 
-    def toggle_pause(self):
+    def start_clock(self):
         """
-        Play/Pause without resetting.
+        First call should ALWAYS be StartCountdown
         """
-        if not self._has_mapping():
+
+        if not self._is_ready():
             return
 
-        if not self.running:
-            # resume
-            self.client.start_countdown(
-                self.clock_input,
-                self.clock_field
-            )
-            self.running = True
-            log.info("[CLOCK] resumed")
-        else:
-            # pause
-            self.client.pause_countdown(
-                self.clock_input,
-                self.clock_field
-            )
-            self.running = False
-            log.info("[CLOCK] paused")
+        current = self.get_time()
 
-    def stop(self):
+        # If empty or 00:00 => restore starting time before start
+        if not current or current in ["00:00", "0:00", "{0:00|mm:ss}"]:
+            log.info(f"[CLOCK] First start => restoring {self.default_time}")
+            self.set_time(self.default_time)
+
+        log.info("[CLOCK] Start")
+        self.client.start_countdown(self.clock_input, self.clock_field)
+
+    def pause_clock(self):
         """
-        Reset clock to initial time — only at period end!
+        Use PauseCountdown
         """
-        if not self._has_mapping():
+        if not self._is_ready():
             return
 
-        self.client.stop_countdown(
-            self.clock_input,
-            self.clock_field
-        )
-        self.running = False
-        log.info("[CLOCK] stopped/reset")
+        log.info("[CLOCK] Pause")
+        self.client.pause_countdown(self.clock_input, self.clock_field)
 
-    # -------------------------------------------------------------
-    # PERIOD SWITCHING
-    # -------------------------------------------------------------
-    def set_period(self, period_index: int):
+    def stop_clock(self):
         """
-        0 = P1, 1 = P2, 2 = P3, 3 = OT
+        StopCountdown means => reset field back to initial state (00:00 or default)
         """
-        if not self._has_mapping():
+        if not self._is_ready():
             return
 
-        m = self.cfg["mapping"]["clock"]
+        log.info("[CLOCK] Stop")
+        self.client.stop_countdown(self.clock_input, self.clock_field)
 
-        if period_index == 0:
-            new_time = m.get("period_1", "20:00")
-        elif period_index == 1:
-            new_time = m.get("period_2", "20:00")
-        elif period_index == 2:
-            new_time = m.get("period_3", "20:00")
-        else:
-            new_time = m.get("overtime", "05:00")
+    # ---------------------------------------
+    # PERIOD ADJUSTMENT
+    # ---------------------------------------
+    def adjust_time(self, delta_seconds: int):
+        """
+        +5 / -5 etc using AdjustCountdown
+        """
+        if not self._is_ready():
+            return
 
-        # store & save
-        self.initial_time = new_time
-        m["initial_time"] = new_time
+        log.info(f"[CLOCK] Adjust {delta_seconds:+} sec")
+        self.client.adjust_countdown(self.clock_input, self.clock_field, delta_seconds)
+
+    # ---------------------------------------
+    # SAVE MAPPINGS FROM MAPPINGDIALOG
+    # ---------------------------------------
+    def update_mapping(self, input_name, field_name, start_time):
+        """
+        Called when user modifies mappings in MappingDialog
+        """
+
+        if "mapping" not in self.cfg:
+            self.cfg["mapping"] = {}
+
+        self.cfg["mapping"]["clock"] = {
+            "input": input_name,
+            "field": field_name,
+            "start_time": start_time
+        }
+
         save_config(self.cfg)
 
-        # reset VMIX countdown
-        self.client.set_countdown(
-            self.clock_input,
-            self.clock_field,
-            new_time
-        )
-        self.running = False
-        log.info(f"[CLOCK] period={period_index} new time={new_time}")
+        # Reload internal values
+        self.clock_map = self.cfg["mapping"]["clock"]
+        self.clock_input = self.clock_map.get("input")
+        self.clock_field = self.clock_map.get("field")
+        self.default_time = self.clock_map.get("start_time", "20:00")
 
-    # -------------------------------------------------------------
-    # IN-GAME ADJUSTMENTS
-    # -------------------------------------------------------------
-    def adjust(self, delta_sec: int):
-        """
-        +/- seconds while running or paused.
-        """
-        if not self._has_mapping():
-            return
-
-        self.client.adjust_countdown(
-            self.clock_input,
-            self.clock_field,
-            delta_sec
-        )
-        log.info(f"[CLOCK] adjust: {delta_sec:+d} sec")
-
-    # -------------------------------------------------------------
-    # FUTURE: PENALTY SYNC (activated later)
-    # -------------------------------------------------------------
-    def sync_penalties_resume(self):
-        """ Called when clock resumes — pause all active penalties """
-        pass
-
-    def sync_penalties_pause(self):
-        """ Called when clock pauses — resume all active penalties """
-        pass
-
-    def sync_penalties_stop(self):
-        """ Called when period stops — reset penalties """
-        pass
+        log.info("[CLOCK] Mapping updated and saved")

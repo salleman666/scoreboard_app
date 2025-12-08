@@ -1,163 +1,135 @@
 import logging
-from scoreboard_app.config_loader import save_config, load_config
-from scoreboard_app.core.vmix_client import VMixClient
 
 log = logging.getLogger(__name__)
 
 
 class ClockController:
     """
-    CONTROL FLOW LOGIC:
-
-    clock mappings stored in vmix_config.json:
-    {
-      "mapping": {
-        "clock": {
-          "input": "<vmix title name>",
-          "field": "<vmix text field name>",   e.g. "Time.Text"
-          "start_time": "20:00"
-        }
-      }
-    }
-
-    ALL VMIX CLOCK ACTIONS USE:
-      - StartCountdown
-      - StopCountdown
-      - PauseCountdown
-      - AdjustCountdown
-      - SetCountdown
+    Master match clock controller.
+    Supports:
+        SetCountdown
+        StartCountdown
+        PauseCountdown
+        StopCountdown
+        AdjustCountdown
     """
 
-    def __init__(self, vmix_client: VMixClient, cfg: dict):
-        self.client = vmix_client
+    def __init__(self, client, cfg):
+        """
+        client -> VMixClient
+        cfg -> full config dict with mapping.clock
+        """
+        self.client = client
         self.cfg = cfg
 
-        # REQUIRED PATH
-        if "mapping" not in self.cfg:
-            self.cfg["mapping"] = {}
+        # load mapping
+        self.mapping = cfg["mapping"]["clock"]
+        self.clock_input = self.mapping.get("input")
+        self.clock_field = self.mapping.get("field")
 
-        if "clock" not in self.cfg["mapping"]:
-            self.cfg["mapping"]["clock"] = {
-                "input": "",
-                "field": "",
-                "start_time": "20:00"
-            }
-            save_config(self.cfg)
+        # runtime state
+        self.running = False
 
-        self.clock_map = self.cfg["mapping"]["clock"]
-        self.clock_input = self.clock_map.get("input")
-        self.clock_field = self.clock_map.get("field")
-        self.default_time = self.clock_map.get("start_time", "20:00")
-
-    # ---------------------------------------
-    # VALIDATION
-    # ---------------------------------------
-    def _is_ready(self):
+    # ======================================================
+    # SAFETY WRAPPER
+    # ======================================================
+    def _ensure_valid(self) -> bool:
         if not self.clock_input or not self.clock_field:
             log.error("[CLOCK] Missing mapping: cannot run")
             return False
         return True
 
-    # ---------------------------------------
-    # READ CLOCK VALUE (OPTIONAL)
-    # ---------------------------------------
-    def get_time(self):
+    def _safe_call(self, fn):
         """
-        Reads current time from vMix text field
+        wrapper to catch vMix issues without crashing GUI
         """
-        if not self._is_ready():
-            return None
+        try:
+            fn()
+        except Exception as e:
+            log.error(f"[CLOCK] VMix operation failed: {e}")
 
-        txt = self.client.read_text(self.clock_input, self.clock_field)
-        return txt
-
-    # ---------------------------------------
-    # CLOCK ACTIONS
-    # ---------------------------------------
-    def set_time(self, mmss: str):
+    # ======================================================
+    # CORE OPERATIONS
+    # ======================================================
+    def set_time(self, value: str):
         """
-        Manually set a time, before first start OR to reset after StopCountdown
+        Set new countdown value e.g. '20:00'
         """
-        if not self._is_ready():
+        if not self._ensure_valid():
             return
 
-        log.info(f"[CLOCK] Set time => {mmss}")
-        self.client.set_countdown(self.clock_input, self.clock_field, mmss)
+        def go():
+            self.client.set_countdown(self.clock_input, self.clock_field, value)
 
-    def start_clock(self):
-        """
-        First call should ALWAYS be StartCountdown
-        """
+        self._safe_call(go)
 
-        if not self._is_ready():
+    def start(self):
+        """
+        Start or resume the match clock.
+        "StartCountdown" must be used when clock is idle/reset.
+        """
+        if not self._ensure_valid():
             return
 
-        current = self.get_time()
+        def go():
+            self.client.start_countdown(self.clock_input, self.clock_field)
 
-        # If empty or 00:00 => restore starting time before start
-        if not current or current in ["00:00", "0:00", "{0:00|mm:ss}"]:
-            log.info(f"[CLOCK] First start => restoring {self.default_time}")
-            self.set_time(self.default_time)
+        self._safe_call(go)
+        self.running = True
 
-        log.info("[CLOCK] Start")
-        self.client.start_countdown(self.clock_input, self.clock_field)
-
-    def pause_clock(self):
+    def pause(self):
         """
-        Use PauseCountdown
+        Pause the match clock.
         """
-        if not self._is_ready():
+        if not self._ensure_valid():
             return
 
-        log.info("[CLOCK] Pause")
-        self.client.pause_countdown(self.clock_input, self.clock_field)
+        def go():
+            self.client.pause_countdown(self.clock_input, self.clock_field)
 
-    def stop_clock(self):
+        self._safe_call(go)
+        self.running = False
+
+    def stop(self):
         """
-        StopCountdown means => reset field back to initial state (00:00 or default)
+        End period — fully reset to configured value.
+        StopCountdown will restore field to StartTime defined in GT title.
         """
-        if not self._is_ready():
+        if not self._ensure_valid():
             return
 
-        log.info("[CLOCK] Stop")
-        self.client.stop_countdown(self.clock_input, self.clock_field)
+        def go():
+            self.client.stop_countdown(self.clock_input, self.clock_field)
 
-    # ---------------------------------------
-    # PERIOD ADJUSTMENT
-    # ---------------------------------------
-    def adjust_time(self, delta_seconds: int):
+        self._safe_call(go)
+        self.running = False
+
+    def adjust(self, seconds: int):
         """
-        +5 / -5 etc using AdjustCountdown
+        Adjust +/- seconds from current running time
+        Can be used during play or paused states.
         """
-        if not self._is_ready():
+        if not self._ensure_valid():
             return
 
-        log.info(f"[CLOCK] Adjust {delta_seconds:+} sec")
-        self.client.adjust_countdown(self.clock_input, self.clock_field, delta_seconds)
+        def go():
+            self.client.adjust_countdown(self.clock_input, self.clock_field, seconds)
 
-    # ---------------------------------------
-    # SAVE MAPPINGS FROM MAPPINGDIALOG
-    # ---------------------------------------
-    def update_mapping(self, input_name, field_name, start_time):
+        self._safe_call(go)
+
+    # ======================================================
+    # UI EVENT HELPERS
+    # ======================================================
+    def toggle_pause(self):
         """
-        Called when user modifies mappings in MappingDialog
+        Unified button:
+        If running → pause
+        If paused → start
         """
+        if not self._ensure_valid():
+            return
 
-        if "mapping" not in self.cfg:
-            self.cfg["mapping"] = {}
-
-        self.cfg["mapping"]["clock"] = {
-            "input": input_name,
-            "field": field_name,
-            "start_time": start_time
-        }
-
-        save_config(self.cfg)
-
-        # Reload internal values
-        self.clock_map = self.cfg["mapping"]["clock"]
-        self.clock_input = self.clock_map.get("input")
-        self.clock_field = self.clock_map.get("field")
-        self.default_time = self.clock_map.get("start_time", "20:00")
-
-        log.info("[CLOCK] Mapping updated and saved")
+        if self.running:
+            self.pause()
+        else:
+            self.start()

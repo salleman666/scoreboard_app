@@ -1,171 +1,187 @@
 import logging
+from typing import Any, Dict, List
+
+from scoreboard_app.core.vmix_client import VMixClient
 
 log = logging.getLogger(__name__)
 
 
 class PenaltyController:
     """
-    NEW PENALTY CONTROLLER USING:
-    - native vMix countdown for each slot
-    - automatic sync with scoreboard clock (if clock provided)
-    - show/hide BG + number fields from mapping
-    """
+    Controller för utvisningar.
 
-    def __init__(self, vmix_client, config, clock_controller=None):
-        self.vmix = vmix_client
-        self.cfg = config
-        self.clock = clock_controller  # <-- OPTIONALLY AVAILABLE
+    Användning i GUI (PenaltyPanel):
 
-        self.mapping = self.cfg.get("mapping", {}).get("penalties", {})
+        data = controller.get_penalties()
 
-        # Expected structure from mapping dialog:
-        # penalties:
-        #   home:
-        #     slot1: { input, time, timebg, number, numberbg }
-        #     slot2: { ... }
-        #   away:
-        #     slot1: { ... }
-        #     slot2: { ... }
-
-        self.slots = {
-            "home": self.mapping.get("home", {}),
-            "away": self.mapping.get("away", {}),
+        data har formatet:
+        {
+            "home": [
+                {"time": "02:00", "number": "12", "name": ""},
+                {"time": "00:00", "number": "",   "name": ""},
+            ],
+            "away": [
+                {"time": "05:00", "number": "22", "name": ""},
+                {"time": "00:00", "number": "",   "name": ""},
+            ],
         }
 
-    # =======================================================
-    # HELPERS
-    # =======================================================
-    def _slot_items(self, side):
-        slots = self.slots.get(side, {})
-        for k, v in slots.items():
-            yield k, v
+    All logik för att läsa/skriva vMix-fält utgår från vmix_config.json:
 
-    # =======================================================
-    # START PENALTY
-    # =======================================================
-    def start_penalty(self, side, slot_id, duration_seconds, player_number=None):
-        slot = self.slots.get(side, {}).get(slot_id)
-        if not slot:
-            return
+      "scoreboard": {
+        "input": "SCOREBOARD UPPE",
+        ...
+      },
 
-        inp = slot.get("input")
-        if not inp:
-            return
+      "mapping": {
+        "penalties": {
+          "home": {
+            "p1": {
+              "time": "HomeP1time.Text",
+              "time_bg": "HomeP1bg.Source",
+              "number": "HomeP1nr.Text",
+              "number_bg": "HomeP1bgnr.Source"
+            },
+            "p2": { ... }
+          },
+          "away": {
+            "p1": { ... },
+            "p2": { ... }
+          }
+        }
+      }
 
-        mm = duration_seconds // 60
-        ss = duration_seconds % 60
-        value = f"{mm:02}:{ss:02}"
+    Just nu används bara time och number för att uppdatera GUI.
+    BG-fälten (time_bg / number_bg) kan användas senare för att
+    tända/släcka grafik, men är inte nödvändiga för att undvika fel.
+    """
 
-        log.info(f"[PENALTY] Start slot {side}/{slot_id} duration={value}")
-        self.vmix.set_countdown(inp, value)
-        self.vmix.start_countdown(inp)
+    # ---------------------------------------------------------
+    def __init__(self, client: VMixClient, config: Dict[str, Any]) -> None:
+        self.client = client
+        self.cfg = config
 
-        # PLAYER NUMBER
-        if player_number is not None:
-            num_field = slot.get("number")
-            bg_field = slot.get("numberbg")
-            if num_field:
-                self.vmix.set_text(inp, num_field, str(player_number))
-                self.vmix.set_text_visible(inp, num_field, True)
-            if bg_field:
-                self.vmix.set_image_visible(inp, bg_field, True)
-        else:
-            # NO NUMBER — ONLY SHOW TIME BG
-            bg_field = slot.get("timebg")
-            if bg_field:
-                self.vmix.set_image_visible(inp, bg_field, True)
+        # Scoreboard-input (t.ex. "SCOREBOARD UPPE")
+        sb_cfg = self.cfg.get("scoreboard", {})
+        self.scoreboard_input: str = sb_cfg.get("input", "")
 
-    # =======================================================
-    # STOP PENALTY
-    # =======================================================
-    def stop_penalty(self, side, slot_id):
-        slot = self.slots.get(side, {}).get(slot_id)
-        if not slot:
-            return
+        # Penalty-mapping från config["mapping"]["penalties"]
+        mapping = self.cfg.get("mapping", {})
+        self.penalty_map: Dict[str, Any] = mapping.get("penalties", {})
 
-        inp = slot.get("input")
-        if not inp:
-            return
+        if not self.scoreboard_input:
+            log.warning(
+                "[PENALTIES] Ingen scoreboard.input satt i config['scoreboard']['input']"
+            )
+        if not self.penalty_map:
+            log.warning(
+                "[PENALTIES] Ingen mapping.penalties hittades i config['mapping']"
+            )
 
-        log.info(f"[PENALTY] Stop {side}/{slot_id}")
-        self.vmix.stop_countdown(inp)
-
-    # =======================================================
-    # CLEAR PENALTY
-    # =======================================================
-    def clear_penalty(self, side, slot_id):
-        slot = self.slots.get(side, {}).get(slot_id)
-        if not slot:
-            return
-
-        inp = slot.get("input")
-        if not inp:
-            return
-
-        log.info(f"[PENALTY] Clear {side}/{slot_id}")
-        self.vmix.set_countdown(inp, "00:00")
-        self.vmix.stop_countdown(inp)
-
-        # HIDE FIELDS
-        for f in ["timebg", "numberbg", "number"]:
-            name = slot.get(f)
-            if name:
-                # Detect text vs image
-                if "Source" in name:
-                    self.vmix.set_image_visible(inp, name, False)
-                else:
-                    self.vmix.set_text_visible(inp, name, False)
-
-    # =======================================================
-    # GLOBAL SYNC
-    # =======================================================
-    def pause_all(self):
+    # ---------------------------------------------------------
+    @staticmethod
+    def _base_name(field_name: str) -> str:
         """
-        Called when scoreboard clock pauses.
-        If no clock provided → skip silently.
+        Tar ett fullständigt fältnamn från vMix (t.ex. 'HomeP1time.Text')
+        och returnerar basnamnet utan suffix (t.ex. 'HomeP1time').
+
+        Detta behövs eftersom VMixClient.get_text / set_text själva lägger
+        till '.Text' i API-anropen.
         """
-        if not self.clock:
-            return
+        if not field_name:
+            return ""
+        # Klipp av allt efter första punkten, t.ex. ".Text" eller ".Source"
+        return field_name.split(".", 1)[0]
 
-        for side in ["home", "away"]:
-            for slot_id, slot in self.slots.get(side, {}).items():
-                inp = slot.get("input")
-                if inp:
-                    self.vmix.stop_countdown(inp)
-
-    def resume_all(self):
+    # ---------------------------------------------------------
+    def _read_field(self, element_full_name: str) -> str:
         """
-        Called when scoreboard clock resumes.
-        If no clock provided → skip silently.
+        Läser textvärdet från ett GT-fält på scoreboard-inputen.
+
+        element_full_name är exakt namnet från vMix / vmix_config.json,
+        t.ex. 'HomeP1time.Text'. Vi gör om det till 'HomeP1time' innan
+        vi skickar det vidare till VMixClient.
         """
-        if not self.clock:
-            return
+        if not self.scoreboard_input or not element_full_name:
+            return ""
 
-        for side in ["home", "away"]:
-            for slot_id, slot in self.slots.get(side, {}).items():
-                inp = slot.get("input")
-                if inp:
-                    self.vmix.start_countdown(inp)
+        base = self._base_name(element_full_name)
+        if not base:
+            return ""
 
-    # =======================================================
-    # GUI STATUS
-    # =======================================================
-    def get_penalties(self):
+        try:
+            value = self.client.get_text(self.scoreboard_input, base)
+            return value or ""
+        except Exception as exc:
+            log.error(
+                "[PENALTIES] Misslyckades att läsa fält '%s' på input '%s': %s",
+                element_full_name,
+                self.scoreboard_input,
+                exc,
+            )
+            return ""
+
+    # ---------------------------------------------------------
+    def _build_side_data(self, side_key: str) -> List[Dict[str, str]]:
         """
-        GUI polling status:
-        - read remaining time for each slot
+        Bygger listan med två slots för 'home' eller 'away'.
+
+        Varje slot är ett dict med:
+           {"time": "...", "number": "...", "name": ""}
+
+        Name används inte ännu (vi har ingen direkt mapping till spelarnamn),
+        så den lämnas tom.
         """
-        result = {"home": {}, "away": {}}
+        side_map = self.penalty_map.get(side_key, {})
 
-        for side in ["home", "away"]:
-            for slot_id, slot in self.slots.get(side, {}).items():
-                inp = slot.get("input")
-                time_field = slot.get("time")
+        slots: List[Dict[str, str]] = []
 
-                if not inp or not time_field:
-                    result[side][slot_id] = {"time": ""}
-                else:
-                    txt = self.vmix.get_text(inp, time_field)
-                    result[side][slot_id] = {"time": txt}
+        # Vi har två uttalat definierade platser: p1 och p2
+        for slot_key in ("p1", "p2"):
+            slot_cfg = side_map.get(slot_key, {}) or {}
 
-        return result
+            time_field = slot_cfg.get("time", "")
+            nr_field = slot_cfg.get("number", "")
+
+            time_val = self._read_field(time_field)
+            nr_val = self._read_field(nr_field)
+
+            slots.append(
+                {
+                    "time": time_val,
+                    "number": nr_val,
+                    # Spelarnamn har vi inte mappat in ännu
+                    "name": "",
+                }
+            )
+
+        # Säkerställ exakt två slots även om config är ofullständig
+        while len(slots) < 2:
+            slots.append({"time": "", "number": "", "name": ""})
+
+        return slots
+
+    # ---------------------------------------------------------
+    def get_penalties(self) -> Dict[str, List[Dict[str, str]]]:
+        """
+        API som används av PenaltyPanel för att uppdatera GUI.
+
+        Returnerar:
+        {
+          "home": [ {time, number, name}, {time, number, name} ],
+          "away": [ {time, number, name}, {time, number, name} ]
+        }
+        """
+        # Om config saknas: returnera tomma strukturer så att GUI inte kraschar
+        if not self.scoreboard_input or not self.penalty_map:
+            log.debug("[PENALTIES] get_penalties körs utan komplett mapping")
+            empty_slot = {"time": "", "number": "", "name": ""}
+            return {
+                "home": [empty_slot.copy(), empty_slot.copy()],
+                "away": [empty_slot.copy(), empty_slot.copy()],
+            }
+
+        home_slots = self._build_side_data("home")
+        away_slots = self._build_side_data("away")
+
+        return {"home": home_slots, "away": away_slots}

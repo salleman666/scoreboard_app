@@ -1,122 +1,147 @@
-from scoreboard_app.controllers.base_controller import BaseController
-import time
+import logging
+from scoreboard_app.core.vmix_client import VMixClient
+from scoreboard_app.controllers.scoreboard_controller import ScoreboardController
 
-class GoalController(BaseController):
-    """
-    Handles goal registration:
-    - sets scoreboard numbers
-    - triggers goal popup
-    - triggers after-goal graphics
-    """
-    def __init__(self, client, cfg):
-        super().__init__(client, cfg)
+log = logging.getLogger(__name__)
 
-        self.cfg = cfg
+
+class GoalController:
+    """
+    Handles:
+        - register goal
+        - update scoreboard score
+        - trigger goal popup overlay
+        - trigger scorer graphics overlay
+        - automatic mapping stored in config:
+        
+        cfg["mapping"]["goals"] = {
+            "goal_popup": {
+                "input": "...",
+                "overlay": 1,
+                "duration_ms": 2000
+            },
+            "after_goal": {
+                "input": "...",
+                "overlay": 2,
+                "duration_ms": 3000,
+                "fields": {
+                    "name": "...",
+                    "number": "...",
+                    "team": "...",
+                    "logo": "..."
+                }
+            }
+        }
+    """
+
+    def __init__(self, client: VMixClient, cfg: dict, scoreboard: ScoreboardController):
         self.client = client
+        self.cfg = cfg
+        self.scoreboard = scoreboard
 
-    # ----------------------------------------------------------------------
-    def add_goal(self, team, number, name):
+        self._resolve_mapping()
+
+    # -------------------------------------------------
+    # CONFIG
+    # -------------------------------------------------
+    def _resolve_mapping(self):
+        gm = self.cfg.get("mapping", {}).get("goals", {})
+
+        # GOAL POPUP BLOCK
+        p = gm.get("goal_popup", {})
+        self.popup_input = p.get("input")
+        self.popup_overlay = p.get("overlay", 1)
+        self.popup_duration = p.get("duration_ms", 2000)
+
+        # SCORER BLOCK
+        a = gm.get("after_goal", {})
+        self.after_input = a.get("input")
+        self.after_overlay = a.get("overlay", 2)
+        self.after_duration = a.get("duration_ms", 3000)
+
+        # scorer field mapping
+        self.after_fields = a.get("fields", {
+            "name": None,
+            "number": None,
+            "team": None,
+            "logo": None,
+        })
+
+        log.info("[GOAL] mapping resolved")
+
+    # -------------------------------------------------
+    # REGISTER GOAL
+    # GUI calls:
+    #   goal_controller.register_goal("home", player_name, number, logo, team)
+    # -------------------------------------------------
+    def register_goal(self, side: str,
+                      player_name=None,
+                      player_number=None,
+                      team_name=None,
+                      logo_url=None):
         """
-        Called from PlayerSelectDialog via goal_panel.py
-        team = "home" | "away"
-        number = jersey number as string
-        name = scorer name as string
+        MAIN ENTRY POINT FOR GOAL EVENT
         """
 
-        if not team:
-            return
-
-        # READ SCORE
-        if team == "home":
-            hs = int(self.get("score.home") or 0) + 1
-            self.set("score.home", hs)
+        if side == "home":
+            self.scoreboard.inc_home(1)
         else:
-            as_ = int(self.get("score.away") or 0) + 1
-            self.set("score.away", as_)
+            self.scoreboard.inc_away(1)
 
-        # UPDATE SCOREBOARD TITLE
-        self._push_score()
+        # Always fire goal popup overlay
+        self._show_goal_popup()
 
-        # SHOW GOAL POPUP (if configured)
-        self._show_goal_popup(team)
+        # Only show scorer graphics IF we have enough data
+        if player_name or player_number or team_name or logo_url:
+            self._show_after_goal(player_name, player_number, team_name, logo_url)
 
-        # SHOW SCORER GRAPHICS (if configured)
-        self._show_after_goal(team, number, name)
-
-    # ----------------------------------------------------------------------
-    def _push_score(self):
-        """
-        Update scoreboard GT fields via vmix_client
-        """
-        m = self.cfg
-
-        if not m.get("score.input"):
+    # -------------------------------------------------
+    # GOAL POPUP OVERLAY
+    # -------------------------------------------------
+    def _show_goal_popup(self):
+        if not self.popup_input:
+            log.error("[GOAL] Missing mapping: goal_popup.input")
             return
 
-        inp = m["score.input"]
+        try:
+            # SHOW
+            self.client.overlay_on(self.popup_input, self.popup_overlay)
+            self.client.after_delay(self.popup_duration,
+                                    lambda: self.client.overlay_off(self.popup_input, self.popup_overlay))
+        except Exception as e:
+            log.error(f"[GOAL] popup overlay failed: {e}")
 
-        # home
-        if m.get("score.home_field") and self.get("score.home") is not None:
-            self.client.set_text(
-                inp,
-                m["score.home_field"],
-                str(self.get("score.home"))
-            )
-
-        # away
-        if m.get("score.away_field") and self.get("score.away") is not None:
-            self.client.set_text(
-                inp,
-                m["score.away_field"],
-                str(self.get("score.away"))
-            )
-
-    # ----------------------------------------------------------------------
-    def _show_goal_popup(self, team):
-        """
-        Use GOAL pop-up overlay settings
-        """
-        m = self.cfg
-        if not m.get("goal.popup_input"):
+    # -------------------------------------------------
+    # AFTER GOAL — PLAYER GRAPHICS
+    # -------------------------------------------------
+    def _show_after_goal(self, name, number, team, logo):
+        if not self.after_input:
+            log.error("[GOAL] Missing mapping: after_goal.input")
             return
 
-        inp = m["goal.popup_input"]
-        ov = int(m.get("goal.popup_overlay") or 1)
-        dur = int(m.get("goal.popup_duration") or 3000)
+        # PUSH fields only if mapped + non-empty
+        try:
+            if name and self.after_fields.get("name"):
+                self.client.update_text(self.after_input, self.after_fields["name"], name)
 
-        # show popup
-        self.client.overlay_on(inp, ov)
-        time.sleep(dur / 1000.0)
-        self.client.overlay_off(inp, ov)
+            if number and self.after_fields.get("number"):
+                self.client.update_text(self.after_input, self.after_fields["number"], str(number))
 
-    # ----------------------------------------------------------------------
-    def _show_after_goal(self, team, number, name):
-        """
-        Display scorer graphics after goal
-        """
-        m = self.cfg
+            if team and self.after_fields.get("team"):
+                self.client.update_text(self.after_input, self.after_fields["team"], team)
 
-        if not m.get("goal.after_input"):
-            return
+            if logo and self.after_fields.get("logo"):
+                self.client.update_text(self.after_input, self.after_fields["logo"], logo)
 
-        inp = m["goal.after_input"]
-        ov = int(m.get("goal.after_overlay") or 1)
-        dur = int(m.get("goal.after_duration") or 3000)
-        pause = int(m.get("goal.after_pause") or 1000)
+        except Exception as e:
+            log.error(f"[GOAL] field update failed: {e}")
 
-        # UPDATE TITLE FIELDS
-        # only update those configured in MappingDialog
-        if number and m.get("goal.after_number_field"):
-            self.client.set_text(inp, m["goal.after_number_field"], number)
+        # SHOW AFTER-GOAL OVERLAY
+        try:
+            self.client.overlay_on(self.after_input, self.after_overlay)
 
-        if name and m.get("goal.after_name_field"):
-            self.client.set_text(inp, m["goal.after_name_field"], name)
+            self.client.after_delay(self.after_duration,
+                                    lambda: self.client.overlay_off(self.after_input, self.after_overlay))
 
-        if team and m.get("goal.after_team_field"):
-            self.client.set_text(inp, m["goal.after_team_field"], team.upper())
-
-        # show overlay
-        self.client.overlay_on(inp, ov)
-        time.sleep(dur / 1000.0)
-        self.client.overlay_off(inp, ov)
-        time.sleep(pause / 1000.0)
+        except Exception as e:
+            log.error(f"[GOAL] after-goal overlay failed: {e}")

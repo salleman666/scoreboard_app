@@ -1,118 +1,215 @@
 import requests
 import xml.etree.ElementTree as ET
 
+
 class VMixClient:
-    def __init__(self, host="127.0.0.1", port=8088, timeout=2):
+    """
+    High-level vMix API wrapper with:
+    - XML status fetch
+    - title field enumeration
+    - safe countdown control
+    - overlay toggling
+    - text updates
+    """
+
+    def __init__(self, host="127.0.0.1", port=8088):
         self.host = host
         self.port = port
-        self.timeout = timeout
-        self.last_xml = None
+        self.base_url = f"http://{self.host}:{self.port}/api/?"
+        self._cached_xml = None
 
-    # -------------------------------------------
-    # Basic HTTP util
-    # -------------------------------------------
+    # --------------------------------------------------
+    # Internal low-level GET wrapper
+    # --------------------------------------------------
     def _get(self, query: str) -> str:
-        url = f"http://{self.host}:{self.port}/api/?{query}"
-        r = requests.get(url, timeout=self.timeout)
+        url = self.base_url + query
+        r = requests.get(url)
         r.raise_for_status()
         return r.text
 
-    # -------------------------------------------
-    # Status / XML
-    # -------------------------------------------
+    # --------------------------------------------------
+    # vMix XML status
+    # --------------------------------------------------
+    def refresh_status(self):
+        """Force refresh and return full XML"""
+        self._cached_xml = self.get_status_xml()
+        return self._cached_xml
+
     def get_status_xml(self) -> str:
-        xml = self._get("")   # empty query returns full status
-        self.last_xml = xml
+        """
+        Retrieves vMix status.
+        vMix requires Function=None to return full XML.
+        """
+        xml = self._get("Function=None")
+        self._cached_xml = xml
         return xml
 
-    def refresh_status(self):
-        return self.get_status_xml()
-
-    # -------------------------------------------
-    # Input listing
-    # -------------------------------------------
-    def list_inputs(self):
+    # --------------------------------------------------
+    # Parsing helpers
+    # --------------------------------------------------
+    def list_inputs(self) -> list:
+        """
+        Returns every input title in the preset.
+        """
         xml = self.get_status_xml()
         root = ET.fromstring(xml)
+
         res = []
         for inp in root.findall("./inputs/input"):
-            title = inp.get("title")
+            title = inp.get("title") or inp.get("shortTitle") or ""
             if title:
                 res.append(title)
         return res
 
-    # -------------------------------------------
-    # FIELD EXTRACTION FIXED HERE
-    # -------------------------------------------
-    def list_title_fields(self, input_title: str):
+    def list_title_fields(self, input_name: str) -> list:
         """
-        Returns list of all GT field names (text, image, color)
-        inside given input title.
+        Returns every <text name="..."> and <image name="..."> field for a specific title,
+        suitable for mapping inside MappingDialog.
         """
         xml = self.get_status_xml()
         root = ET.fromstring(xml)
 
-        # find input
         for inp in root.findall("./inputs/input"):
-            title = inp.get("title", "")
-            if title.strip().lower() == input_title.strip().lower():
+            title = inp.get("title") or inp.get("shortTitle")
+            if title != input_name:
+                continue
 
-                fields = []
+            fields = []
 
-                # TEXT fields
-                for t in inp.findall("./text"):
-                    name = t.get("name")
-                    if name:
-                        fields.append(name)
+            for node in inp.findall("./text"):
+                nm = node.get("name")
+                if nm:
+                    fields.append(nm)
 
-                # IMAGE fields
-                for im in inp.findall("./image"):
-                    name = im.get("name")
-                    if name:
-                        fields.append(name)
+            for node in inp.findall("./image"):
+                nm = node.get("name")
+                if nm:
+                    fields.append(nm)
 
-                # COLOR fields
-                for c in inp.findall("./color"):
-                    name = c.get("name")
-                    if name:
-                        fields.append(name)
+            for node in inp.findall("./color"):
+                nm = node.get("name")
+                if nm:
+                    fields.append(nm)
 
-                return fields
+            return fields
 
-        return []  # not found
+        return []
 
-    # -------------------------------------------
-    # COUNTDOWN COMMANDS
-    # -------------------------------------------
-    def set_countdown(self, input_title, field_name, value: str):
-        cmd = (
-            f"Function=SetCountdown"
-            f"&Input={input_title}"
-            f"&SelectedName={field_name}"
-            f"&Value={value}"
+    # --------------------------------------------------
+    # Base API function executor
+    # --------------------------------------------------
+    def call_function(self, function: str, **kwargs):
+        """
+        Sends a vMix API function:
+        e.g.
+            call_function("SetText", Input="Scoreboard", SelectedName="HomeScore.Text", Value="5")
+        """
+        parts = [f"Function={function}"]
+        for k, v in kwargs.items():
+            if v is None:
+                continue
+            parts.append(f"{k}={v}")
+
+        query = "&".join(parts)
+        return self._get(query)
+
+    # --------------------------------------------------
+    # TEXT UPDATE
+    # --------------------------------------------------
+    def update_text(self, input_name: str, field_name: str, value: str):
+        if not input_name or not field_name:
+            return
+        self.call_function("SetText", Input=input_name, SelectedName=field_name, Value=value)
+
+    # --------------------------------------------------
+    # IMAGE UPDATE
+    # --------------------------------------------------
+    def update_image(self, input_name: str, field_name: str, path_or_url: str):
+        if not input_name or not field_name:
+            return
+        self.call_function("SetImage", Input=input_name, SelectedName=field_name, Value=path_or_url)
+
+    # --------------------------------------------------
+    # OVERLAY TOGGLE
+    # --------------------------------------------------
+    def overlay_toggle(self, overlay_number: int):
+        self.call_function("OverlayInput", Value=str(overlay_number))
+
+    # --------------------------------------------------
+    # COUNTDOWN LOGIC (correct vMix usage)
+    # --------------------------------------------------
+    def set_countdown(self, input_name: str, field_name: str, mmss: str):
+        """
+        DOES NOT start clock, only sets initial value.
+        Example: "20:00"
+        """
+        if not input_name or not field_name:
+            return
+        self.call_function(
+            "SetCountdown",
+            Input=input_name,
+            SelectedName=field_name,
+            Value=mmss,
         )
-        return self._get(cmd)
 
-    def start_countdown(self, input_title, field_name):
-        cmd = (
-            f"Function=StartCountdown"
-            f"&Input={input_title}"
-            f"&SelectedName={field_name}"
+    def start_countdown(self, input_name: str, field_name: str):
+        """
+        FIRST start after a SetCountdown
+        """
+        if not input_name or not field_name:
+            return
+        self.call_function(
+            "StartCountdown",
+            Input=input_name,
+            SelectedName=field_name,
         )
-        return self._get(cmd)
 
-    def pause_countdown(self, input_title, field_name):
-        cmd = (
-            f"Function=PauseCountdown"
-            f"&Input={input_title}"
-            f"&SelectedName={field_name}"
+    def pause_countdown(self, input_name: str, field_name: str):
+        """
+        Toggle pause/resume for running clock
+        """
+        if not input_name or not field_name:
+            return
+        self.call_function(
+            "PauseCountdown",
+            Input=input_name,
+            SelectedName=field_name,
         )
-        return self._get(cmd)
 
-    def stop_countdown(self, input_title, field_name):
-        cmd = (
-            f"Function=StopCountdown"
-            f"&Input={input_title}"
-            f"&SelectedName={field_name}"
+    def stop_countdown(self, input_name: str, field_name: str):
+        """
+        FULL stop — resets to initial time
+        """
+        if not input_name or not field_name:
+            return
+        self.call_function(
+            "StopCountdown",
+            Input=input_name,
+            SelectedName=field_name,
         )
-        return self._get(cmd)
+
+    def adjust_countdown(self, input_name: str, field_name: str, seconds: int):
+        """
+        Adjust ±seconds while running.
+        Example: -5 or +10
+        """
+        if not input_name or not field_name:
+            return
+        self.call_function(
+            "AdjustCountdown",
+            Input=input_name,
+            SelectedName=field_name,
+            Value=str(seconds),
+        )
+
+    # --------------------------------------------------
+    # ENABLED — for Empty Goal graphics
+    # --------------------------------------------------
+    def set_visible(self, input_name: str, overlay_number: int, enabled: bool):
+        """
+        toggles overlay on/off — but this depends on your graphics layout.
+        """
+        if enabled:
+            self.call_function("OverlayInput", Input=input_name, Value=str(overlay_number))
+        else:
+            self.call_function("OverlayInputOff", Input=input_name, Value=str(overlay_number))

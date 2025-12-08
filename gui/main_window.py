@@ -4,65 +4,63 @@ from tkinter import ttk
 from scoreboard_app.core.vmix_client import VMixClient
 from scoreboard_app.config.config_loader import load_config, save_config
 
+# Controllers
 from scoreboard_app.controllers.clock_controller import ClockController
-from scoreboard_app.controllers.goal_controller import GoalController
 from scoreboard_app.controllers.scoreboard_controller import ScoreboardController
-from scoreboard_app.gui.settings_dialog import open_settings_dialog
+from scoreboard_app.controllers.goal_controller import GoalController
+from scoreboard_app.controllers.penalty_controller import PenaltyController
+
+# Panels
 from scoreboard_app.gui.clock_panel import ClockPanel
 from scoreboard_app.gui.goal_panel import GoalPanel
-from scoreboard_app.gui.empty_goal_panel import EmptyGoalPanel
+from scoreboard_app.gui.penalty_panel import PenaltyPanel
+from scoreboard_app.gui.settings_dialog import open_settings_dialog
 
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Scoreboard Control")
-        self.geometry("900x650")
+        self.title("SCOREBOARD CONTROL")
 
-        # --------------------------------------------
-        # Load config from JSON
-        # --------------------------------------------
+        # --------------------------------------
+        # Load config + Connect to vMix
+        # --------------------------------------
         self.cfg = load_config()
+        host = self.cfg.get("vmix", {}).get("host", "127.0.0.1")
+        port = int(self.cfg.get("vmix", {}).get("port", 8088))
 
-        # --------------------------------------------
-        # VMIX client
-        # --------------------------------------------
-        self.client = VMixClient()
+        self.client = VMixClient(host, port)
 
-        # --------------------------------------------
-        # Controllers
-        # --------------------------------------------
+        # --------------------------------------
+        # Initialize controllers (NO EXTRA ARG)
+        # --------------------------------------
         self.clock = ClockController(self.client, self.cfg)
-        self.scoreboard = ScoreboardController(self.client, self.cfg, self.clock)
+        self.scoreboard = ScoreboardController(self.client, self.cfg)
         self.goal = GoalController(self.client, self.cfg, self.scoreboard)
+        self.penalty = PenaltyController(self.client, self.cfg, self.scoreboard)
 
-        # --------------------------------------------
-        # GUI PANELS
-        # --------------------------------------------
+        # --------------------------------------
+        # Build UI
+        # --------------------------------------
         nb = ttk.Notebook(self)
-        nb.pack(fill="both", expand=True)
+        nb.pack(expand=True, fill="both")
 
-        # CLOCK
-        cp = ClockPanel(nb, self.clock)
-        nb.add(cp, text="Clock")
+        nb.add(ClockPanel(self, self.clock), text="CLOCK")
+        nb.add(GoalPanel(self, self.goal), text="GOALS")
+        nb.add(PenaltyPanel(self, self.penalty), text="PENALTIES")
 
-        # GOALS
-        gp = GoalPanel(nb, self.goal)
-        nb.add(gp, text="Goals")
+        # --------------------------------------
+        # MENU + SETTINGS
+        # --------------------------------------
+        menubar = tk.Menu(self)
+        self.config(menu=menubar)
 
-        # EMPTY GOAL
-        eg = EmptyGoalPanel(nb, self.scoreboard)
-        nb.add(eg, text="Empty Goal")
-
-        # --------------------------------------------
-        # SETTINGS BUTTON
-        # --------------------------------------------
-        settings_btn = ttk.Button(
-            self,
-            text="Mapping / Settings",
-            command=lambda: open_settings_dialog(self, self.cfg)
+        settings = tk.Menu(menubar, tearoff=False)
+        settings.add_command(
+            label="Mappings & Settings",
+            command=lambda: open_settings_dialog(self, self.cfg, self.client)
         )
-        settings_btn.pack(side="right", padx=10, pady=10)
+        menubar.add_cascade(label="Settings", menu=settings)
 
 
 def launch_app():

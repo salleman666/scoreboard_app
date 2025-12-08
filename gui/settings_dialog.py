@@ -1,30 +1,76 @@
 import tkinter as tk
 from tkinter import ttk
-
+from scoreboard_app.config.config_loader import load_config, save_config
 from scoreboard_app.gui.mapping_dialog import MappingDialog
 
-class SettingsDialog(tk.Toplevel):
-    def __init__(self, master, cfg, client):
-        super().__init__(master)
-        self.title("Settings")
-        self.geometry("300x300")
 
+class SettingsDialog(tk.Toplevel):
+    def __init__(self, parent, cfg, client):
+        super().__init__(parent)
+        self.parent = parent
         self.cfg = cfg
         self.client = client
 
-        ttk.Label(self, text="Settings", font=("Arial", 12, "bold")).pack(pady=6)
+        self.title("Settings")
+        self.geometry("400x200")
 
-        btn_frame = ttk.Frame(self)
-        btn_frame.pack(fill="x", expand=True)
+        # ======================
+        # ALWAYS FIX STRUCTURE BEFORE UI
+        # ======================
+        self._ensure_global_mapping()
 
-        ttk.Button(btn_frame, text="Mapping",
-                   command=self._open_mapping).pack(fill="x", pady=4)
+        ttk.Button(self, text="Open Mapping", command=self._open_mapping).pack(pady=15)
+        ttk.Button(self, text="Close", command=self.destroy).pack(pady=15)
 
-        ttk.Button(btn_frame, text="Close",
-                   command=self.destroy).pack(fill="x", pady=4)
+    # ==================================================
+    # CREATE STRUCTURE IF MISSING OR INVALID
+    # ==================================================
+    def _ensure_global_mapping(self):
 
+        if "mapping" not in self.cfg:
+            self.cfg["mapping"] = {}
+
+        m = self.cfg["mapping"]
+
+        # CLOCK
+        if "clock" not in m or not isinstance(m["clock"], dict):
+            m["clock"] = {"input": None, "time": None, "period": None}
+
+        # PENALTIES
+        if "penalties" not in m or not isinstance(m["penalties"], dict):
+            m["penalties"] = {
+                "input": None,
+                "home": {"p1_time": None, "p1_nr": None, "p2_time": None, "p2_nr": None},
+                "away": {"p1_time": None, "p1_nr": None, "p2_time": None, "p2_nr": None},
+            }
+        else:
+            # BAD TYPE FIXER – list → dict
+            if not isinstance(m["penalties"], dict):
+                m["penalties"] = {
+                    "input": None,
+                    "home": {"p1_time": None, "p1_nr": None, "p2_time": None, "p2_nr": None},
+                    "away": {"p1_time": None, "p1_nr": None, "p2_time": None, "p2_nr": None},
+                }
+
+        # GOALS
+        if "goals" not in m or not isinstance(m["goals"], dict):
+            m["goals"] = {
+                "input": None,
+                "name": None,
+                "number": None,
+                "logo": None,
+                "team": None,
+            }
+
+        save_config(self.cfg)
+
+    # ==================================================
+    # OPEN MAPPING
+    # ==================================================
     def _open_mapping(self):
+        # MappingDialog ALWAYS gets fully corrected config here
         MappingDialog(self, self.cfg, self.client)
 
-def open_settings_dialog(master, cfg, client):
-    SettingsDialog(master, cfg, client)
+
+def open_settings_dialog(parent, cfg, client):
+    SettingsDialog(parent, cfg, client)

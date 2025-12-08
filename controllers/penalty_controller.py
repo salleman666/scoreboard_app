@@ -1,249 +1,171 @@
-import time
-import threading
-from scoreboard_app.core.vmix_client import VMixClient
-from scoreboard_app.gui.player_select_dialog import PlayerSelectDialog
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class PenaltyController:
     """
-    Backend for managing hockey penalties.
-
-    - Supports 2 HOME slots
-    - Supports 2 AWAY slots
-    - Slots store:
-        active, duration, started_at, number, name
-    - GUI calls get_penalties() to update the display
-    - When the game clock pauses, all active penalties pause
+    NEW PENALTY CONTROLLER USING:
+    - native vMix countdown for each slot
+    - automatic sync with scoreboard clock (if clock provided)
+    - show/hide BG + number fields from mapping
     """
 
-    def __init__(self, client, config):
-        self.client = client
-        self.config = config
-        self.cfg = config                # <<< REQUIRED FOR GUI COMPATIBILITY
-        self.clock_running = False
+    def __init__(self, vmix_client, config, clock_controller=None):
+        self.vmix = vmix_client
+        self.cfg = config
+        self.clock = clock_controller  # <-- OPTIONALLY AVAILABLE
 
-        # 4 penalty slots — structured internal state
-        self.penalties = {
-            "home": [
-                self._new_slot(),
-                self._new_slot(),
-            ],
-            "away": [
-                self._new_slot(),
-                self._new_slot(),
-            ]
+        self.mapping = self.cfg.get("mapping", {}).get("penalties", {})
+
+        # Expected structure from mapping dialog:
+        # penalties:
+        #   home:
+        #     slot1: { input, time, timebg, number, numberbg }
+        #     slot2: { ... }
+        #   away:
+        #     slot1: { ... }
+        #     slot2: { ... }
+
+        self.slots = {
+            "home": self.mapping.get("home", {}),
+            "away": self.mapping.get("away", {}),
         }
 
-        # start watcher thread
-        self._start_penalty_timer_thread()
+    # =======================================================
+    # HELPERS
+    # =======================================================
+    def _slot_items(self, side):
+        slots = self.slots.get(side, {})
+        for k, v in slots.items():
+            yield k, v
 
-    def _new_slot(self):
-        """Return empty penalty slot structure"""
-        return {
-            "active": False,
-            "duration": 0,      # seconds
-            "remaining": 0,     # seconds
-            "last_tick": 0,
-            "number": "",
-            "name": "",
-        }
-
-    # ----------------------------------------------------------------------
-    # LIVE PENALTY INSERTION
-    # ----------------------------------------------------------------------
-
-    def start_penalty(self, parent_tk, team: str, slot_index: int):
-        """
-        Called when operator clicks a penalty slot button in the GUI.
-        """
-        # Determine which lineup input to use
-        if team == "home":
-            lineup_input = self.config.get("penalty_players", {}).get("home_input", "")
-        else:
-            lineup_input = self.config.get("penalty_players", {}).get("away_input", "")
-
-        # Open selection dialog
-        dlg = PlayerSelectDialog(parent_tk, lineup_input)
-        result = dlg.run()
-        if not result:
+    # =======================================================
+    # START PENALTY
+    # =======================================================
+    def start_penalty(self, side, slot_id, duration_seconds, player_number=None):
+        slot = self.slots.get(side, {}).get(slot_id)
+        if not slot:
             return
 
-        duration_minutes = result["duration"]
-        seconds = duration_minutes * 60
+        inp = slot.get("input")
+        if not inp:
+            return
 
-        slot = self.penalties[team][slot_index]
-        slot["active"] = True
-        slot["duration"] = seconds
-        slot["remaining"] = seconds
-        slot["last_tick"] = time.time()
-        slot["number"] = result["number"]
-        slot["name"] = result["name"]
+        mm = duration_seconds // 60
+        ss = duration_seconds % 60
+        value = f"{mm:02}:{ss:02}"
 
-        # update graphics
-        self._apply_to_vmix(team, slot_index)
+        log.info(f"[PENALTY] Start slot {side}/{slot_id} duration={value}")
+        self.vmix.set_countdown(inp, value)
+        self.vmix.start_countdown(inp)
 
-    # ----------------------------------------------------------------------
-    # CLOCK SYNC
-    # ----------------------------------------------------------------------
-
-    def set_clock_running(self, running: bool):
-        self.clock_running = running
-
-    # ----------------------------------------------------------------------
-    # BACKGROUND TIMER THREAD
-    # ----------------------------------------------------------------------
-
-    def _start_penalty_timer_thread(self):
-        t = threading.Thread(target=self._timer_loop, daemon=True)
-        t.start()
-
-    def _timer_loop(self):
-        """
-        Runs forever, ticking penalties every second
-        """
-        while True:
-            time.sleep(1)
-            if not self.clock_running:
-                continue
-
-            now = time.time()
-
-            # update all slots
-            for team in ["home", "away"]:
-                for i in range(2):
-                    slot = self.penalties[team][i]
-                    if not slot["active"]:
-                        continue
-
-                    delta = now - slot["last_tick"]
-                    slot["last_tick"] = now
-                    slot["remaining"] -= delta
-
-                    if slot["remaining"] <= 0:
-                        self._clear_slot(team, i)
-                    else:
-                        self._update_time_to_vmix(team, i)
-
-    # ----------------------------------------------------------------------
-    # SLOT CLEARING
-    # ----------------------------------------------------------------------
-
-    def _clear_slot(self, team, i):
-        slot = self.penalties[team][i]
-        slot["active"] = False
-        slot["remaining"] = 0
-        slot["duration"] = 0
-
-        mapping = self._mapping(team, i)
-
-        # time text
-        if mapping.get("field_time"):
-            self.client.set_text(mapping["field_time"], "")
-
-        # number text
-        if mapping.get("field_number"):
-            self.client.set_text(mapping["field_number"], "")
-
-        # name text
-        if mapping.get("field_name"):
-            self.client.set_text(mapping["field_name"], "")
-
-        # backgrounds hide
-        if mapping.get("field_number_bg"):
-            self.client.set_image_visible(mapping["field_number_bg"], False)
-        if mapping.get("field_time_bg"):
-            self.client.set_image_visible(mapping["field_time_bg"], False)
-
-    # ----------------------------------------------------------------------
-    # V-MIX UPDATES
-    # ----------------------------------------------------------------------
-
-    def _mapping(self, team, i):
-        """
-        Get mapping dict from config for slot:
-            config["penalty"]["home"][0] or config["penalty"]["away"][1]
-        """
-        if "penalty" not in self.config:
-            return {}
-        return self.config["penalty"][team][i]
-
-    def _apply_to_vmix(self, team, i):
-        """
-        Write player name/number/time to vMix fields
-        """
-        slot = self.penalties[team][i]
-        mapping = self._mapping(team, i)
-
-        # time field ON
-        if mapping.get("field_time_bg"):
-            self.client.set_image_visible(mapping["field_time_bg"], True)
-
-        # write full time initially
-        self._update_time_to_vmix(team, i)
-
-        # write number if present
-        if slot["number"] and mapping.get("field_number"):
-            self.client.set_text(mapping["field_number"], slot["number"])
-            if mapping.get("field_number_bg"):
-                self.client.set_image_visible(mapping["field_number_bg"], True)
+        # PLAYER NUMBER
+        if player_number is not None:
+            num_field = slot.get("number")
+            bg_field = slot.get("numberbg")
+            if num_field:
+                self.vmix.set_text(inp, num_field, str(player_number))
+                self.vmix.set_text_visible(inp, num_field, True)
+            if bg_field:
+                self.vmix.set_image_visible(inp, bg_field, True)
         else:
-            if mapping.get("field_number"):
-                self.client.set_text(mapping["field_number"], "")
-            if mapping.get("field_number_bg"):
-                self.client.set_image_visible(mapping["field_number_bg"], False)
+            # NO NUMBER — ONLY SHOW TIME BG
+            bg_field = slot.get("timebg")
+            if bg_field:
+                self.vmix.set_image_visible(inp, bg_field, True)
 
-        # write name if present
-        if slot["name"] and mapping.get("field_name"):
-            self.client.set_text(mapping["field_name"], slot["name"])
-        else:
-            if mapping.get("field_name"):
-                self.client.set_text(mapping["field_name"], "")
+    # =======================================================
+    # STOP PENALTY
+    # =======================================================
+    def stop_penalty(self, side, slot_id):
+        slot = self.slots.get(side, {}).get(slot_id)
+        if not slot:
+            return
 
-    def _update_time_to_vmix(self, team, i):
+        inp = slot.get("input")
+        if not inp:
+            return
+
+        log.info(f"[PENALTY] Stop {side}/{slot_id}")
+        self.vmix.stop_countdown(inp)
+
+    # =======================================================
+    # CLEAR PENALTY
+    # =======================================================
+    def clear_penalty(self, side, slot_id):
+        slot = self.slots.get(side, {}).get(slot_id)
+        if not slot:
+            return
+
+        inp = slot.get("input")
+        if not inp:
+            return
+
+        log.info(f"[PENALTY] Clear {side}/{slot_id}")
+        self.vmix.set_countdown(inp, "00:00")
+        self.vmix.stop_countdown(inp)
+
+        # HIDE FIELDS
+        for f in ["timebg", "numberbg", "number"]:
+            name = slot.get(f)
+            if name:
+                # Detect text vs image
+                if "Source" in name:
+                    self.vmix.set_image_visible(inp, name, False)
+                else:
+                    self.vmix.set_text_visible(inp, name, False)
+
+    # =======================================================
+    # GLOBAL SYNC
+    # =======================================================
+    def pause_all(self):
         """
-        Write countdown text to graphics
+        Called when scoreboard clock pauses.
+        If no clock provided → skip silently.
         """
-        slot = self.penalties[team][i]
-        mapping = self._mapping(team, i)
+        if not self.clock:
+            return
 
-        secs = max(0, int(slot["remaining"]))
-        mm = secs // 60
-        ss = secs % 60
-        txt = f"{mm:02}:{ss:02}"
+        for side in ["home", "away"]:
+            for slot_id, slot in self.slots.get(side, {}).items():
+                inp = slot.get("input")
+                if inp:
+                    self.vmix.stop_countdown(inp)
 
-        if mapping.get("field_time"):
-            self.client.set_text(mapping["field_time"], txt)
+    def resume_all(self):
+        """
+        Called when scoreboard clock resumes.
+        If no clock provided → skip silently.
+        """
+        if not self.clock:
+            return
 
-    # ----------------------------------------------------------------------
-    # GUI ACCESSOR
-    # ----------------------------------------------------------------------
+        for side in ["home", "away"]:
+            for slot_id, slot in self.slots.get(side, {}).items():
+                inp = slot.get("input")
+                if inp:
+                    self.vmix.start_countdown(inp)
 
+    # =======================================================
+    # GUI STATUS
+    # =======================================================
     def get_penalties(self):
         """
-        GUI calls this to refresh penalty display.
-        Returns dict with formatted strings.
+        GUI polling status:
+        - read remaining time for each slot
         """
-        display = {"home": [], "away": []}
+        result = {"home": {}, "away": {}}
 
-        for team in ["home", "away"]:
-            for slot in self.penalties[team]:
-                if slot["active"]:
-                    secs = max(0, int(slot["remaining"]))
-                    mm = secs // 60
-                    ss = secs % 60
-                    txt = f"{mm:02}:{ss:02}"
-                    display[team].append({
-                        "active": True,
-                        "time": txt,
-                        "number": slot["number"],
-                        "name": slot["name"],
-                    })
+        for side in ["home", "away"]:
+            for slot_id, slot in self.slots.get(side, {}).items():
+                inp = slot.get("input")
+                time_field = slot.get("time")
+
+                if not inp or not time_field:
+                    result[side][slot_id] = {"time": ""}
                 else:
-                    display[team].append({
-                        "active": False,
-                        "time": "",
-                        "number": "",
-                        "name": "",
-                    })
+                    txt = self.vmix.get_text(inp, time_field)
+                    result[side][slot_id] = {"time": txt}
 
-        return display
+        return result
